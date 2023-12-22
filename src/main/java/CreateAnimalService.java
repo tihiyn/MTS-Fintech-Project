@@ -4,7 +4,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public interface CreateAnimalService {
     // метод для создания животных при помощи цикла while
-    default public void createAnimals() {
+    default void createAnimals() {
         // счётчик
         int counter = 0;
         // массив пород (по 3 для каждого животного)

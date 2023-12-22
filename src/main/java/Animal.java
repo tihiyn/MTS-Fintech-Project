@@ -7,7 +7,7 @@ public interface Animal {
      * @Since: 1.0
      * @Author: Nikita
      */
-    public String getBreed();
+    String getBreed();
 
     /**
      * Метод, который возвращает имя животного
@@ -15,7 +15,7 @@ public interface Animal {
      * @Since: 1.0
      * @Author: Nikita
      */
-    public String getName();
+    String getName();
 
     /**
      * Метод, который возвращает цену животного в магазине.
@@ -24,7 +24,7 @@ public interface Animal {
      * @Since: 1.0
      * @Author: Nikita
      */
-    public BigDecimal getCost();
+    BigDecimal getCost();
 
     /**
      * Метод, который возвращает характер животного
@@ -32,7 +32,7 @@ public interface Animal {
      * @Since: 1.0
      * @Author: Nikita
      */
-    public String getCharacter();
+    String getCharacter();
 
     /**
      * Метод, который возвращает голос животного
@@ -40,5 +40,5 @@ public interface Animal {
      * @Since: 1.0
      * @Author: Nikita
      */
-    public String getVoice();
+    String getVoice();
 }
