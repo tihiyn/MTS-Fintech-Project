@@ -9,8 +9,6 @@ public abstract class AbstractAnimal implements Animal {
     protected BigDecimal cost;
     // характер животного
     protected String character;
-    // голос животного
-    protected String voice;
 
     // реализация геттеров
     @Override

@@ -35,7 +35,7 @@ public interface CreateAnimalService {
                 default -> null;
             };
             // логирование
-            System.out.println(counter + "-ое животное: " + animal.getClass().getName());
+            System.out.format("%d-ое животное: %s\n", counter, animal.getClass().getName());
             System.out.println("Порода: " + animal.getBreed());
             System.out.println("Кличка: " + animal.getName());
             System.out.println("Цена: " + animal.getCost());
