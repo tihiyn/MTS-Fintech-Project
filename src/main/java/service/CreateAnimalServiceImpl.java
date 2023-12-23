@@ -1,8 +1,14 @@
+package service;
+
+import service.CreateAnimalService;
+import dto.*;
+import model.*;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CreateAnimalServiceImpl implements CreateAnimalService{
+public class CreateAnimalServiceImpl implements CreateAnimalService {
     // переопределённый метод для создания животных при помощи цикла do-while
     @Override
     public void createAnimals() {
@@ -14,7 +20,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService{
         String[] names = new String[] {"Мурзик", "Васька", "Матроскин", "Жучка", "Дружок", "Бобик", "Аква", "Щарки", "Волна", "Клык", "Волчок", "Серый"};
         // массив характеров (по 3 для каждого животного)
         String[] characters = new String[] {"Добрый", "Злой", "Игривый", "Вредный", "Верный", "Пугливый"};
-        // переменная класса Animal
+        // переменная класса dto.Animal
         Animal animal;
 
         do {
@@ -57,7 +63,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService{
             String[] names = new String[] {"Мурзик", "Васька", "Матроскин", "Жучка", "Дружок", "Бобик", "Аква", "Щарки", "Волна", "Клык", "Волчок", "Серый"};
             // массив характеров (по 3 для каждого животного)
             String[] characters = new String[] {"Добрый", "Злой", "Игривый", "Вредный", "Верный", "Пугливый"};
-            // переменная класса Animal
+            // переменная класса dto.Animal
             Animal animal;
 
             // сгенерируем случайное число от 0 до 3, которое будет сопоставлено с одним из классов животных

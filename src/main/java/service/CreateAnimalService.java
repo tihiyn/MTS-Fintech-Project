@@ -1,3 +1,8 @@
+package service;
+
+import dto.*;
+import model.*;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.concurrent.ThreadLocalRandom;
@@ -13,7 +18,7 @@ public interface CreateAnimalService {
         String[] names = new String[] {"Мурзик", "Васька", "Матроскин", "Жучка", "Дружок", "Бобик", "Аква", "Щарки", "Волна", "Клык", "Волчок", "Серый"};
         // массив характеров (по 3 для каждого животного)
         String[] characters = new String[] {"Добрый", "Злой", "Игривый", "Вредный", "Верный", "Пугливый"};
-        // переменная класса Animal
+        // переменная класса dto.Animal
         Animal animal;
 
         while (counter++ < 10) {

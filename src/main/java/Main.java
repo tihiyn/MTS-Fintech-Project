@@ -1,3 +1,6 @@
+import service.CreateAnimalService;
+import service.CreateAnimalServiceImpl;
+
 public class Main {
     public static void main(String[] args) {
         // первый объект для создания животных

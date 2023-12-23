@@ -1,3 +1,7 @@
+package dto;
+
+import dto.Animal;
+
 import java.math.BigDecimal;
 
 public abstract class AbstractAnimal implements Animal {

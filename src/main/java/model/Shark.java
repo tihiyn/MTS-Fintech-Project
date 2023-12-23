@@ -1,10 +1,14 @@
+package model;
+
+import dto.*;
+
 import java.math.BigDecimal;
 
-public class Cat extends Pet {
-    // голос кошки
-    private static final String voice = "Мяу";
+public class Shark extends Predator {
+    // голос акулы
+    private static final String voice = "Буль";
 
-    public Cat(String breed, String name, BigDecimal cost, String character) {
+    public Shark(String breed, String name, BigDecimal cost, String character) {
         this.breed = breed;
         this.name = name;
         this.cost = cost;
