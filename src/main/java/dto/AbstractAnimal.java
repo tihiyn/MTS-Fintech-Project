@@ -14,6 +14,13 @@ public abstract class AbstractAnimal implements Animal {
     // характер животного
     protected String character;
 
+    public AbstractAnimal(String breed, String name, BigDecimal cost, String character) {
+        this.breed = breed;
+        this.name = name;
+        this.cost = cost;
+        this.character = character;
+    }
+
     // реализация геттеров
     @Override
     public String getBreed() {

@@ -1,6 +1,6 @@
 package model;
 
-import dto.*;
+import dto.Predator;
 
 import java.math.BigDecimal;
 
@@ -9,10 +9,7 @@ public class Wolf extends Predator {
     private static final String voice = "Аууууу";
 
     public Wolf(String breed, String name, BigDecimal cost, String character) {
-        this.breed = breed;
-        this.name = name;
-        this.cost = cost;
-        this.character = character;
+        super(breed, name, cost, character);
     }
 
     // релизация геттера getVoice()
