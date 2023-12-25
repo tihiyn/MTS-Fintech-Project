@@ -1,7 +1,5 @@
 package model;
 
-import dto.Predator;
-
 import java.math.BigDecimal;
 
 public class Shark extends Predator {

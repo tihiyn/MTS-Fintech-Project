@@ -1,6 +1,6 @@
-package dto;
+package model;
 
-import dto.Animal;
+import model.Animal;
 
 import java.math.BigDecimal;
 

@@ -1,7 +1,5 @@
 package model;
 
-import dto.*;
-
 import java.math.BigDecimal;
 
 public class Dog extends Pet {

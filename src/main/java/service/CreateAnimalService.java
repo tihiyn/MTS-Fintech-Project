@@ -1,6 +1,5 @@
 package service;
 
-import dto.*;
 import model.*;
 
 import java.math.BigDecimal;
@@ -18,7 +17,7 @@ public interface CreateAnimalService {
         String[] names = new String[] {"Мурзик", "Васька", "Матроскин", "Жучка", "Дружок", "Бобик", "Аква", "Щарки", "Волна", "Клык", "Волчок", "Серый"};
         // массив характеров (по 3 для каждого животного)
         String[] characters = new String[] {"Добрый", "Злой", "Игривый", "Вредный", "Верный", "Пугливый"};
-        // переменная класса dto.Animal
+        // переменная класса model.Animal
         Animal animal;
 
         while (counter++ < 10) {
