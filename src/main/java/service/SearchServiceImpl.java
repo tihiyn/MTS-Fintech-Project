@@ -38,6 +38,7 @@ public class SearchServiceImpl implements SearchService {
 
         for (Animal animal : inputArray) {
             age = LocalDate.now().getYear() - animal.getBirthDate().getYear();
+
             // корректировка возраста
             if (LocalDate.now().getDayOfYear() < animal.getBirthDate().getDayOfYear())
                 age -= 1;
@@ -86,14 +87,14 @@ public class SearchServiceImpl implements SearchService {
         // вывод дубликатов
         System.out.println("Дубликаты: ");
         for (int i = 0; i < counter; i++) {
-                System.out.format("%d-ый дубликат: %s\n", i + 1, duplicates[i].getClass().getName());
-                System.out.println("Порода: " + duplicates[i].getBreed());
-                System.out.println("Кличка: " + duplicates[i].getName());
-                System.out.println("Цена: " + duplicates[i].getCost());
-                System.out.println("Характер: " + duplicates[i].getCharacter());
-                System.out.println("Голос: " + duplicates[i].getVoice());
-                System.out.println("День рождения животного: " + duplicates[i].getBirthDate().format(formatter));
-                System.out.println();
+            System.out.format("%d-ый дубликат: %s\n", i + 1, duplicates[i].getClass().getName());
+            System.out.println("Порода: " + duplicates[i].getBreed());
+            System.out.println("Кличка: " + duplicates[i].getName());
+            System.out.println("Цена: " + duplicates[i].getCost());
+            System.out.println("Характер: " + duplicates[i].getCharacter());
+            System.out.println("Голос: " + duplicates[i].getVoice());
+            System.out.println("День рождения животного: " + duplicates[i].getBirthDate().format(formatter));
+            System.out.println();
         }
     }
 }
