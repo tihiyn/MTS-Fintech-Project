@@ -5,51 +5,56 @@ import java.time.LocalDate;
 
 public interface Animal {
     /**
-     * Метод, который возвращает породу животного
+     * Метод, который возвращает породу животного.
      *
-     * @Since: 1.0
-     * @Author: Nikita
+     * @return порода животного.
+     * @since 1.0
+     * @author Nikita
      */
     String getBreed();
 
     /**
-     * Метод, который возвращает имя животного
+     * Метод, который возвращает имя животного.
      *
-     * @Since: 1.0
-     * @Author: Nikita
+     * @return имя животного.
+     * @since 1.0
+     * @author Nikita
      */
     String getName();
 
     /**
      * Метод, который возвращает цену животного в магазине.
-     * Значение округляется до 2 знаков после запятой.
      *
-     * @Since: 1.0
-     * @Author: Nikita
+     * @return цена животного в магазине.
+     * @since 1.0
+     * @author Nikita
      */
     BigDecimal getCost();
 
     /**
-     * Метод, который возвращает характер животного
+     * Метод, который возвращает характер животного.
      *
-     * @Since: 1.0
-     * @Author: Nikita
+     * @return характер животного.
+     * @since 1.0
+     * @author Nikita
      */
     String getCharacter();
 
     /**
-     * Метод, который возвращает голос животного
+     * Метод, который возвращает голос животного.
      *
-     * @Since: 1.0
-     * @Author: Nikita
+     * @return голос животного.
+     * @since 1.0
+     * @author Nikita
      */
     String getVoice();
 
     /**
-     * Метод, который возвращает день рождения животного
+     * Метод, который возвращает дату рождения животного.
      *
-     * @Since 1.1
-     * @Author Nikita
+     * @return дата рождения животного.
+     * @since 1.0
+     * @author Nikita
      */
     LocalDate getBirthDate();
 }

@@ -17,10 +17,11 @@ public interface CreateAnimalService {
     String[] characters = new String[]{"Добрый", "Злой", "Игривый", "Вредный", "Верный", "Пугливый"};
 
     /**
-     * Метод, который генерирует случайную дату
+     * Метод, который генерирует случайную дату.
      *
-     * @Since: 1.1
-     * @Author: Nikita
+     * @return случайная дата.
+     * @since 1.1
+     * @author Nikita
      */
     default LocalDate createRandomDate() {
         // случайный год
@@ -36,10 +37,11 @@ public interface CreateAnimalService {
     }
 
     /**
-     * Метод, отвечающий непосредственно за создание животного
+     * Метод, отвечающий непосредственно за создание животного.
      *
-     * @Since: 1.1
-     * @Author: Nikita
+     * @return объект животного.
+     * @since 1.1
+     * @author Nikita
      */
     default Animal commonCreating(int counter) {
         // переменная класса model.Animal
@@ -77,10 +79,11 @@ public interface CreateAnimalService {
     }
 
     /**
-     * Метод для создания животных при помощи цикла while
+     * Метод для создания животных при помощи цикла while.
      *
-     * @Since: 1.1
-     * @Author: Nikita
+     * @return массив животных.
+     * @since 1.1
+     * @author Nikita
      */
     default Animal[] createAnimals() {
         // счётчик

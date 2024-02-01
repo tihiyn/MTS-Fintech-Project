@@ -52,10 +52,34 @@ public class SearchServiceImpl implements SearchService {
         return Arrays.copyOf(outputArray, counter);
     }
 
-    @Override
-    public void findDuplicate(Animal[] inputArray) {
+    /**
+     * Метод выводит на экран массив дубликатов животных.
+     * Метод может быть вызван только из метода findDuplicate().
+     *
+     * @param duplicates массив дубликатов
+     * @param counter количество дубликатов
+     * @since 1.2
+     * @author Nikita
+     */
+    private void printDuplicate(Animal[] duplicates, int counter) {
         // формат даты
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+        System.out.println("Дубликаты: ");
+        for (int i = 0; i < counter; i++) {
+            System.out.format("%d-ый дубликат: %s\n", i + 1, duplicates[i].getClass().getName());
+            System.out.println("Порода: " + duplicates[i].getBreed());
+            System.out.println("Кличка: " + duplicates[i].getName());
+            System.out.println("Цена: " + duplicates[i].getCost());
+            System.out.println("Характер: " + duplicates[i].getCharacter());
+            System.out.println("Голос: " + duplicates[i].getVoice());
+            System.out.println("День рождения животного: " + duplicates[i].getBirthDate().format(formatter));
+            System.out.println();
+        }
+    }
+
+    @Override
+    public Animal[] findDuplicate(Animal[] inputArray) {
         // массив дубликатов животных
         Animal[] duplicates = new Animal[inputArray.length];
         // флаг
@@ -85,16 +109,12 @@ public class SearchServiceImpl implements SearchService {
         }
 
         // вывод дубликатов
-        System.out.println("Дубликаты: ");
-        for (int i = 0; i < counter; i++) {
-            System.out.format("%d-ый дубликат: %s\n", i + 1, duplicates[i].getClass().getName());
-            System.out.println("Порода: " + duplicates[i].getBreed());
-            System.out.println("Кличка: " + duplicates[i].getName());
-            System.out.println("Цена: " + duplicates[i].getCost());
-            System.out.println("Характер: " + duplicates[i].getCharacter());
-            System.out.println("Голос: " + duplicates[i].getVoice());
-            System.out.println("День рождения животного: " + duplicates[i].getBirthDate().format(formatter));
-            System.out.println();
-        }
+        printDuplicate(duplicates, counter);
+
+        // "обрезка" массива дубликатов, чтобы отсутствовали лишние null-значения в конце
+        Animal[] trimDupl = new Animal[counter];
+        System.arraycopy(duplicates, 0, trimDupl, 0, counter);
+
+        return trimDupl;
     }
 }
