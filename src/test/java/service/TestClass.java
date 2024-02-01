@@ -7,15 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.lang.reflect.AnnotatedArrayType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @DisplayName("Outer class")
@@ -40,6 +38,14 @@ class TestClass {
             assertEquals(cat1, stillCat1);
             assertEquals(sameCat1, stillCat1);
             assertEquals(cat1, cat1);
+            assertNotEquals(anotherDog, null);
+
+            stillCat1 = null;
+            assertEquals(stillCat1, stillCat1);
+            assertEquals(stillCat1, null);
+            assertNotEquals(stillCat1, sameCat1);
+            sameCat1 = null;
+            assertEquals(stillCat1, sameCat1);
         }
     }
 
@@ -65,7 +71,16 @@ class TestClass {
             // массив имён животных, которые родились в високосном году
             String[] outputArray = {dog.getName(), anotherCat.getName()};
 
+            // корректный случай
             assertArrayEquals(outputArray, searchObject.findLeapYearNames(inputArray));
+            // случай, когда в исходном массиве нет животных, родившихся в високосный год
+            assertArrayEquals(new Animal[0], searchObject.findLeapYearNames(new Animal[] {shark, anotherDog, wolf}));
+            // случай, когда передаётся пустой массив животных
+            assertArrayEquals(new Animal[0], searchObject.findLeapYearNames(new Animal[0]));
+            // случай, когда передаётся массив, содержащий null-значение
+            assertThrows(NullPointerException.class, () -> {
+                searchObject.findLeapYearNames(new Animal[] {cat, dog, null});
+            });
         }
 
         /**
@@ -89,7 +104,7 @@ class TestClass {
 
         @DisplayName("Test method findOlderAnimal")
         @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
-        @ValueSource(ints = {9, 5, 1})
+        @ValueSource(ints = {9, 5, 1, 40})
         public void findOlderAnimal(int value) {
             // создание объекта для поиска
             SearchService searchObject = new SearchServiceImpl();
@@ -109,10 +124,18 @@ class TestClass {
             Animal[][] outputArrays = {
                     {cat, dog, shark},
                     {cat, dog, wolf, shark, anotherDog},
-                    {cat, dog, wolf, shark, anotherCat, anotherDog}
+                    {cat, dog, wolf, shark, anotherCat, anotherDog},
+                    {}
             };
 
+            // корректный случай
             assertTrue(containsArray(outputArrays, searchObject.findOlderAnimal(inputArray, value)));
+            // случай, когда передаётся пустой массив
+            assertTrue(containsArray(outputArrays, searchObject.findOlderAnimal(new Animal[] {}, value)));
+            // случай, когда передаётся массив, содержащий null-значения
+            assertThrows(NullPointerException.class, () -> {
+                containsArray(outputArrays, searchObject.findOlderAnimal(new Animal[] {cat, null}, value));
+            });
         }
 
         @Test
@@ -131,7 +154,16 @@ class TestClass {
             // массив дубликатов
             Animal[] outputArray = {cat, dog};
 
+            // корректный случай
             assertArrayEquals(outputArray, searchObject.findDuplicate(inputArray));
+            // случай, когда дубликатов нет
+            assertArrayEquals(new Animal[0], searchObject.findDuplicate(new Animal[] {cat, dog}));
+            // случай, когда передаётся пустой массив животных
+            assertArrayEquals(new Animal[0], searchObject.findLeapYearNames(new Animal[0]));
+            // случай, когда передаётся массив, содержащий null-значение
+            assertThrows(NullPointerException.class, () -> {
+                searchObject.findLeapYearNames(new Animal[] {cat, dog, null});
+            });
         }
     }
 }
