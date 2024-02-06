@@ -1,6 +1,6 @@
-package service;
+package ru.mts.service;
 
-import model.*;
+import ru.mts.model.*;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -44,7 +44,7 @@ public interface CreateAnimalService {
      * @author Nikita
      */
     default Animal commonCreating(int counter) {
-        // переменная класса model.Animal
+        // переменная класса ru.mts.model.Animal
         Animal animal;
         // формат даты
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");

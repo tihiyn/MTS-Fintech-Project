@@ -1,13 +1,13 @@
-package model;
+package ru.mts.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class Shark extends Predator {
-    // голос акулы
-    private static final String voice = "Буль";
+public class Cat extends Pet {
+    // голос кошки
+    private static final String voice = "Мяу";
 
-    public Shark(String breed, String name, BigDecimal cost, String character, LocalDate birthDate) {
+    public Cat(String breed, String name, BigDecimal cost, String character, LocalDate birthDate) {
         super(breed, name, cost, character, birthDate);
     }
 

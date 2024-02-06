@@ -1,13 +1,12 @@
-package service;
+package ru.mts.service;
 
-import model.*;
+import ru.mts.model.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.lang.reflect.AnnotatedArrayType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;

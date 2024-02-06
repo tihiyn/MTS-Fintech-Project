@@ -1,6 +1,6 @@
-package service;
+package ru.mts.service;
 
-import model.Animal;
+import ru.mts.model.Animal;
 
 public interface SearchService {
     /**
