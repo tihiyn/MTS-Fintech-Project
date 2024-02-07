@@ -2,6 +2,7 @@ package ru.mts.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalEnum;
 import ru.mts.service.CreateAnimalServiceImpl;
@@ -13,14 +14,13 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@Component
+@Repository
 public class AnimalsRepositoryImpl implements AnimalsRepository {
     // "хранилище" животных
-    public Animal[] animalsArray;
+    private Animal[] animalsArray;
     // объект для внедрения зависимостей
-    public CreateAnimalServiceImpl createAnimalService;
+    private CreateAnimalServiceImpl createAnimalService;
 
-    @Autowired
     public AnimalsRepositoryImpl(CreateAnimalServiceImpl createAnimalService) {
         this.createAnimalService = createAnimalService;
     }
@@ -33,11 +33,12 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
      */
     @PostConstruct
     public void fillStorage() {
-        animalsArray = createAnimalService.animalsArray;
+        // инициализация "хранилища" животных
+        animalsArray = createAnimalService.getAnimalsArray();
 
         // логгирование списка типов животных
         System.out.println("Типы животных:");
-        for (AnimalEnum type : createAnimalService.animalType) {
+        for (AnimalEnum type : createAnimalService.getAnimalType()) {
             System.out.println(type);
         }
         System.out.println();

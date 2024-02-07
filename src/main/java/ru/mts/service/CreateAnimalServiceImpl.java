@@ -11,26 +11,46 @@ import java.util.List;
 @Scope("prototype")
 public class CreateAnimalServiceImpl implements CreateAnimalService {
     // список типов созданных животных
-    public List<AnimalEnum> animalType = new ArrayList<>();
+    private List<AnimalEnum> animalType;
     // список животных
-    public Animal[] animalsArray;
+    private Animal[] animalsArray;
+
+    public List<AnimalEnum> getAnimalType() {
+        return animalType;
+    }
+
+    public Animal[] getAnimalsArray() {
+        return animalsArray;
+    }
 
     /**
-     * Метод для определения типов животных
+     * Метод для определения типов животных. Внутри вызвается метод для создания животных
      *
      * @Since: 1.3
      * @Author: Nikita
      */
     public void defineTypeOfAnimals() {
+        // вызов метода для создания животных
+        createAnimals();
+
+        // инициализация списка типов животных
+        animalType = new ArrayList<>(10);
         for (Animal animal : animalsArray) {
-            if (animal.getClass() == Cat.class) {
-                animalType.add(AnimalEnum.CAT);
-            } else if (animal.getClass() == Dog.class) {
-                animalType.add(AnimalEnum.DOG);
-            } else if (animal.getClass() == Wolf.class) {
-                animalType.add(AnimalEnum.WOLF);
-            } else if (animal.getClass() == Shark.class) {
-                animalType.add(AnimalEnum.SHARK);
+            switch (animal.getClass().toString()) {
+                case "class ru.mts.model.Cat":
+                    animalType.add(AnimalEnum.CAT);
+                    break;
+                case "class ru.mts.model.Dog":
+                    animalType.add(AnimalEnum.DOG);
+                    break;
+                case "class ru.mts.model.Wolf":
+                    animalType.add(AnimalEnum.WOLF);
+                    break;
+                case "class ru.mts.model.Shark":
+                    animalType.add(AnimalEnum.SHARK);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + animal.getClass().toString());
             }
         }
     }
