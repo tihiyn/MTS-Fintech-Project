@@ -121,7 +121,7 @@ class TestClass {
 
             // двумерный массив имён животных, возраст которых больше value
             Animal[][] outputArrays = {
-                    {cat, dog, shark},
+                    {cat, dog, wolf, shark},
                     {cat, dog, wolf, shark, anotherDog},
                     {cat, dog, wolf, shark, anotherCat, anotherDog},
                     {}

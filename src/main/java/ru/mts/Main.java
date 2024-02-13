@@ -1,34 +1,43 @@
 package ru.mts;
 
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+//import ru.mts.model.Animal;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import ru.mts.model.Animal;
 import ru.mts.repository.AnimalsRepositoryImpl;
 
+@SpringBootApplication
+@EnableScheduling
 public class Main {
     public static void main(String[] args) {
-        // инициализация контекста
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-                ApplicationContext.class
-        );
+        SpringApplication.run(Main.class, args);
 
-        // создание бина animalsRepositoryImpl
-        AnimalsRepositoryImpl animalsRepository = context.getBean("animalsRepositoryImpl", AnimalsRepositoryImpl.class);
-
-        System.out.println("Имена животных, которые родились в високосный год: ");
-        for (String animal : animalsRepository.findLeapYearNames()) {
-            System.out.println(animal);
-        }
-        System.out.println();
-
-        int N = 25;
-        System.out.format("Имена животных, которым больше %d лет: \n", N);
-        for (Animal animal : animalsRepository.findOlderAnimal(N)) {
-            System.out.println(animal.getName());
-        }
-        System.out.println();
-
-        // вызов метода для поиска дубликатов
-        animalsRepository.findDuplicate();
+//        // инициализация контекста
+//        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+//                ApplicationContext.class
+//        );
+//
+//        // создание бина animalsRepositoryImpl
+//        AnimalsRepositoryImpl animalsRepository = context.getBean("animalsRepositoryImpl", AnimalsRepositoryImpl.class);
+//
+//        System.out.println("Имена животных, которые родились в високосный год: ");
+//        for (String animal : animalsRepository.findLeapYearNames()) {
+//            System.out.println(animal);
+//        }
+//        System.out.println();
+//
+//        int N = 25;
+//        System.out.format("Имена животных, которым больше %d лет: \n", N);
+//        for (Animal animal : animalsRepository.findOlderAnimal(N)) {
+//            System.out.println(animal.getName());
+//        }
+//        System.out.println();
+//
+//        // вызов метода для поиска дубликатов
+//        animalsRepository.findDuplicate();
 
 
         // первый объект для создания животных

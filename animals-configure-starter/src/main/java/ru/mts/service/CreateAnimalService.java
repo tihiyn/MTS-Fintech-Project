@@ -1,5 +1,11 @@
 package ru.mts.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.stereotype.Component;
+import ru.mts.AnimalsProperties;
 import ru.mts.model.*;
 
 import java.math.BigDecimal;
@@ -8,11 +14,20 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ThreadLocalRandom;
 
+@EnableConfigurationProperties(AnimalsProperties.class)
 public interface CreateAnimalService {
     // массив пород (по 3 для каждого животного)
     String[] breeds = new String[]{"Британская", "Шотландская", "Сфинкс", "Немецкая овчарка", "Доберман", "Лабрадор", "Тигровая", "Белая", "Молот", "Полярный", "Ньюфаундлендский", "Японский"};
     // массив имён (по 3 для каждого животного)
     String[] names = new String[]{"Мурзик", "Васька", "Матроскин", "Жучка", "Дружок", "Бобик", "Аква", "Шарки", "Волна", "Клык", "Волчок", "Серый"};
+//    @Value("${application.animal.cat.names}")
+//    String[] catNames;
+//    @Value("${application.animal.dog.names}")
+//    String[] dogNames;
+//    @Value("${application.animal.shark.names}")
+//    String[] sharkNames;
+//    @Value("${application.animal.wolf.names}")
+//    String[] wolfNames;
     // массив характеров (по 3 для каждого животного)
     String[] characters = new String[]{"Добрый", "Злой", "Игривый", "Вредный", "Верный", "Пугливый"};
 

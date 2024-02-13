@@ -1,13 +1,13 @@
 package ru.mts.repository;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Repository;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalEnum;
+
+import jakarta.annotation.PostConstruct;
 import ru.mts.service.CreateAnimalServiceImpl;
 
-import javax.annotation.PostConstruct;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;

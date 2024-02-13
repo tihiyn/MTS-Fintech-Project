@@ -1,0 +1,18 @@
+application:
+  animal:
+    catNames:
+      - Мурзик
+      - Васька
+      - Матроскин
+    dogNames:
+      - Жучка
+      - Дружок
+      - Бобик
+    sharkNames:
+      - Аква
+      - Шарки
+      - Волна
+    wolfNames:
+      - Клык
+      - Волчок
+      - Серый
