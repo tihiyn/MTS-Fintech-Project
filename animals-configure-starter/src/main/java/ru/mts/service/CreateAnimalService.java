@@ -1,12 +1,10 @@
 package ru.mts.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Component;
-import ru.mts.AnimalsProperties;
-import ru.mts.model.*;
+import ru.mts.model.Animal;
+import ru.mts.model.Cat;
+import ru.mts.model.Dog;
+import ru.mts.model.Shark;
+import ru.mts.model.Wolf;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -14,13 +12,12 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ThreadLocalRandom;
 
-@EnableConfigurationProperties(AnimalsProperties.class)
 public interface CreateAnimalService {
     // массив пород (по 3 для каждого животного)
     String[] breeds = new String[]{"Британская", "Шотландская", "Сфинкс", "Немецкая овчарка", "Доберман", "Лабрадор", "Тигровая", "Белая", "Молот", "Полярный", "Ньюфаундлендский", "Японский"};
     // массив имён (по 3 для каждого животного)
     String[] names = new String[]{"Мурзик", "Васька", "Матроскин", "Жучка", "Дружок", "Бобик", "Аква", "Шарки", "Волна", "Клык", "Волчок", "Серый"};
-//    @Value("${application.animal.cat.names}")
+    //    @Value("${application.animal.cat.names}")
 //    String[] catNames;
 //    @Value("${application.animal.dog.names}")
 //    String[] dogNames;
@@ -35,8 +32,8 @@ public interface CreateAnimalService {
      * Метод, который генерирует случайную дату.
      *
      * @return случайная дата.
-     * @since 1.1
      * @author Nikita
+     * @since 1.1
      */
     default LocalDate createRandomDate() {
         // случайный год
@@ -55,8 +52,8 @@ public interface CreateAnimalService {
      * Метод, отвечающий непосредственно за создание животного.
      *
      * @return объект животного.
-     * @since 1.1
      * @author Nikita
+     * @since 1.1
      */
     default Animal commonCreating(int counter) {
         // переменная класса ru.mts.model.Animal
@@ -97,8 +94,8 @@ public interface CreateAnimalService {
      * Метод для создания животных при помощи цикла while.
      *
      * @return массив животных.
-     * @since 1.1
      * @author Nikita
+     * @since 1.1
      */
     default Animal[] createAnimals() {
         // счётчик

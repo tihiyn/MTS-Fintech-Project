@@ -1,13 +1,11 @@
 package ru.mts.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import ru.mts.AnimalsProperties;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalEnum;
+import ru.mts.properties.AnimalProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +25,10 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     public Animal[] getAnimalsArray() {
         return animalsArray;
     }
+
+    @Autowired
+    private AnimalProperties animalProperties;
+
 
     /**
      * Метод для определения типов животных. Внутри вызвается метод для создания животных
