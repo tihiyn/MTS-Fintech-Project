@@ -2,18 +2,13 @@ package ru.mts;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-//import ru.mts.model.Animal;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import ru.mts.model.Animal;
-import ru.mts.repository.AnimalsRepositoryImpl;
 
 @SpringBootApplication
 @EnableScheduling
-public class Main {
+public class Application {
     public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
+        SpringApplication.run(Application.class, args);
 
 //        // инициализация контекста
 //        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(

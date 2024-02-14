@@ -1,13 +1,21 @@
 package ru.mts;
 
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties(prefix = "application.animals")
+@Component
+@ConfigurationProperties(prefix = "animal")
+@Validated
 public class AnimalsProperties {
+    @NotEmpty
     private String[] catNames;
+    @NotEmpty
     private String[] dogNames;
+    @NotEmpty
     private String[] sharkNames;
+    @NotEmpty
     private String[] wolfNames;
 
     public String[] getCatNames() {
