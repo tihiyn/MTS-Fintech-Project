@@ -3,11 +3,12 @@ package ru.mts;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ru.mts.model.Animal;
+import ru.mts.repository.AnimalsRepository;
 import ru.mts.repository.AnimalsRepositoryImpl;
 
 @Component
 public class Scheduler {
-    public AnimalsRepositoryImpl animalsRepository;
+    private AnimalsRepository animalsRepository;
 
     public Scheduler(AnimalsRepositoryImpl animalsRepository) {
         this.animalsRepository = animalsRepository;

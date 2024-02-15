@@ -78,13 +78,13 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         // создание животного
         animal = switch (numOfClass) {
             case 0 ->
-                    new Cat(breeds[ThreadLocalRandom.current().nextInt(3)], animalsProperties.getCatNames()[ThreadLocalRandom.current().nextInt(3)], randCost, characters[ThreadLocalRandom.current().nextInt(6)], createRandomDate());
+                    new Cat(breeds[ThreadLocalRandom.current().nextInt(3)], animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters[ThreadLocalRandom.current().nextInt(6)], createRandomDate());
             case 1 ->
-                    new Dog(breeds[ThreadLocalRandom.current().nextInt(3, 6)], animalsProperties.getDogNames()[ThreadLocalRandom.current().nextInt(3)], randCost, characters[ThreadLocalRandom.current().nextInt(6)], createRandomDate());
+                    new Dog(breeds[ThreadLocalRandom.current().nextInt(3, 6)], animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters[ThreadLocalRandom.current().nextInt(6)], createRandomDate());
             case 2 ->
-                    new Shark(breeds[ThreadLocalRandom.current().nextInt(6, 9)], animalsProperties.getSharkNames()[ThreadLocalRandom.current().nextInt(3)], randCost, characters[ThreadLocalRandom.current().nextInt(6)], createRandomDate());
+                    new Shark(breeds[ThreadLocalRandom.current().nextInt(6, 9)], animalsProperties.getSharkNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters[ThreadLocalRandom.current().nextInt(6)], createRandomDate());
             case 3 ->
-                    new Wolf(breeds[ThreadLocalRandom.current().nextInt(9, 12)], animalsProperties.getWolfNames()[ThreadLocalRandom.current().nextInt(3)], randCost, characters[ThreadLocalRandom.current().nextInt(6)], createRandomDate());
+                    new Wolf(breeds[ThreadLocalRandom.current().nextInt(9, 12)], animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters[ThreadLocalRandom.current().nextInt(6)], createRandomDate());
             default -> null;
         };
         // логирование

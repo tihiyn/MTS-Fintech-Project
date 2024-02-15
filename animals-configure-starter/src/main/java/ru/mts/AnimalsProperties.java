@@ -5,48 +5,50 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.List;
+
 @Component
 @ConfigurationProperties(prefix = "animal")
 @Validated
 public class AnimalsProperties {
     @NotEmpty
-    private String[] catNames;
+    private List<String> catNames;
     @NotEmpty
-    private String[] dogNames;
+    private List<String> dogNames;
     @NotEmpty
-    private String[] sharkNames;
+    private List<String> sharkNames;
     @NotEmpty
-    private String[] wolfNames;
+    private List<String> wolfNames;
 
-    public String[] getCatNames() {
+    public List<String> getCatNames() {
         return catNames;
     }
 
-    public void setCatNames(String[] catNames) {
+    public void setCatNames(List<String> catNames) {
         this.catNames = catNames;
     }
 
-    public String[] getDogNames() {
+    public List<String> getDogNames() {
         return dogNames;
     }
 
-    public void setDogNames(String[] dogNames) {
+    public void setDogNames(List<String> dogNames) {
         this.dogNames = dogNames;
     }
 
-    public String[] getSharkNames() {
+    public List<String> getSharkNames() {
         return sharkNames;
     }
 
-    public void setSharkNames(String[] sharkNames) {
+    public void setSharkNames(List<String> sharkNames) {
         this.sharkNames = sharkNames;
     }
 
-    public String[] getWolfNames() {
+    public List<String> getWolfNames() {
         return wolfNames;
     }
 
-    public void setWolfNames(String[] wolfNames) {
+    public void setWolfNames(List<String> wolfNames) {
         this.wolfNames = wolfNames;
     }
 }
