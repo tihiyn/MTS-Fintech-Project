@@ -1,6 +1,7 @@
 package ru.mts.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,12 +24,12 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     // список животных
     private Animal[] animalsArray;
 
-    @Autowired
+//    @Autowired
     private AnimalsProperties animalsProperties;
 
-//    public CreateAnimalServiceImpl(AnimalsProperties animalsProperties) {
-//        this.animalsProperties = animalsProperties;
-//    }
+    public CreateAnimalServiceImpl(AnimalsProperties animalsProperties) {
+        this.animalsProperties = animalsProperties;
+    }
 
     public List<AnimalEnum> getAnimalType() {
         return animalType;
