@@ -1,11 +1,9 @@
 package ru.mts.repository;
 
-import org.springframework.scheduling.annotation.Scheduled;
+import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalEnum;
-
-import jakarta.annotation.PostConstruct;
 import ru.mts.service.CreateAnimalServiceImpl;
 
 import java.time.LocalDate;
@@ -25,6 +23,10 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         this.createAnimalService = createAnimalService;
     }
 
+    public Animal[] getAnimalsArray() {
+        return animalsArray;
+    }
+
     /**
      * PostConstruct-метод для наполнения "хранилища"
      *
@@ -37,7 +39,6 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         animalsArray = createAnimalService.getAnimalsArray();
 
         // логгирование списка типов животных
-        System.out.println("Типы животных:");
         for (AnimalEnum type : createAnimalService.getAnimalType()) {
             System.out.println(type);
         }

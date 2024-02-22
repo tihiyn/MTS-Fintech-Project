@@ -1,7 +1,5 @@
 package ru.mts.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -12,6 +10,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -24,7 +23,6 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     // список животных
     private Animal[] animalsArray;
 
-//    @Autowired
     private AnimalsProperties animalsProperties;
 
     public CreateAnimalServiceImpl(AnimalsProperties animalsProperties) {
@@ -109,10 +107,12 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
      */
     public void defineTypeOfAnimals() {
         // вызов метода для создания животных
-        createAnimals();
+        animalsArray = createAnimals(10);
+
+        System.out.println("define type");
 
         // инициализация списка типов животных
-        animalType = new ArrayList<>(10);
+        animalType = new ArrayList<>(animalsArray.length);
         for (Animal animal : animalsArray) {
             switch (animal.getClass().toString()) {
                 case "class ru.mts.model.Cat":
@@ -139,17 +139,17 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
      * @Since: 1.1
      * @Author: Nikita
      */
-    public void createAnimals() {
-        // счётчик
-        int counter = 1;
-        // инициализация массива животных
-        animalsArray = new Animal[10];
-
-        do {
-            animalsArray[counter - 1] = commonCreating(counter);
-        }
-        while (counter++ < 10);
-    }
+//    public void createAnimals() {
+//        // счётчик
+//        int counter = 1;
+//        // инициализация массива животных
+//        animalsArray = new Animal[10];
+//
+//        do {
+//            animalsArray[counter - 1] = commonCreating(counter);
+//        }
+//        while (counter++ < 10);
+//    }
 
 
     /**
@@ -161,11 +161,11 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
      */
     public Animal[] createAnimals(int N) {
         // массив животных
-        Animal[] animalsArray = new Animal[N];
+        animalsArray = new Animal[N];
         for (int i = 0; i < N; i++) {
             animalsArray[i] = commonCreating(i + 1);
         }
-
-        return animalsArray;
+        Animal[] returnArray = Arrays.copyOf(animalsArray, animalsArray.length);
+        return returnArray;
     }
 }
