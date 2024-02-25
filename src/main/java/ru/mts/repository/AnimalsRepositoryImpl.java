@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalEnum;
+import ru.mts.service.CreateAnimalService;
 import ru.mts.service.CreateAnimalServiceImpl;
 
 import java.time.LocalDate;
@@ -17,12 +18,13 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     // "хранилище" животных
     private Animal[] animalsArray;
     // объект для внедрения зависимостей
-    private CreateAnimalServiceImpl createAnimalService;
+    private CreateAnimalService createAnimalService;
 
-    public AnimalsRepositoryImpl(CreateAnimalServiceImpl createAnimalService) {
+    public AnimalsRepositoryImpl(CreateAnimalService createAnimalService) {
         this.createAnimalService = createAnimalService;
     }
 
+    @Override
     public Animal[] getAnimalsArray() {
         return animalsArray;
     }
@@ -31,15 +33,16 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
      * PostConstruct-метод для наполнения "хранилища"
      *
      * @author Nikita
-     * @since 1.1
+     * @since 1.4
      */
     @PostConstruct
+    @Override
     public void fillStorage() {
         // инициализация "хранилища" животных
-        animalsArray = createAnimalService.getAnimalsArray();
+        animalsArray = createAnimalService.receiveAnimalsArray();
 
         // логгирование списка типов животных
-        for (AnimalEnum type : createAnimalService.getAnimalType()) {
+        for (AnimalEnum type : createAnimalService.receiveAnimalType()) {
             System.out.println(type);
         }
         System.out.println();

@@ -7,12 +7,10 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import ru.mts.AnimalsProperties;
 import ru.mts.model.*;
-import ru.mts.repository.AnimalsRepositoryImpl;
+import ru.mts.repository.AnimalsRepository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -29,8 +27,9 @@ import static org.mockito.Mockito.when;
 public class SpringBootApplicationTestClass {
     Animal cat, dog, wolf, shark, anotherCat, anotherDog, sameCat;
     @MockBean
-    private CreateAnimalServiceImpl createAnimalService;
-    private AnimalsRepositoryImpl animalsRepository;
+    private CreateAnimalService createAnimalService;
+    @Autowired
+    private AnimalsRepository animalsRepository;
     @Autowired
     private AnimalsProperties animalsProperties;
 
@@ -44,9 +43,13 @@ public class SpringBootApplicationTestClass {
         return false;
     }
 
-    @BeforeEach
-    public void init() {
-        // создание животных
+    /**
+     * Метод для инициализации животных
+     *
+     * @author Nikita
+     * @since 1.4
+     */
+    private void initAnimals() {
         cat = new Cat("Британская", animalsProperties.getCatNames().get(1), BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Добрый", LocalDate.now().minusYears(10).minusDays(1));
         dog = new Dog("Доберман", animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(25000).setScale(2, RoundingMode.HALF_UP), "Злой", LocalDate.now().minusYears(10));
         wolf = new Wolf("Японский", animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(500000).setScale(2, RoundingMode.HALF_UP), "Игривый", LocalDate.now().minusYears(10).plusDays(1));
@@ -60,6 +63,7 @@ public class SpringBootApplicationTestClass {
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3, 4})
     public void findLeapYearNames(int value) {
+        initAnimals();
         // массив животных, который якобы заполнил CreateAnimalServcieImpl
         Animal[] inputArray;
         // список типов животных, который якобы заполнил CreateAnimalServcieImpl
@@ -103,10 +107,9 @@ public class SpringBootApplicationTestClass {
         }
 
         // задание поведения для MockBean
-        when(createAnimalService.getAnimalsArray()).thenReturn(inputArray);
-        when(createAnimalService.getAnimalType()).thenReturn(types);
+        when(createAnimalService.receiveAnimalsArray()).thenReturn(inputArray);
+        when(createAnimalService.receiveAnimalType()).thenReturn(types);
 
-        animalsRepository = new AnimalsRepositoryImpl(createAnimalService);
         if (value == 4) {
             assertThrows(NullPointerException.class, () -> {
                 animalsRepository.fillStorage();
@@ -127,6 +130,7 @@ public class SpringBootApplicationTestClass {
     @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
     @ValueSource(ints = {10, 9, 15, 50, 1, 35, 24, 12, 18})
     public void findOlderAnimal(int value) {
+        initAnimals();
         // массив животных, который якобы заполнил CreateAnimalServcieImpl
         Animal[] inputArray = new Animal[]{cat, dog, wolf, shark, anotherCat, anotherDog, sameCat};
         // список типов животных, который якобы заполнил CreateAnimalServcieImpl
@@ -144,27 +148,26 @@ public class SpringBootApplicationTestClass {
         switch (value) {
             case 24:
                 // задаём поведение для MockBean, если массив животных пустой
-                when(createAnimalService.getAnimalsArray()).thenReturn(new Animal[0]);
-                when(createAnimalService.getAnimalType()).thenReturn(new ArrayList<>());
+                when(createAnimalService.receiveAnimalsArray()).thenReturn(new Animal[0]);
+                when(createAnimalService.receiveAnimalType()).thenReturn(new ArrayList<>());
                 break;
             case 12:
                 // задаём поведение для MockBean, если массив животных содержит null-значения
-                when(createAnimalService.getAnimalsArray()).thenReturn(new Animal[]{cat, dog, null});
-                when(createAnimalService.getAnimalType()).thenReturn(List.of(AnimalEnum.CAT, AnimalEnum.DOG));
+                when(createAnimalService.receiveAnimalsArray()).thenReturn(new Animal[]{cat, dog, null});
+                when(createAnimalService.receiveAnimalType()).thenReturn(List.of(AnimalEnum.CAT, AnimalEnum.DOG));
                 break;
             case 18:
                 // задаём поведение для MockBean, если массив животных равен null
-                when(createAnimalService.getAnimalsArray()).thenReturn(null);
-                when(createAnimalService.getAnimalType()).thenReturn(null);
+                when(createAnimalService.receiveAnimalsArray()).thenReturn(null);
+                when(createAnimalService.receiveAnimalType()).thenReturn(null);
                 break;
             default:
                 // задаём поведение для корректного случая
-                when(createAnimalService.getAnimalsArray()).thenReturn(inputArray);
-                when(createAnimalService.getAnimalType()).thenReturn(types);
+                when(createAnimalService.receiveAnimalsArray()).thenReturn(inputArray);
+                when(createAnimalService.receiveAnimalType()).thenReturn(types);
                 break;
         }
 
-        animalsRepository = new AnimalsRepositoryImpl(createAnimalService);
         if (value == 18) {
             assertThrows(NullPointerException.class, () -> {
                 animalsRepository.fillStorage();
@@ -185,6 +188,7 @@ public class SpringBootApplicationTestClass {
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3, 4})
     public void findDuplicate(int value) {
+        initAnimals();
         // массив животных, который якобы заполнил CreateAnimalServcieImpl
         Animal[] inputArray;
         // список типов животных, который якобы заполнил CreateAnimalServcieImpl
@@ -228,10 +232,9 @@ public class SpringBootApplicationTestClass {
         }
 
         // задание поведения для MockBean
-        when(createAnimalService.getAnimalsArray()).thenReturn(inputArray);
-        when(createAnimalService.getAnimalType()).thenReturn(types);
+        when(createAnimalService.receiveAnimalsArray()).thenReturn(inputArray);
+        when(createAnimalService.receiveAnimalType()).thenReturn(types);
 
-        animalsRepository = new AnimalsRepositoryImpl(createAnimalService);
         if (value == 4) {
             assertThrows(NullPointerException.class, () -> {
                 animalsRepository.fillStorage();
@@ -243,14 +246,8 @@ public class SpringBootApplicationTestClass {
                     animalsRepository.findDuplicate();
                 });
             } else {
-                assertTrue(animalsRepository.findDuplicate().equals(outputArray));
+                assertEquals(animalsRepository.findDuplicate(), outputArray);
             }
         }
-    }
-
-    @Configuration
-    @ComponentScan
-    static class SpringBootApplicationTestConfig {
-
     }
 }

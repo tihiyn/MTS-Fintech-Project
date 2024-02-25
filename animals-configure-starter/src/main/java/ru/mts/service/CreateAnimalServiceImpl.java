@@ -29,11 +29,12 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         this.animalsProperties = animalsProperties;
     }
 
-    public List<AnimalEnum> getAnimalType() {
+    @Override
+    public List<AnimalEnum> receiveAnimalType() {
         return animalType;
     }
 
-    public Animal[] getAnimalsArray() {
+    public Animal[] receiveAnimalsArray() {
         return animalsArray;
     }
 
@@ -99,15 +100,10 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         return animal;
     }
 
-    /**
-     * Метод для определения типов животных. Внутри вызвается метод для создания животных
-     *
-     * @Since: 1.3
-     * @Author: Nikita
-     */
+    @Override
     public void defineTypeOfAnimals() {
         // вызов метода для создания животных
-        animalsArray = createAnimals(10);
+        animalsArray = createAnimals();
 
         System.out.println("define type");
 
@@ -133,31 +129,30 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         }
     }
 
-    /**
-     * Переопределённый метод для создания животных при помощи цикла do-while
-     *
-     * @Since: 1.1
-     * @Author: Nikita
-     */
-//    public void createAnimals() {
-//        // счётчик
-//        int counter = 1;
-//        // инициализация массива животных
-//        animalsArray = new Animal[10];
-//
-//        do {
-//            animalsArray[counter - 1] = commonCreating(counter);
-//        }
-//        while (counter++ < 10);
-//    }
+    @Override
+    public Animal[] createAnimals() {
+        // счётчик
+        int counter = 1;
+        // инициализация массива животных
+        animalsArray = new Animal[10];
+
+        do {
+            animalsArray[counter - 1] = commonCreating(counter);
+        }
+        while (counter++ < 10);
+
+        Animal[] returnArray = Arrays.copyOf(animalsArray, animalsArray.length);
+        return returnArray;
+    }
 
 
     /**
      * Перегруженный метод для создания животных при помощи цикла for.
      * Аргументы: N - количество животных, которое необходимо создать
      *
-     * @Since: 1.1
-     * @Author: Nikita
+     * @return массив созданных животных
+     * @since 1.1
+     * @author Nikita
      */
     public Animal[] createAnimals(int N) {
         // массив животных

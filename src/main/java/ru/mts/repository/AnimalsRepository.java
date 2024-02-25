@@ -6,6 +6,17 @@ import java.util.Set;
 
 public interface AnimalsRepository {
     /**
+     * Геттер для массива животных
+     *
+     * @return массив животных
+     * @author Nikita
+     * @since 1.4
+     */
+    Animal[] getAnimalsArray();
+
+    void fillStorage();
+
+    /**
      * Метод ищет животных, родившихся в високосный год.
      *
      * @return массив из имён животных, родившихся в високосный год.
@@ -15,10 +26,10 @@ public interface AnimalsRepository {
     String[] findLeapYearNames();
 
     /**
-     * Метод ищет животных, возраст которых больще N лет.
+     * Метод ищет животных, возраст которых больше N лет.
      *
      * @param N возрастная граница.
-     * @return массив животных, возраст которых больще N лет.
+     * @return массив животных, возраст которых больше N лет.
      * @author Nikita
      * @since 1.1
      */

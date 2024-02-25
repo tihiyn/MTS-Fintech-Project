@@ -15,6 +15,7 @@ import ru.mts.AnimalsProperties;
 import ru.mts.bpp.CreateAnimalServiceBeanPostProcessor;
 import ru.mts.model.*;
 import ru.mts.repository.AnimalsRepositoryImpl;
+import ru.mts.repository.AnimalsRepository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,7 +24,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
 
@@ -33,7 +33,8 @@ import static org.mockito.Mockito.when;
 public class SpringBootStarterTestClass {
     Animal cat, dog, wolf, shark, anotherCat, anotherDog;
     Animal[] animals;
-    private AnimalsRepositoryImpl animalsRepository;
+
+    private AnimalsRepository animalsRepository;
     @Autowired
     private CreateAnimalServiceBeanPostProcessor createAnimalServiceBeanPostProcessor;
     @Autowired
@@ -41,29 +42,28 @@ public class SpringBootStarterTestClass {
     @MockBean
     private CreateAnimalServiceImpl createAnimalService;
 
-    @BeforeEach
-    public void init() {
-        animalsRepository = new AnimalsRepositoryImpl(createAnimalService);
 
-        // изменение поведения MockBean
-        when(createAnimalService.getAnimalType()).thenCallRealMethod();
-        when(createAnimalService.getAnimalsArray()).thenCallRealMethod();
-        doCallRealMethod().when(createAnimalService).defineTypeOfAnimals();
-
-        // создание животных
-        cat = new Cat("Британская", animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Добрый", LocalDate.of(2100, 7, 26));
-        dog = new Dog("Доберман", animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(25000).setScale(2, RoundingMode.HALF_UP), "Злой", LocalDate.of(2000, 12, 1));
-        wolf = new Wolf("Японский", animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(500000).setScale(2, RoundingMode.HALF_UP), "Игривый", LocalDate.of(1998, 3, 24));
-        shark = new Shark("Молот", animalsProperties.getSharkNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(1000000).setScale(2, RoundingMode.HALF_UP), "Пугливый", LocalDate.of(2050, 6, 13));
-        anotherCat = new Cat("Сфинкс", animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Вредный", LocalDate.of(2022, 1, 5));
-        anotherDog = new Dog("Немецкая овчарка", animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(15000).setScale(2, RoundingMode.HALF_UP), "Верный", LocalDate.of(2015, 10, 12));
-
+    private void initAnimals() {
+        cat = new Cat("Британская", animalsProperties.getCatNames().get(1), BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Добрый", LocalDate.now().minusYears(10).minusDays(1));
+        dog = new Dog("Доберман", animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(25000).setScale(2, RoundingMode.HALF_UP), "Злой", LocalDate.now().minusYears(10));
+        wolf = new Wolf("Японский", animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(500000).setScale(2, RoundingMode.HALF_UP), "Игривый", LocalDate.now().minusYears(10).plusDays(1));
+        shark = new Shark("Молот", animalsProperties.getSharkNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(1000000).setScale(2, RoundingMode.HALF_UP), "Пугливый", LocalDate.of(1996, 6, 13));
+        anotherCat = new Cat("Сфинкс", animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Вредный", LocalDate.of(2004, 1, 5));
+        anotherDog = new Dog("Немецкая овчарка", animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(15000).setScale(2, RoundingMode.HALF_UP), "Верный", LocalDate.of(1984, 10, 12));
     }
 
     @DisplayName("Test methods for creating animals")
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3})
     public void starterTest(int value) {
+        animalsRepository = new AnimalsRepositoryImpl(createAnimalService);
+
+        // изменение поведения MockBean
+        when(createAnimalService.receiveAnimalType()).thenCallRealMethod();
+        when(createAnimalService.receiveAnimalsArray()).thenCallRealMethod();
+        doCallRealMethod().when(createAnimalService).defineTypeOfAnimals();
+
+        initAnimals();
         switch (value) {
             case 0:
                 // корректный вариант
@@ -85,7 +85,7 @@ public class SpringBootStarterTestClass {
                 throw new IllegalStateException("Unexpected value: " + value);
         }
 
-        when(createAnimalService.createAnimals(anyInt())).thenReturn(animals);
+        when(createAnimalService.createAnimals()).thenReturn(animals);
         if (value == 2 || value == 3) {
             assertThrows(NullPointerException.class, () -> {
                 createAnimalServiceBeanPostProcessor.postProcessAfterInitialization(createAnimalService, "createAnimalService");
