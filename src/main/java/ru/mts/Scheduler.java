@@ -6,6 +6,9 @@ import ru.mts.model.Animal;
 import ru.mts.repository.AnimalsRepository;
 import ru.mts.repository.AnimalsRepositoryImpl;
 
+import java.time.LocalDate;
+import java.util.Map;
+
 @Component
 public class Scheduler {
     private AnimalsRepository animalsRepository;
@@ -23,19 +26,23 @@ public class Scheduler {
      */
     @Scheduled(fixedRate = 60000)
     public void printResults() {
-        System.out.println("Имена животных, которые родились в високосный год: ");
-        for (String animal : animalsRepository.findLeapYearNames()) {
-            System.out.println(animal);
+        System.out.println("Names of animals that were born in a leap year: ");
+        for (Map.Entry<String, LocalDate> node: animalsRepository.findLeapYearNames().entrySet()) {
+            System.out.println("Name: " + node.getKey() + ", Birth Date: " + node.getValue());
         }
         System.out.println();
 
         int N = 25;
-        System.out.format("Имена животных, которым больше %d лет: \n", N);
-        for (Animal animal : animalsRepository.findOlderAnimal(N)) {
-            System.out.println(animal.getName());
+        System.out.format("Names of animals that are more than %d y.o.: \n", N);
+        for (Map.Entry<Animal, Integer> node: animalsRepository.findOlderAnimal(N).entrySet()) {
+            System.out.println("Name: " + node.getKey().getName() + ", Age: " + node.getValue());
         }
         System.out.println();
 
-        animalsRepository.findDuplicate();
+        for (Map.Entry<String, Integer> node: animalsRepository.findDuplicate().entrySet()) {
+            if (node.getValue() > 0) {
+                System.out.println("Type: " + node.getKey() + ", Num Of Duplicates: " + node.getValue());
+            }
+        }
     }
 }

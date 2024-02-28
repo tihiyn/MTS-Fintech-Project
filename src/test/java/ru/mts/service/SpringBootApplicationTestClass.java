@@ -1,6 +1,5 @@
 package ru.mts.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -8,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import ru.mts.AnimalsProperties;
 import ru.mts.model.*;
 import ru.mts.repository.AnimalsRepository;
@@ -23,9 +23,9 @@ import static org.mockito.Mockito.when;
 
 @DisplayName("Class for testing application")
 @SpringBootTest
-@Profile("test")
+@ActiveProfiles("test")
 public class SpringBootApplicationTestClass {
-    Animal cat, dog, wolf, shark, anotherCat, anotherDog, sameCat;
+    Animal cat1, cat2, cat3, dog1, wolf1, wolf2, shark1, sameCat2, sameShark1, sameCat3;
     @MockBean
     private CreateAnimalService createAnimalService;
     @Autowired
@@ -43,6 +43,15 @@ public class SpringBootApplicationTestClass {
         return false;
     }
 
+    public static boolean containsHashMap(List<HashMap<Animal, Integer>> list, Map<Animal, Integer> targetMap) {
+        for (HashMap<Animal, Integer> map : list) {
+            if (map.equals(targetMap)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Метод для инициализации животных
      *
@@ -50,204 +59,327 @@ public class SpringBootApplicationTestClass {
      * @since 1.4
      */
     private void initAnimals() {
-        cat = new Cat("Британская", animalsProperties.getCatNames().get(1), BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Добрый", LocalDate.now().minusYears(10).minusDays(1));
-        dog = new Dog("Доберман", animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(25000).setScale(2, RoundingMode.HALF_UP), "Злой", LocalDate.now().minusYears(10));
-        wolf = new Wolf("Японский", animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(500000).setScale(2, RoundingMode.HALF_UP), "Игривый", LocalDate.now().minusYears(10).plusDays(1));
-        shark = new Shark("Молот", animalsProperties.getSharkNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(1000000).setScale(2, RoundingMode.HALF_UP), "Пугливый", LocalDate.of(1996, 6, 13));
-        anotherCat = new Cat("Сфинкс", animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Вредный", LocalDate.of(2004, 1, 5));
-        anotherDog = new Dog("Немецкая овчарка", animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), BigDecimal.valueOf(15000).setScale(2, RoundingMode.HALF_UP), "Верный", LocalDate.of(1984, 10, 12));
-        sameCat = new Cat("Британская", animalsProperties.getCatNames().get(1), BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Добрый", LocalDate.now().minusYears(10).minusDays(1));
+        cat1 = new Cat("Британская", animalsProperties.getCatNames().get(1), BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Добрый", LocalDate.now().minusYears(10).minusDays(1));
+        cat2 = new Cat("Шотландская", animalsProperties.getCatNames().get(0), BigDecimal.valueOf(12000.05).setScale(2, RoundingMode.HALF_UP), "Верный", LocalDate.of(2013, 4, 18));
+        cat3 = new Cat("Сфинкс", animalsProperties.getCatNames().get(2), BigDecimal.valueOf(7000.2).setScale(2, RoundingMode.HALF_UP), "Вредный", LocalDate.of(2008, 9, 9));
+
+        dog1 = new Dog("Доберман", animalsProperties.getDogNames().get(2), BigDecimal.valueOf(25000).setScale(2, RoundingMode.HALF_UP), "Злой", LocalDate.now().minusYears(10));
+
+        wolf1 = new Wolf("Японский", animalsProperties.getWolfNames().get(0), BigDecimal.valueOf(500000).setScale(2, RoundingMode.HALF_UP), "Игривый", LocalDate.now().minusYears(10).plusDays(1));
+        wolf2 = new Wolf("Полярный", animalsProperties.getWolfNames().get(1), BigDecimal.valueOf(700000.157).setScale(2, RoundingMode.HALF_UP), "Игривый", LocalDate.of(1997, 2, 1));
+
+        shark1 = new Shark("Молот", animalsProperties.getSharkNames().get(1), BigDecimal.valueOf(1000000).setScale(2, RoundingMode.HALF_UP), "Пугливый", LocalDate.of(1996, 6, 13));
+
+        sameCat2 = new Cat("Шотландская", animalsProperties.getCatNames().get(0), BigDecimal.valueOf(12000.05).setScale(2, RoundingMode.HALF_UP), "Верный", LocalDate.of(2013, 4, 18));
+        sameShark1 = new Shark("Молот", animalsProperties.getSharkNames().get(1), BigDecimal.valueOf(1000000).setScale(2, RoundingMode.HALF_UP), "Пугливый", LocalDate.of(1996, 6, 13));
+        sameCat3 = new Cat("Сфинкс", animalsProperties.getCatNames().get(2), BigDecimal.valueOf(7000.2).setScale(2, RoundingMode.HALF_UP), "Вредный", LocalDate.of(2008, 9, 9));
+
     }
 
     @DisplayName("Test findLeapYearNames method")
     @ParameterizedTest(name = "Test {arguments}")
-    @ValueSource(ints = {0, 1, 2, 3, 4})
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7})
     public void findLeapYearNames(int value) {
         initAnimals();
         // массив животных, который якобы заполнил CreateAnimalServcieImpl
-        Animal[] inputArray;
-        // список типов животных, который якобы заполнил CreateAnimalServcieImpl
+        Map<String, List<Animal>> input = new HashMap<>();
+        /*
+        Список типов животных, который якобы заполнил CreateAnimalServcieImpl.
+        На самом деле порядок элементов списка может быть не совсем таким, потому что
+        элементы в HashMap не упорядочены.
+         */
         List<AnimalEnum> types;
         // массив имён животных, родившихся в високосный год
-        String[] outputArray;
+        Map<String, LocalDate> output = new HashMap<>();
 
         switch (value) {
             case 0:
                 // случай, когда в массиве есть животные, родившиеся в високосный год
-                inputArray = new Animal[]{cat, dog, wolf, shark, anotherCat, anotherDog, sameCat};
-                types = List.of(AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.SHARK, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.CAT);
-                outputArray = new String[]{shark.getName(), anotherCat.getName(), anotherDog.getName()};
+                input.put("Cat", List.of(cat1, cat3, cat2));
+                input.put("Dog", List.of(dog1));
+                input.put("Wolf", List.of(wolf1, wolf2));
+                input.put("Shark", List.of(shark1));
+                types = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF, AnimalEnum.SHARK);
+                output.put("Cat " + cat3.getName(), LocalDate.of(2008, 9, 9));
+                output.put("Shark " + shark1.getName(), LocalDate.of(1996, 6, 13));
                 break;
             case 1:
                 // случай когда в массиве нет животных, родившихся в високосный год
-                inputArray = new Animal[]{cat, wolf, dog};
-                types = List.of(AnimalEnum.CAT, AnimalEnum.WOLF, AnimalEnum.DOG);
-                outputArray = new String[0];
+                input.put("Cat", List.of(cat1, cat2));
+                input.put("Dog", List.of(dog1));
+                input.put("Wolf", List.of(wolf1, wolf2));
+                types = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF);
                 break;
             case 2:
-                // случай, когда массив животных пустой
-                inputArray = new Animal[0];
-                types = new ArrayList<>();
-                outputArray = new String[0];
+                // вариант, когда список содержит null-значения
+                input.put("Shark", List.of(shark1));
+                input.put("Dog", new ArrayList<>());
+                input.put("Wolf", Arrays.asList(wolf1, null));
+                input.put("Cat", new ArrayList<>());
+                types = Arrays.asList(AnimalEnum.SHARK, AnimalEnum.WOLF, null);
                 break;
             case 3:
-                // случай, когда в массиве животных есть null-значения
-                inputArray = new Animal[]{wolf, dog, null, anotherCat};
-                types = List.of(AnimalEnum.WOLF, AnimalEnum.DOG, AnimalEnum.CAT);
-                outputArray = new String[0];
+                // вариант, когда все списки пустые
+                input.put("Cat", new ArrayList<>());
+                input.put("Dog", new ArrayList<>());
+                input.put("Wolf", new ArrayList<>());
+                input.put("Shark", new ArrayList<>());
+                types = new ArrayList<>();
                 break;
             case 4:
-                // случай, когда массив равен null
-                inputArray = null;
-                types = null;
-                outputArray = null;
+                // вариант, когда value равно null
+                input.put("Cat", null);
+                input.put("Dog", List.of(dog1));
+                types = List.of(AnimalEnum.DOG);
+                break;
+            case 5:
+                // вариант, когда key равен null
+                input.put(null, new ArrayList<>());
+                input.put("Shark", List.of(shark1));
+                types = List.of(AnimalEnum.SHARK);
+                break;
+            case 6:
+                // вариант, когда мапа равна null
+                input = null;
+                types = new ArrayList<>();
+                break;
+            case 7:
+                // вариант, когда мапа пустая
+                types = new ArrayList<>();
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + value);
         }
 
         // задание поведения для MockBean
-        when(createAnimalService.receiveAnimalsArray()).thenReturn(inputArray);
+        when(createAnimalService.receiveCreatedAnimals()).thenReturn(input);
         when(createAnimalService.receiveAnimalType()).thenReturn(types);
 
-        if (value == 4) {
+        animalsRepository.fillStorage();
+        if (value == 2 || value == 4 || value == 6) {
             assertThrows(NullPointerException.class, () -> {
-                animalsRepository.fillStorage();
+                animalsRepository.findLeapYearNames();
             });
-        } else {
-            animalsRepository.fillStorage();
-            if (value == 3) {
-                assertThrows(NullPointerException.class, () -> {
-                    animalsRepository.findLeapYearNames();
-                });
-            } else {
-                assertArrayEquals(animalsRepository.findLeapYearNames(), outputArray);
-            }
+        }
+        else if (value == 5) {
+            assertThrows(IllegalStateException.class, () -> {
+                animalsRepository.findLeapYearNames();
+            });
+        }
+        else {
+            assertEquals(output, animalsRepository.findLeapYearNames());
         }
     }
 
     @DisplayName("Test findOlderAnimal method")
     @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
-    @ValueSource(ints = {10, 9, 15, 50, 1, 35, 24, 12, 18})
+    @ValueSource(ints = {10, 9, 20, 50, 24, 12, 18, 5})
     public void findOlderAnimal(int value) {
         initAnimals();
         // массив животных, который якобы заполнил CreateAnimalServcieImpl
-        Animal[] inputArray = new Animal[]{cat, dog, wolf, shark, anotherCat, anotherDog, sameCat};
+        Map<String, List<Animal>> input = new HashMap<>();
+        input.put("Cat", List.of(cat1, cat3, cat2));
+        input.put("Dog", List.of(dog1));
+        input.put("Wolf", List.of(wolf1, wolf2));
+        input.put("Shark", List.of(shark1));
         // список типов животных, который якобы заполнил CreateAnimalServcieImpl
-        List<AnimalEnum> types = List.of(AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.SHARK, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.CAT);
+        List<AnimalEnum> types = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF, AnimalEnum.SHARK);
         // двумерный массив имён животных, возраст которых больше value
-        Animal[][] outputArrays = {
-                {cat, dog, shark, anotherCat, anotherDog, sameCat},
-                {shark, anotherCat, anotherDog, sameCat},
-                {shark, anotherCat, anotherDog},
-                {cat, dog, wolf, shark, anotherCat, anotherDog, sameCat},
-                {anotherDog},
-                {}
-        };
+        List<HashMap<Animal, Integer>> outputResults = List.of(
+                new HashMap<Animal, Integer>() {{
+                    put(cat3, 15);
+                    put(wolf2, 27);
+                    put(shark1, 27);
+                }},
+                new HashMap<Animal, Integer>() {{
+                    put(cat1, 10);
+                    put(cat2, 10);
+                    put(cat3, 15);
+                    put(dog1, 10);
+                    put(wolf2, 27);
+                    put(shark1, 27);
+                }},
+                new HashMap<Animal, Integer>() {{
+                    put(wolf2, 27);
+                    put(shark1, 27);
+                }},
+                new HashMap<Animal, Integer>() {{
+                    put(shark1, 27);
+                }},
+                new HashMap<Animal, Integer>() {{
+                    put(null, 0);
+                }}
+        );
 
         switch (value) {
             case 24:
                 // задаём поведение для MockBean, если массив животных пустой
-                when(createAnimalService.receiveAnimalsArray()).thenReturn(new Animal[0]);
-                when(createAnimalService.receiveAnimalType()).thenReturn(new ArrayList<>());
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new HashMap<>() {{
+                    put("Cat", Arrays.asList(cat1, null));
+                    put("Dog", List.of(dog1));
+                }});
+                when(createAnimalService.receiveAnimalType()).thenReturn(Arrays.asList(AnimalEnum.CAT, null, AnimalEnum.DOG));
                 break;
             case 12:
                 // задаём поведение для MockBean, если массив животных содержит null-значения
-                when(createAnimalService.receiveAnimalsArray()).thenReturn(new Animal[]{cat, dog, null});
-                when(createAnimalService.receiveAnimalType()).thenReturn(List.of(AnimalEnum.CAT, AnimalEnum.DOG));
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new HashMap<>() {{
+                    put("Cat", new ArrayList<>());
+                    put("Dog", new ArrayList<>());
+                }});
+                when(createAnimalService.receiveAnimalType()).thenReturn(new ArrayList<>());
                 break;
             case 18:
                 // задаём поведение для MockBean, если массив животных равен null
-                when(createAnimalService.receiveAnimalsArray()).thenReturn(null);
-                when(createAnimalService.receiveAnimalType()).thenReturn(null);
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(null);
+                when(createAnimalService.receiveAnimalType()).thenReturn(new ArrayList<>());
+                break;
+            case 5:
+                // задаём поведение для MockBean, если массив животных содержит null-значения
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new HashMap<>() {{
+                    put(null, new ArrayList<>(List.of(cat1, cat2)));
+                    put("Dog", new ArrayList<>(List.of(dog1)));
+                }});
+                when(createAnimalService.receiveAnimalType()).thenReturn(List.of(AnimalEnum.DOG));
                 break;
             default:
                 // задаём поведение для корректного случая
-                when(createAnimalService.receiveAnimalsArray()).thenReturn(inputArray);
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(input);
                 when(createAnimalService.receiveAnimalType()).thenReturn(types);
                 break;
         }
 
-        if (value == 18) {
+        animalsRepository.fillStorage();
+        if (value == 24 || value == 18) {
             assertThrows(NullPointerException.class, () -> {
-                animalsRepository.fillStorage();
+                animalsRepository.findOlderAnimal(value);
+            });
+        } else if (value == 5) {
+            assertThrows(IllegalStateException.class, () -> {
+                animalsRepository.findOlderAnimal(value);
             });
         } else {
-            animalsRepository.fillStorage();
-            if (value == 12) {
-                assertThrows(NullPointerException.class, () -> {
-                    animalsRepository.findOlderAnimal(value);
-                });
-            } else {
-                assertTrue(containsArray(outputArrays, animalsRepository.findOlderAnimal(value)));
-            }
+            assertTrue(containsHashMap(outputResults, animalsRepository.findOlderAnimal(value)));
         }
     }
 
     @DisplayName("Test findDuplicate method")
     @ParameterizedTest(name = "Test {arguments}")
-    @ValueSource(ints = {0, 1, 2, 3, 4})
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7})
     public void findDuplicate(int value) {
         initAnimals();
         // массив животных, который якобы заполнил CreateAnimalServcieImpl
-        Animal[] inputArray;
+        Map<String, List<Animal>> input = new HashMap<>();
         // список типов животных, который якобы заполнил CreateAnimalServcieImpl
         List<AnimalEnum> types;
         // множество дубликатов животных
-        Set<Animal> outputArray;
+        Map<String, Integer> output = new HashMap<>();
 
         switch (value) {
             case 0:
-                // случай, когда в массиве животных есть дубликаты
-                inputArray = new Animal[]{cat, dog, wolf, dog, shark, anotherCat, cat, anotherDog, sameCat};
-                types = List.of(AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.DOG, AnimalEnum.SHARK, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.CAT);
-                outputArray = new HashSet<>(Arrays.asList(dog, cat));
+                // случай, когда в мапе животных есть дубликаты
+                input.put("Cat", List.of(cat1, cat3, sameCat3, cat3, cat2, sameCat2, cat1));
+                input.put("Dog", List.of(dog1));
+                input.put("Wolf", List.of(wolf1, wolf2));
+                input.put("Shark", List.of(shark1, sameShark1, shark1, sameShark1));
+                types = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT,
+                        AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF,
+                        AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK);
+                output.put("Cat", 4);
+                output.put("Shark", 3);
+                output.put("Dog", 0);
+                output.put("Wolf", 0);
                 break;
             case 1:
-                // случай, когда в массиве животных нет дубликатов
-                inputArray = new Animal[]{cat, wolf, anotherDog, shark};
-                types = List.of(AnimalEnum.CAT, AnimalEnum.WOLF, AnimalEnum.CAT, AnimalEnum.SHARK);
-                outputArray = new HashSet<>();
+                // другой случай, когда в мапе животных есть дубликаты
+                input.put("Cat", List.of(cat1, cat3, cat2));
+                input.put("Dog", List.of(dog1));
+                input.put("Wolf", List.of(wolf1, wolf2));
+                input.put("Shark", List.of(shark1, shark1, shark1));
+                types = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF,
+                        AnimalEnum.WOLF, AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK);
+                output.put("Cat", 0);
+                output.put("Shark", 2);
+                output.put("Dog", 0);
+                output.put("Wolf", 0);
                 break;
             case 2:
-                // случай, когда массив животных пуст
-                inputArray = new Animal[0];
-                types = new ArrayList<>();
-                outputArray = new HashSet<>();
+                // случай, когда дубликатов нет
+                input.put("Cat", List.of(cat1, cat3, cat2));
+                input.put("Dog", List.of(dog1));
+                input.put("Wolf", List.of(wolf1, wolf2));
+                input.put("Shark", List.of(shark1));
+                types = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF,
+                        AnimalEnum.WOLF, AnimalEnum.SHARK);
+                output.put("Cat", 0);
+                output.put("Shark", 0);
+                output.put("Dog", 0);
+                output.put("Wolf", 0);
                 break;
             case 3:
                 // случай, когда в массиве животных есть null-значения
-                inputArray = new Animal[]{wolf, dog, null, anotherCat};
-                types = List.of(AnimalEnum.WOLF, AnimalEnum.DOG, AnimalEnum.CAT);
-                outputArray = new HashSet<>();
+                input.put("Cat", List.of(cat1, cat3));
+                input.put("Dog", List.of(dog1));
+                input.put("Wolf", Arrays.asList(null, null));
+                types = Arrays.asList(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, null);
+                output.put("Cat", 0);
+                output.put("Shark", 0);
+                output.put("Dog", 0);
+                output.put("Wolf", 0);
                 break;
             case 4:
-                // случай, когда массив животных равен null
-                inputArray = null;
-                types = null;
-                outputArray = null;
+                // случай, когда список животных равен null
+                input.put("Cat", List.of(cat1, cat3));
+                input.put("Dog", null);
+                types = Arrays.asList(AnimalEnum.CAT, AnimalEnum.CAT);
+                output.put("Cat", 0);
+                output.put("Shark", 0);
+                output.put("Dog", 0);
+                output.put("Wolf", 0);
+                break;
+            case 5:
+                // случай, когда key равен null
+                input.put("Cat", List.of(cat1, cat3));
+                input.put(null, List.of(dog1));
+                types = Arrays.asList(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG);
+                output.put("Cat", 0);
+                output.put("Shark", 0);
+                output.put("Dog", 0);
+                output.put("Wolf", 0);
+                break;
+            case 6:
+                // вариант, когда мапа равна null
+                input = null;
+                types = new ArrayList<>();
+                break;
+            case 7:
+                // вариант, когда мапа пустая
+                types = new ArrayList<>();
+                output.put("Cat", 0);
+                output.put("Shark", 0);
+                output.put("Dog", 0);
+                output.put("Wolf", 0);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + value);
         }
 
         // задание поведения для MockBean
-        when(createAnimalService.receiveAnimalsArray()).thenReturn(inputArray);
+        when(createAnimalService.receiveCreatedAnimals()).thenReturn(input);
         when(createAnimalService.receiveAnimalType()).thenReturn(types);
 
-        if (value == 4) {
-            assertThrows(NullPointerException.class, () -> {
-                animalsRepository.fillStorage();
+        animalsRepository.fillStorage();
+        if (value == 3 || value == 4 || value == 5) {
+            assertThrows(IllegalStateException.class, () -> {
+                animalsRepository.findDuplicate();
             });
-        } else {
-            animalsRepository.fillStorage();
-            if (value == 3) {
-                assertThrows(NullPointerException.class, () -> {
-                    animalsRepository.findDuplicate();
-                });
-            } else {
-                assertEquals(animalsRepository.findDuplicate(), outputArray);
-            }
+        }
+        else if (value == 6) {
+            assertThrows(NullPointerException.class, () -> {
+                animalsRepository.findDuplicate();
+            });
+        }
+        else {
+            assertEquals(output, animalsRepository.findDuplicate());
         }
     }
 }

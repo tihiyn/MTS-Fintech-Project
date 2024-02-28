@@ -5,13 +5,15 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.mts.AnimalsProperties;
 import ru.mts.model.*;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
@@ -20,8 +22,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class CreateAnimalServiceImpl implements CreateAnimalService {
     // список типов созданных животных
     private List<AnimalEnum> animalType;
-    // список животных
-    private Animal[] animalsArray;
+    // созданные животные
+    private Map<String, List<Animal>> createdAnimals;
 
     private AnimalsProperties animalsProperties;
 
@@ -34,8 +36,8 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         return animalType;
     }
 
-    public Animal[] receiveAnimalsArray() {
-        return animalsArray;
+    public Map<String, List<Animal>> receiveCreatedAnimals() {
+        return createdAnimals;
     }
 
     /**
@@ -103,46 +105,84 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     @Override
     public void defineTypeOfAnimals() {
         // вызов метода для создания животных
-        animalsArray = createAnimals();
-
-        System.out.println("define type");
+        createdAnimals = createAnimals();
 
         // инициализация списка типов животных
-        animalType = new ArrayList<>(animalsArray.length);
-        for (Animal animal : animalsArray) {
-            switch (animal.getClass().toString()) {
-                case "class ru.mts.model.Cat":
-                    animalType.add(AnimalEnum.CAT);
+        animalType = new ArrayList<>();
+
+        for (Map.Entry<String, List<Animal>> node : createdAnimals.entrySet()) {
+            switch (node.getKey()) {
+                case "Cat":
+                    for (int i = 0; i < node.getValue().size(); i++) {
+                        if (node.getValue().get(i) != null)
+                            animalType.add(AnimalEnum.CAT);
+                        else
+                            animalType.add(null);
+                    }
                     break;
-                case "class ru.mts.model.Dog":
-                    animalType.add(AnimalEnum.DOG);
+                case "Dog":
+                    for (int i = 0; i < node.getValue().size(); i++) {
+                        if (node.getValue().get(i) != null)
+                            animalType.add(AnimalEnum.DOG);
+                        else
+                            animalType.add(null);
+                    }
                     break;
-                case "class ru.mts.model.Wolf":
-                    animalType.add(AnimalEnum.WOLF);
+                case "Wolf":
+                    for (int i = 0; i < node.getValue().size(); i++) {
+                        if (node.getValue().get(i) != null)
+                            animalType.add(AnimalEnum.WOLF);
+                        else
+                            animalType.add(null);
+                    }
                     break;
-                case "class ru.mts.model.Shark":
-                    animalType.add(AnimalEnum.SHARK);
+                case "Shark":
+                    for (int i = 0; i < node.getValue().size(); i++) {
+                        if (node.getValue().get(i) != null)
+                            animalType.add(AnimalEnum.SHARK);
+                        else
+                            animalType.add(null);
+                    }
                     break;
                 default:
-                    throw new IllegalStateException("Unexpected value: " + animal.getClass().toString());
+                    throw new IllegalStateException("Unexpected value: " + node.getKey());
             }
         }
     }
 
     @Override
-    public Animal[] createAnimals() {
+    public Map<String, List<Animal>> createAnimals() {
         // счётчик
         int counter = 1;
-        // инициализация массива животных
-        animalsArray = new Animal[10];
+        // создание "макета" мапы
+        createdAnimals = new HashMap<>(4);
+        createdAnimals.put("Cat", new ArrayList<>());
+        createdAnimals.put("Dog", new ArrayList<>());
+        createdAnimals.put("Wolf", new ArrayList<>());
+        createdAnimals.put("Shark", new ArrayList<>());
 
         do {
-            animalsArray[counter - 1] = commonCreating(counter);
+            Animal animal = commonCreating(counter);
+            switch (animal.getClass().toString()) {
+                case "class ru.mts.model.Cat":
+                    createdAnimals.get("Cat").add(animal);
+                    break;
+                case "class ru.mts.model.Dog":
+                    createdAnimals.get("Dog").add(animal);
+                    break;
+                case "class ru.mts.model.Wolf":
+                    createdAnimals.get("Wolf").add(animal);
+                    break;
+                case "class ru.mts.model.Shark":
+                    createdAnimals.get("Shark").add(animal);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + animal.getClass().toString());
+            }
         }
         while (counter++ < 10);
 
-        Animal[] returnArray = Arrays.copyOf(animalsArray, animalsArray.length);
-        return returnArray;
+        return createdAnimals;
     }
 
 
@@ -151,16 +191,36 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
      * Аргументы: N - количество животных, которое необходимо создать
      *
      * @return массив созданных животных
-     * @since 1.1
      * @author Nikita
+     * @since 1.1
      */
-    public Animal[] createAnimals(int N) {
-        // массив животных
-        animalsArray = new Animal[N];
+    public Map<String, List<Animal>> createAnimals(int N) {
+        // создание "макета" мапы
+        createdAnimals = new HashMap<>(4);
+        createdAnimals.put("Cat", new ArrayList<>());
+        createdAnimals.put("Dog", new ArrayList<>());
+        createdAnimals.put("Wolf", new ArrayList<>());
+        createdAnimals.put("Shark", new ArrayList<>());
         for (int i = 0; i < N; i++) {
-            animalsArray[i] = commonCreating(i + 1);
+            Animal animal = commonCreating(i + 1);
+            switch (animal.getClass().toString()) {
+                case "class ru.mts.model.Cat":
+                    createdAnimals.get("Cat").add(animal);
+                    break;
+                case "class ru.mts.model.Dog":
+                    createdAnimals.get("Dog").add(animal);
+                    break;
+                case "class ru.mts.model.Wolf":
+                    createdAnimals.get("Wolf").add(animal);
+                    break;
+                case "class ru.mts.model.Shark":
+                    createdAnimals.get("Shark").add(animal);
+                    break;
+                default:
+                    throw new IllegalStateException("Unexpected value: " + animal.getClass().toString());
+            }
         }
-        Animal[] returnArray = Arrays.copyOf(animalsArray, animalsArray.length);
-        return returnArray;
+
+        return createdAnimals;
     }
 }

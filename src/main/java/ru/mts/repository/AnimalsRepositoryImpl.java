@@ -5,18 +5,15 @@ import org.springframework.stereotype.Repository;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalEnum;
 import ru.mts.service.CreateAnimalService;
-import ru.mts.service.CreateAnimalServiceImpl;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Repository
 public class AnimalsRepositoryImpl implements AnimalsRepository {
     // "хранилище" животных
-    private Animal[] animalsArray;
+    private Map<String, List<Animal>> animalsMap;
     // объект для внедрения зависимостей
     private CreateAnimalService createAnimalService;
 
@@ -25,8 +22,8 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     }
 
     @Override
-    public Animal[] getAnimalsArray() {
-        return animalsArray;
+    public Map<String, List<Animal>> getAnimalsMap() {
+        return animalsMap;
     }
 
     /**
@@ -39,7 +36,7 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     @Override
     public void fillStorage() {
         // инициализация "хранилища" животных
-        animalsArray = createAnimalService.receiveAnimalsArray();
+        animalsMap = createAnimalService.receiveCreatedAnimals();
 
         // логгирование списка типов животных
         for (AnimalEnum type : createAnimalService.receiveAnimalType()) {
@@ -49,48 +46,72 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     }
 
     @Override
-    public String[] findLeapYearNames() {
+    public Map<String, LocalDate> findLeapYearNames() {
         // массив для имён животных, родившихся в високосных год
-        String[] outputArray = new String[animalsArray.length];
-        // счётчик
-        int counter = 0;
+        Map<String, LocalDate> output = new HashMap<>();
 
-        for (Animal animal : animalsArray) {
-            // год рождения животного
-            int year = animal.getBirthDate().getYear();
-            // проверка года на високосность
-            if (year % 4 == 0 && ((year % 100 != 0) || (year % 400 == 0))) {
-                outputArray[counter] = animal.getName();
-                counter++;
+        for(Map.Entry<String, List<Animal>> node: createAnimalService.receiveCreatedAnimals().entrySet()) {
+            if (node.getKey() != null) {
+                for (Animal animal: node.getValue()) {
+                    // год рождения животного
+                    int year = animal.getBirthDate().getYear();
+                    // проверка года на високосность
+                    if (year % 4 == 0 && ((year % 100 != 0) || (year % 400 == 0))) {
+                        output.put(node.getKey() + " " +animal.getName(), animal.getBirthDate());
+                    }
+                }
+            }
+            else {
+                throw new IllegalStateException("Invalid key: " + null);
             }
         }
 
-        return Arrays.copyOf(outputArray, counter);
+        return output;
     }
 
     @Override
-    public Animal[] findOlderAnimal(int N) {
+    public Map<Animal, Integer> findOlderAnimal(int N) {
         // массив для животных, возраст которых больше N лет
-        Animal[] outputArray = new Animal[animalsArray.length];
-        // счётчик
-        int counter = 0;
+        Map<Animal, Integer> output = new HashMap<>();
+        boolean flag = false;
         // возраст
         int age;
+        // счётчик
+        int maxAge = 0;
+        Animal olderAnimal = null;
 
-        for (Animal animal : animalsArray) {
-            age = LocalDate.now().getYear() - animal.getBirthDate().getYear();
+        for (Map.Entry<String, List<Animal>> node: createAnimalService.receiveCreatedAnimals().entrySet()) {
+            if (node.getKey() != null) {
+                for (Animal animal : node.getValue()) {
+                    age = LocalDate.now().getYear() - animal.getBirthDate().getYear();
 
-            // корректировка возраста
-            if (LocalDate.now().getDayOfYear() < animal.getBirthDate().getDayOfYear())
-                age -= 1;
+                    // корректировка возраста
+                    if (LocalDate.now().getDayOfYear() < animal.getBirthDate().getDayOfYear())
+                        age -= 1;
 
-            if (age > N) {
-                outputArray[counter] = animal;
-                counter++;
+                    if (!flag) {
+                        if (age > maxAge) {
+                            olderAnimal = animal;
+                            maxAge = age;
+                        }
+                    }
+
+                    if (age > N) {
+                        flag = true;
+                        output.put(animal, age);
+                    }
+                }
+            }
+            else {
+                throw new IllegalStateException("Invalid key: " + null);
             }
         }
 
-        return Arrays.copyOf(outputArray, counter);
+        if (!flag) {
+            output.put(olderAnimal, maxAge);
+        }
+
+        return output;
     }
 
     /**
@@ -107,7 +128,7 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         // счётчик
         int counter = 0;
 
-        System.out.println("Дубликаты: ");
+        System.out.println("Animal duplicates: ");
         for (Animal animal : dupl) {
             System.out.format("%d-ый дубликат: %s\n", counter + 1, animal.getClass().getName());
             System.out.println("Порода: " + animal.getBreed());
@@ -122,35 +143,54 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     }
 
     @Override
-    public Set<Animal> findDuplicate() {
+    public Map<String, Integer> findDuplicate() {
         // множество дубликатов животных
-        Set<Animal> duplicates = new HashSet<>();
+        Map<String, Integer> duplicates = new HashMap<>(4);
+        duplicates.put("Cat", 0);
+        duplicates.put("Dog", 0);
+        duplicates.put("Wolf", 0);
+        duplicates.put("Shark", 0);
+
+        Map<String, Integer> output = new HashMap<>();
         // флаг
         boolean flag;
+        // множество дубликатов животных
+        Set<Animal> duplSet = new HashSet<>();
 
-        for (int i = 0; i < animalsArray.length - 1; i++) {
-            for (int j = i + 1; j < animalsArray.length; j++) {
-                // проверка равенства объектов
-                if (animalsArray[i].equals(animalsArray[j])) {
-                    flag = false;
-                    // проверка наличия найденного дубликата в массиве дубликатов
-                    for (Animal animal : duplicates) {
-                        if (animal != null && animal.equals(animalsArray[i])) {
-                            flag = true;
-                            break;
+        for (Map.Entry<String, List<Animal>> node: createAnimalService.receiveCreatedAnimals().entrySet()) {
+            if (node.getKey() != null && node.getValue() != null) {
+                for (int i = 0; i < node.getValue().size() - 1; i++) {
+                    for (int j = i + 1; j < node.getValue().size(); j++) {
+                        if (node.getValue().get(i) != null || node.getValue().get(j) != null) {
+                            if (node.getValue().get(i).equals(node.getValue().get(j))) {
+                                flag = false;
+                                // проверка наличия найденного дубликата в массиве дубликатов
+                                for (Animal animal : duplSet) {
+                                    if (animal != null && animal.equals(node.getValue().get(i))) {
+                                        flag = true;
+                                        break;
+                                    }
+                                }
+                                // если найденного дубликата в массиве дубликатов нет, то добавляемя его туда
+                                if (!flag) {
+                                    duplSet.add(node.getValue().get(i));
+                                }
+                                duplicates.put(node.getKey(), duplicates.get(node.getKey()) + 1);
+                                break;
+                            }
+                        } else {
+                            throw new IllegalStateException("Invalid value of Animal: " + null);
                         }
                     }
-
-                    // если найденного дубликата в массиве дубликатов нет, то добавляемя его туда
-                    if (!flag) {
-                        duplicates.add(animalsArray[i]);
-                    }
                 }
+            }
+            else {
+                throw new IllegalStateException("Invalid value: " + null);
             }
         }
 
         // вывод дубликатов
-        printDuplicate(duplicates);
+        printDuplicate(duplSet);
 
         return duplicates;
     }

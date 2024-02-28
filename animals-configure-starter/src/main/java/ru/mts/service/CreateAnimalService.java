@@ -4,6 +4,7 @@ import ru.mts.model.Animal;
 import ru.mts.model.AnimalEnum;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CreateAnimalService {
     // массив пород (по 3 для каждого животного)
@@ -23,18 +24,18 @@ public interface CreateAnimalService {
     /**
      * Метод для создания животных при помощи цикла do-while
      *
-     * @return массив созданных животных
-     * @since  1.1
+     * @return HashMap с созданными животными
+     * @since  1.5
      * @author Nikita
      */
-    Animal[] createAnimals();
+    Map<String, List<Animal>> createAnimals();
 
     /**
      * Метод для получения списка типов животных
      *
      * @return список типов созданных животных
-     * @since  1.4
      * @author Nikita
+     * @since 1.4
      */
     List<AnimalEnum> receiveAnimalType();
 
@@ -45,5 +46,5 @@ public interface CreateAnimalService {
      * @since  1.4
      * @author Nikita
      */
-    Animal[] receiveAnimalsArray();
+    Map<String, List<Animal>> receiveCreatedAnimals();
 }
