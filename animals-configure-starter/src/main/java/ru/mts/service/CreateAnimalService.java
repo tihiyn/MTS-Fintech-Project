@@ -7,17 +7,15 @@ import java.util.List;
 import java.util.Map;
 
 public interface CreateAnimalService {
-    // массив пород (по 3 для каждого животного)
-    String[] breeds = new String[]{"Британская", "Шотландская", "Сфинкс", "Немецкая овчарка", "Доберман", "Лабрадор", "Тигровая", "Белая", "Молот", "Полярный", "Ньюфаундлендский", "Японский"};
+    List<String> breeds = List.of("Британская", "Шотландская", "Сфинкс", "Немецкая овчарка", "Доберман", "Лабрадор", "Тигровая", "Белая", "Молот", "Полярный", "Ньюфаундлендский", "Японский");
 
-    // массив характеров (по 3 для каждого животного)
-    String[] characters = new String[]{"Добрый", "Злой", "Игривый", "Вредный", "Верный", "Пугливый"};
+    List<String> characters = List.of("Добрый", "Злой", "Игривый", "Вредный", "Верный", "Пугливый");
 
     /**
      * Метод для определения типов животных. Внутри вызвается метод для создания животных
      *
-     * @since 1.3
      * @author Nikita
+     * @since 1.3
      */
     void defineTypeOfAnimals();
 
@@ -25,10 +23,10 @@ public interface CreateAnimalService {
      * Метод для создания животных при помощи цикла do-while
      *
      * @return HashMap с созданными животными
-     * @since  1.5
      * @author Nikita
+     * @since 1.5
      */
-    Map<String, List<Animal>> createAnimals();
+    Map<AnimalEnum, List<Animal>> createAnimals();
 
     /**
      * Метод для получения списка типов животных
@@ -37,14 +35,14 @@ public interface CreateAnimalService {
      * @author Nikita
      * @since 1.4
      */
-    List<AnimalEnum> receiveAnimalType();
+    List<AnimalEnum> receiveAnimalTypes();
 
     /**
-     * Метод для получения массива животных
+     * Метод для получения созданных животных
      *
-     * @return массив созданных животных
-     * @since  1.4
+     * @return HashMap из созданных животных
      * @author Nikita
+     * @since 1.4
      */
-    Map<String, List<Animal>> receiveCreatedAnimals();
+    Map<AnimalEnum, List<Animal>> receiveCreatedAnimals();
 }

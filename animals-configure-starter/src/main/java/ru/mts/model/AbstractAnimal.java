@@ -5,15 +5,10 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public abstract class AbstractAnimal implements Animal {
-    // порода животного
     protected String breed;
-    // имя животного
     protected String name;
-    // цена животного в магазине
     protected BigDecimal cost;
-    // характер животного
     protected String character;
-    // день рождения животного в формате dd-MM-yyyy
     protected LocalDate birthDate;
 
     public AbstractAnimal(String breed, String name, BigDecimal cost, String character, LocalDate birthDate) {
@@ -24,7 +19,6 @@ public abstract class AbstractAnimal implements Animal {
         this.birthDate = birthDate;
     }
 
-    // реализация геттеров
     @Override
     public String getBreed() {
         return breed;
@@ -50,7 +44,6 @@ public abstract class AbstractAnimal implements Animal {
         return birthDate;
     }
 
-    // переопределённая версия метода equals, которая сравнивает объекты по всем полям
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

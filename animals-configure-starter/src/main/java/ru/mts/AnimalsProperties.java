@@ -6,7 +6,6 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 
-//@Component
 @ConfigurationProperties(prefix = "animal")
 @Validated
 public class AnimalsProperties {
