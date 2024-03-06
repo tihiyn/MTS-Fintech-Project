@@ -6,6 +6,7 @@ import ru.mts.model.AnimalEnum;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface AnimalsRepository {
     /**
@@ -50,5 +51,11 @@ public interface AnimalsRepository {
      * @author Nikita
      * @since 1.1
      */
-    Map<String, Integer> findDuplicate();
+    Map<String, Set<Animal>> findDuplicate();
+
+    double findAverageAge();
+
+    List<Animal> findOldAndExpensive();
+
+    List<String> findMinCostAnimals();
 }

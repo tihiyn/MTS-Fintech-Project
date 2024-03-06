@@ -6,10 +6,14 @@ import ru.mts.model.Animal;
 import ru.mts.model.AnimalEnum;
 import ru.mts.service.CreateAnimalService;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
+import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class AnimalsRepositoryImpl implements AnimalsRepository {
@@ -45,63 +49,40 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
 
     @Override
     public Map<String, LocalDate> findLeapYearNames() {
-        Map<String, LocalDate> leapYearAnimals = new HashMap<>();
-
-        for (Map.Entry<AnimalEnum, List<Animal>> node : animalStorage.entrySet()) {
-            if (node.getKey() != null) {
-                for (Animal animal : node.getValue()) {
-                    int year = animal.getBirthDate().getYear();
-
-                    if (year % 4 == 0 && ((year % 100 != 0) || (year % 400 == 0))) {
-                        leapYearAnimals.put(node.getKey().toString() + " " + animal.getName(), animal.getBirthDate());
-                    }
-                }
-            } else {
-                throw new IllegalStateException("Invalid key: " + null);
-            }
-        }
-
-        return leapYearAnimals;
+        return animalStorage.entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .flatMap(entry -> entry.getValue().stream()
+                        .filter(animal -> Year.of(animal.getBirthDate().getYear()).isLeap())
+                        .map(animal -> Map.entry(entry.getKey().toString() + " " + animal.getName(), animal.getBirthDate())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     @Override
     public Map<Animal, Integer> findOlderAnimal(int N) {
-        Map<Animal, Integer> olderThanNAnimals = new HashMap<>();
 
-        boolean flag = false;
-        int maxAge = 0;
-        Animal oldestAnimal = null;
+        Animal oldestAnimal = animalStorage.entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .flatMap(entry -> entry.getValue().stream()).min((animal1, animal2) -> {
+                    if (animal1.getBirthDate().isBefore(animal2.getBirthDate()))
+                        return -1;
+                    else if (animal1.getBirthDate().equals(animal2.getBirthDate()))
+                        return 0;
+                    else
+                        return 1;
+                })
+                .orElse(null);
 
-        for (Map.Entry<AnimalEnum, List<Animal>> node : animalStorage.entrySet()) {
-            if (node.getKey() != null) {
-                for (Animal animal : node.getValue()) {
-                    int age = Period.between(animal.getBirthDate(), LocalDate.now()).getYears();
+        Map<Animal, Integer> olderAnimals =  animalStorage.entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .flatMap(entry -> entry.getValue().stream()
+                        .filter(animal -> Period.between(animal.getBirthDate(), LocalDate.now()).getYears() > N)
+                        .map(animal -> Map.entry(animal, Period.between(animal.getBirthDate(), LocalDate.now()).getYears())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-                    if (!flag) {
-                        if (oldestAnimal == null)
-                            oldestAnimal = animal;
+        if (olderAnimals.isEmpty() && oldestAnimal != null)
+            olderAnimals.put(oldestAnimal, Period.between(oldestAnimal.getBirthDate(), LocalDate.now()).getYears());
 
-                        if (animal.getBirthDate().isBefore(oldestAnimal.getBirthDate())) {
-                            oldestAnimal = animal;
-                            maxAge = age;
-                        }
-                    }
-
-                    if (age > N) {
-                        flag = true;
-                        olderThanNAnimals.put(animal, age);
-                    }
-                }
-            } else {
-                throw new IllegalStateException("Invalid key: " + null);
-            }
-        }
-
-        if (!flag) {
-            olderThanNAnimals.put(oldestAnimal, maxAge);
-        }
-
-        return olderThanNAnimals;
+        return olderAnimals;
     }
 
     /**
@@ -131,43 +112,70 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     }
 
     @Override
-    public Map<String, Integer> findDuplicate() {
-        Map<String, Integer> duplicates = new HashMap<>();
-        Set<Animal> setOfDuplicates = new HashSet<>();
-        boolean flag;
+    public Map<String, Set<Animal>> findDuplicate() {
+        Map<Animal, Long> map = animalStorage.entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .flatMap(entry -> entry.getValue().stream())
+                .collect(Collectors.groupingBy(n -> n, Collectors.counting()));
 
-        for (AnimalEnum animalEnum : AnimalEnum.values()) {
-            duplicates.put(animalEnum.toString(), 0);
-        }
+//        for(Map.Entry<Animal, Long> node: map.entrySet()) {
+//            System.out.println(node.getKey().getName() + " " + node.getValue() );
+//        }
 
-        for (Map.Entry<AnimalEnum, List<Animal>> node : animalStorage.entrySet()) {
-            if (node.getValue() != null && node.getKey() != null) {
-                for (int i = 0; i < node.getValue().size() - 1; i++) {
-                    for (int j = i + 1; j < node.getValue().size(); j++) {
-                        if (node.getValue().get(i).equals(node.getValue().get(j))) {
-                            flag = false;
-                            for (Animal animal : setOfDuplicates) {
-                                if (animal != null && animal.equals(node.getValue().get(i))) {
-                                    flag = true;
-                                    break;
-                                }
-                            }
+        return map.entrySet().stream()
+                .filter(e -> e.getValue() > 1)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.groupingBy(animal -> animal.getClass().toString(), Collectors.mapping(animal -> animal, Collectors.toSet())));
+    }
 
-                            if (!flag) {
-                                setOfDuplicates.add(node.getValue().get(i));
-                            }
-                            duplicates.put(node.getKey().toString(), duplicates.get(node.getKey().toString()) + 1);
-                            break;
-                        }
-                    }
-                }
-            } else {
-                throw new IllegalStateException("Invalid value: " + null);
-            }
-        }
+    public double findAverageAge() {
+        double averageAge = animalStorage.entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .flatMap(entry -> entry.getValue().stream())
+                .mapToInt(animal -> Period.between(animal.getBirthDate(), LocalDate.now()).getYears())
+                .average()
+                .orElse(0);
 
-        printSetOfDuplicates(setOfDuplicates);
+        BigDecimal result = new BigDecimal(averageAge).setScale(2, RoundingMode.HALF_UP);
+        return result.doubleValue();
+    }
 
-        return duplicates;
+    @Override
+    public List<Animal> findOldAndExpensive() {
+        double averageCost = animalStorage.entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .flatMap(entry -> entry.getValue().stream())
+                .mapToDouble(animal -> animal.getCost().doubleValue())
+                .average()
+                .orElse(0);
+
+//        System.out.println(averageCost);
+
+        return animalStorage.entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .flatMap(entry -> entry.getValue().stream())
+                .filter(animal -> animal.getCost().doubleValue() > averageCost &&
+                        Period.between(animal.getBirthDate(), LocalDate.now()).getYears() > 5)
+                .sorted((animal1, animal2) -> {
+                    if (animal1.getBirthDate().isBefore(animal2.getBirthDate()))
+                        return -1;
+                    else if (animal1.getBirthDate().equals(animal2.getBirthDate()))
+                        return 0;
+                    else
+                        return 1;
+                })
+                .toList();
+    }
+
+    @Override
+    public List<String> findMinCostAnimals() {
+        return animalStorage.entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .flatMap(entry -> entry.getValue().stream())
+                .sorted(Comparator.comparingDouble(animal -> animal.getCost().doubleValue()))
+                .map(Animal::getName)
+                .limit(3)
+                .sorted(Comparator.reverseOrder())
+                .toList();
     }
 }
