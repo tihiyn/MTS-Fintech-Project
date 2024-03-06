@@ -9,6 +9,7 @@ import ru.mts.repository.AnimalsRepositoryImpl;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public class Scheduler {
@@ -40,12 +41,11 @@ public class Scheduler {
         }
         System.out.println();
 
-//        for (Map.Entry<String, List<Animal>> node : animalsRepository.findDuplicate().entrySet()) {
-//            if (node.getValue() > 0) {
-//                System.out.format("Type: %s, Num of Duplicates: %d %n", node.getKey(), node.getValue());
-//            }
-//        }
-//        System.out.println();
+        System.out.println("Duplicates of animals: ");
+        for (Map.Entry<String, Set<Animal>> node : animalsRepository.findDuplicate().entrySet()) {
+            System.out.format("Type: %s, Duplicates: %s %n", node.getKey(), node.getValue());
+        }
+        System.out.println();
 
         System.out.format("Average animal age: %.2f %n", animalsRepository.findAverageAge());
         System.out.println();
