@@ -51,7 +51,7 @@ public interface AnimalsRepository {
      * @author Nikita
      * @since 1.1
      */
-    Map<String, Set<Animal>> findDuplicate();
+    Map<String, List<Animal>> findDuplicate();
 
     double findAverageAge();
 

@@ -42,7 +42,7 @@ public class Scheduler {
         System.out.println();
 
         System.out.println("Duplicates of animals: ");
-        for (Map.Entry<String, Set<Animal>> node : animalsRepository.findDuplicate().entrySet()) {
+        for (Map.Entry<String, List<Animal>> node : animalsRepository.findDuplicate().entrySet()) {
             System.out.format("Type: %s, Duplicates: %s %n", node.getKey(), node.getValue());
         }
         System.out.println();

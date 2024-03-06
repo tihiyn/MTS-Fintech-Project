@@ -291,22 +291,22 @@ class TestClass {
 
             Map<AnimalEnum, List<Animal>> animals = new HashMap<>();
             List<AnimalEnum> animalTypes;
-            Map<String, Set<Animal>> duplicates = new HashMap<>();
+            Map<String, List<Animal>> duplicates = new HashMap<>();
 
             initAnimals();
             switch (value) {
                 case 0:
-                    animals.put(AnimalEnum.CAT, List.of(cat1, cat3, sameCat3, cat3, cat2, sameCat2, cat1));
+                    animals.put(AnimalEnum.CAT, List.of(cat1, cat3, sameCat3, cat3, cat2, sameCat2));
                     animals.put(AnimalEnum.DOG, List.of(dog1));
                     animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
                     animals.put(AnimalEnum.SHARK, List.of(shark1, sameShark1, shark1, sameShark1));
 
                     animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT,
-                            AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF,
+                            AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF,
                             AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK);
 
-                    duplicates.put("class ru.mts.model.Cat", Set.of(cat1, cat2, cat3));
-                    duplicates.put("class ru.mts.model.Shark", Set.of(shark1));
+                    duplicates.put("class ru.mts.model.Cat", List.of(cat3, sameCat3, cat3, cat2, sameCat2));
+                    duplicates.put("class ru.mts.model.Shark", List.of(shark1, sameShark1, shark1, sameShark1));
                     break;
                 case 1:
                     animals.put(AnimalEnum.CAT, List.of(cat1, cat3, cat2));
@@ -317,10 +317,9 @@ class TestClass {
                     animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF,
                             AnimalEnum.WOLF, AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK);
 
-                    duplicates.put("class ru.mts.model.Shark", Set.of(shark1));
+                    duplicates.put("class ru.mts.model.Shark", List.of(shark1, shark1, shark1));
                     break;
                 case 2:
-                    // случай, когда дубликатов нет
                     animals.put(AnimalEnum.CAT, List.of(cat1, cat3, cat2));
                     animals.put(AnimalEnum.DOG, List.of(dog1));
                     animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
@@ -365,12 +364,11 @@ class TestClass {
                     animals.put(AnimalEnum.SHARK, List.of(shark1, shark1));
 
                     animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT,
-                            AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF,
-                            AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK);
+                            AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF,
+                            AnimalEnum.SHARK, AnimalEnum.SHARK);
 
-                    // cat2 - Лёлик, shark1 - Шарки
-                    duplicates.put("class ru.mts.model.Cat", Set.of(cat1, cat2));
-                    duplicates.put("class ru.mts.model.Shark", Set.of(shark1));
+                    duplicates.put("class ru.mts.model.Cat", List.of(cat1, cat2, sameCat2, cat2, cat1));
+                    duplicates.put("class ru.mts.model.Shark", List.of(shark1, shark1));
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + value);

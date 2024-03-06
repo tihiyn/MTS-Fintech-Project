@@ -112,20 +112,12 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     }
 
     @Override
-    public Map<String, Set<Animal>> findDuplicate() {
-        Map<Animal, Long> map = animalStorage.entrySet().stream()
-                .filter(entry -> entry.getKey() != null)
-                .flatMap(entry -> entry.getValue().stream())
-                .collect(Collectors.groupingBy(n -> n, Collectors.counting()));
+    public Map<String, List<Animal>> findDuplicate() {
 
-//        for(Map.Entry<Animal, Long> node: map.entrySet()) {
-//            System.out.println(node.getKey().getName() + " " + node.getValue() );
-//        }
-
-        return map.entrySet().stream()
-                .filter(e -> e.getValue() > 1)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.groupingBy(animal -> animal.getClass().toString(), Collectors.mapping(animal -> animal, Collectors.toSet())));
+        return animalStorage.values().stream()
+                .flatMap(animals -> animals.stream()
+                        .filter(animal -> Collections.frequency(animals, animal) > 1))
+                .collect(Collectors.groupingBy(animal -> animal.getClass().toString(), Collectors.mapping(animal -> animal, Collectors.toList())));
     }
 
     public double findAverageAge() {
