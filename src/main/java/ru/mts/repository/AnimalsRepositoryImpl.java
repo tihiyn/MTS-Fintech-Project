@@ -113,10 +113,10 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
 
     @Override
     public Map<String, List<Animal>> findDuplicate() {
-
-        return animalStorage.values().stream()
-                .flatMap(animals -> animals.stream()
-                        .filter(animal -> Collections.frequency(animals, animal) > 1))
+        return animalStorage.entrySet().stream()
+                .filter(entry -> entry.getKey() != null)
+                .flatMap(entry -> entry.getValue().stream()
+                        .filter(animal -> Collections.frequency(entry.getValue(), animal) > 1))
                 .collect(Collectors.groupingBy(animal -> animal.getClass().toString(), Collectors.mapping(animal -> animal, Collectors.toList())));
     }
 

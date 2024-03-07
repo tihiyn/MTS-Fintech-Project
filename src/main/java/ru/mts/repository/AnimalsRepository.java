@@ -24,7 +24,6 @@ public interface AnimalsRepository {
      * Метод ищет животных, родившихся в високосный год.
      *
      * @return Map<String, LocalDate>, где String - тип животного + его имя; LocalDate - дата рождения животного
-     * @throws IllegalStateException если тип животного null
      * @author Nikita
      * @since 1.1
      */
@@ -36,7 +35,6 @@ public interface AnimalsRepository {
      *
      * @param N возрастная граница.
      * @return Map<Animal, Integer>, где Animal - животное; Integer - его возраст
-     * @throws IllegalStateException если тип животного null
      * @author Nikita
      * @since 1.1
      */
@@ -47,15 +45,36 @@ public interface AnimalsRepository {
      * Внутри вызывается метод для логирования.
      *
      * @return Map<String, Integer>, где String - тип животного, Integer - кол-во дубликатов данного типа
-     * @throws IllegalStateException если тип животного равен null или список животных равен null
      * @author Nikita
      * @since 1.1
      */
     Map<String, List<Animal>> findDuplicate();
 
+    /**
+     * Метод вычисляет средний возраст всех животных.
+     *
+     * @return средний возраст всех животных
+     * @author Nikita
+     * @since 1.6
+     */
     double findAverageAge();
 
+    /**
+     * Метод ищет всех животных, возраст которых больше 5 лет и
+     * стоимость которых больше средней стоимости всех животных
+     *
+     * @return список животных
+     * @author Nikita
+     * @since 1.6
+     */
     List<Animal> findOldAndExpensive();
 
+    /**
+     * Метод ищет 3 животных с самой низкой ценой
+     *
+     * @return список имён животных, отсортированный в обратном алфавитном порядке
+     * @author Nikita
+     * @since 1.6
+     */
     List<String> findMinCostAnimals();
 }
