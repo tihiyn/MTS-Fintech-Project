@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("Class for testing animals-configure-starter")
 @SpringBootTest
 @ActiveProfiles("test")
-public class SpringBootStarterTestClass {
+public class CreateAnimalServiceImplTest {
     Animal cat1, cat2, cat3, dog1, wolf1, wolf2, shark1;
     Map<AnimalEnum, List<Animal>> animals;
 

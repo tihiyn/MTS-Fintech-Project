@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 @DisplayName("Class for testing application")
 @SpringBootTest
 @ActiveProfiles("test")
-public class SpringBootApplicationTestClass {
+public class AnimalRepositoryImplTest {
     Animal cat1, cat2, cat3, dog1, dog2, wolf1, wolf2, shark1, shark2, sameCat2, sameShark1, sameCat3;
     @MockBean
     private CreateAnimalService createAnimalService;
@@ -35,7 +35,7 @@ public class SpringBootApplicationTestClass {
      * Своя реализация метода contains.
      * Метод проверяет, содержится ли в списке из HashMap заданная HashMap
      *
-     * @param list      список из HashMap
+     * @param list список из HashMap
      * @param targetMap заданная HashMap
      * @return {@code true} если list содержит targetMap
      * @author Nikita

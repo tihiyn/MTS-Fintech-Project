@@ -21,11 +21,11 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 
-@DisplayName("Outer class")
-class TestClass {
+@DisplayName("Class for unit testing")
+class JUnitTest {
     @Nested
     @DisplayName("Class for testing method equals from AbstractAnimal")
-    public class FirstInnerClass {
+    public class AbstractAnimalTest {
         @Test
         @DisplayName("Test override method equals")
         public void equals() {
@@ -57,7 +57,7 @@ class TestClass {
     @Nested
     @DisplayName("Class for testing methods from AnimalsRepositoryImpl")
     @ExtendWith(MockitoExtension.class)
-    public class SecondInnerClass {
+    public class AnimalsRepositoryImplTest {
         @Mock
         CreateAnimalService createAnimalService;
         Animal cat1, cat2, cat3, dog1, dog2, wolf1, wolf2, shark1, shark2, sameCat2, sameShark1, sameCat3;
