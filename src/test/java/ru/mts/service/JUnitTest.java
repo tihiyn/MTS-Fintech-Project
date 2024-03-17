@@ -8,6 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import ru.mts.exceptions.IllegalCollectionSizeException;
+import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.*;
 import ru.mts.repository.AnimalsRepository;
 import ru.mts.repository.AnimalsRepositoryImpl;
@@ -193,7 +195,7 @@ class JUnitTest {
 
         @DisplayName("Test method findOlderAnimal")
         @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
-        @ValueSource(ints = {10, 9, 20, 50, 24, 12, 18, 5})
+        @ValueSource(ints = {10, 9, 20, 50, 24, 12, 18, 5, 0, -2})
         public void findOlderAnimal(int value) {
             AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(createAnimalService);
 
@@ -237,8 +239,12 @@ class JUnitTest {
                     }},
 
                     new HashMap<>() {{
+                        put(cat1, 10);
+                        put(cat2, 10);
+                        put(dog1, 10);
+                    }},
 
-                    }}
+                    new HashMap<>()
             );
 
             switch (value) {
@@ -267,6 +273,13 @@ class JUnitTest {
                     }});
                     when(createAnimalService.receiveAnimalTypes()).thenReturn(List.of(AnimalEnum.DOG));
                     break;
+                case 0:
+                    when(createAnimalService.receiveCreatedAnimals()).thenReturn(new HashMap<>() {{
+                        put(AnimalEnum.CAT, new ArrayList<>(List.of(cat1, cat2)));
+                        put(AnimalEnum.DOG, new ArrayList<>(List.of(dog1)));
+                    }});
+                    when(createAnimalService.receiveAnimalTypes()).thenReturn(List.of(AnimalEnum.CAT, AnimalEnum.DOG));
+                    break;
                 default:
                     when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
                     when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
@@ -278,7 +291,12 @@ class JUnitTest {
                 assertThrows(NullPointerException.class, () -> {
                     animalsRepository.findOlderAnimal(value);
                 });
-            } else {
+            } else if (value == -2) {
+                assertThrows(NegativeArgumentException.class, () -> {
+                    animalsRepository.findOlderAnimal(value);
+                });
+            }
+            else {
                 assertTrue(containsHashMap(outputResults, animalsRepository.findOlderAnimal(value)));
             }
         }
@@ -562,7 +580,7 @@ class JUnitTest {
         @DisplayName("Test findMinCostAnimals method")
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7})
-        public void findMinCostAnimals(int value) {
+        public void findMinCostAnimals(int value) throws IllegalCollectionSizeException {
             AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(createAnimalService);
 
             Map<AnimalEnum, List<Animal>> animals = new HashMap<>();
@@ -649,7 +667,12 @@ class JUnitTest {
                 assertThrows(NullPointerException.class, () -> {
                     animalsRepository.findMinCostAnimals();
                 });
-            } else {
+            } else if (value == 3 || value == 7) {
+                assertThrows(IllegalCollectionSizeException.class, () -> {
+                    animalsRepository.findMinCostAnimals();
+                });
+            }
+            else {
                 assertEquals(minCostAnimals, animalsRepository.findMinCostAnimals());
             }
         }

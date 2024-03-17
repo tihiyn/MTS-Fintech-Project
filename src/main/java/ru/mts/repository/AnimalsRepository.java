@@ -1,12 +1,13 @@
 package ru.mts.repository;
 
+import ru.mts.exceptions.IllegalCollectionSizeException;
+import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalEnum;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface AnimalsRepository {
     /**
@@ -44,6 +45,7 @@ public interface AnimalsRepository {
      * Метод ищет дубликаты среди животных.
      * Внутри вызывается метод для логирования.
      *
+     * @throws NegativeArgumentException - если возраст отрицательный
      * @return Map<String, Integer>, где String - тип животного, Integer - кол-во дубликатов данного типа
      * @author Nikita
      * @since 1.1
@@ -72,9 +74,10 @@ public interface AnimalsRepository {
     /**
      * Метод ищет 3 животных с самой низкой ценой
      *
+     * @throws IllegalCollectionSizeException - если животных меньше 3
      * @return список имён животных, отсортированный в обратном алфавитном порядке
      * @author Nikita
      * @since 1.6
      */
-    List<String> findMinCostAnimals();
+    List<String> findMinCostAnimals() throws IllegalCollectionSizeException;
 }

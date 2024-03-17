@@ -8,6 +8,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import ru.mts.AnimalsProperties;
+import ru.mts.exceptions.IllegalCollectionSizeException;
+import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.*;
 import ru.mts.repository.AnimalsRepository;
 
@@ -35,7 +37,7 @@ public class AnimalRepositoryImplTest {
      * Своя реализация метода contains.
      * Метод проверяет, содержится ли в списке из HashMap заданная HashMap
      *
-     * @param list список из HashMap
+     * @param list      список из HashMap
      * @param targetMap заданная HashMap
      * @return {@code true} если list содержит targetMap
      * @author Nikita
@@ -161,7 +163,7 @@ public class AnimalRepositoryImplTest {
 
     @DisplayName("Test findOlderAnimal method")
     @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
-    @ValueSource(ints = {50, 10, 9, 20, 24, 12, 18, 5})
+    @ValueSource(ints = {50, 10, 9, 20, 24, 12, 18, 5, 0, -2})
     public void findOlderAnimal(int value) {
         Map<AnimalEnum, List<Animal>> animals = new HashMap<>();
 
@@ -203,8 +205,12 @@ public class AnimalRepositoryImplTest {
                 }},
 
                 new HashMap<>() {{
+                    put(cat1, 10);
+                    put(cat2, 10);
+                    put(dog1, 10);
+                }},
 
-                }}
+                new HashMap<>()
         );
 
         switch (value) {
@@ -233,6 +239,13 @@ public class AnimalRepositoryImplTest {
                 }});
                 when(createAnimalService.receiveAnimalTypes()).thenReturn(List.of(AnimalEnum.DOG));
                 break;
+            case 0:
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new HashMap<>() {{
+                    put(AnimalEnum.CAT, new ArrayList<>(List.of(cat1, cat2)));
+                    put(AnimalEnum.DOG, new ArrayList<>(List.of(dog1)));
+                }});
+                when(createAnimalService.receiveAnimalTypes()).thenReturn(List.of(AnimalEnum.CAT, AnimalEnum.DOG));
+                break;
             default:
                 when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
                 when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
@@ -244,7 +257,12 @@ public class AnimalRepositoryImplTest {
             assertThrows(NullPointerException.class, () -> {
                 animalsRepository.findOlderAnimal(value);
             });
-        } else {
+        } else if (value == -2) {
+            assertThrows(NegativeArgumentException.class, () -> {
+                animalsRepository.findOlderAnimal(value);
+            });
+        }
+        else {
             assertTrue(containsHashMap(outputResults, animalsRepository.findOlderAnimal(value)));
         }
     }
@@ -522,7 +540,7 @@ public class AnimalRepositoryImplTest {
     @DisplayName("Test findMinCostAnimals method")
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7})
-    public void findMinCostAnimals(int value) {
+    public void findMinCostAnimals(int value) throws IllegalCollectionSizeException {
         Map<AnimalEnum, List<Animal>> animals = new HashMap<>();
         List<AnimalEnum> animalTypes;
         List<String> minCostAnimals = new ArrayList<>();
@@ -607,7 +625,12 @@ public class AnimalRepositoryImplTest {
             assertThrows(NullPointerException.class, () -> {
                 animalsRepository.findMinCostAnimals();
             });
-        } else {
+        } else if (value == 3 || value == 7) {
+            assertThrows(IllegalCollectionSizeException.class, () -> {
+                animalsRepository.findMinCostAnimals();
+            });
+        }
+        else {
             assertEquals(minCostAnimals, animalsRepository.findMinCostAnimals());
         }
     }

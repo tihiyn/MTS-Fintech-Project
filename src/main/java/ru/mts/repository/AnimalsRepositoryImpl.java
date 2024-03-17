@@ -2,6 +2,8 @@ package ru.mts.repository;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Repository;
+import ru.mts.exceptions.IllegalCollectionSizeException;
+import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalEnum;
 import ru.mts.service.CreateAnimalService;
@@ -60,29 +62,33 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     @Override
     public Map<Animal, Integer> findOlderAnimal(int N) {
 
-        Animal oldestAnimal = animalStorage.entrySet().stream()
-                .filter(entry -> entry.getKey() != null)
-                .flatMap(entry -> entry.getValue().stream()).min((animal1, animal2) -> {
-                    if (animal1.getBirthDate().isBefore(animal2.getBirthDate()))
-                        return -1;
-                    else if (animal1.getBirthDate().equals(animal2.getBirthDate()))
-                        return 0;
-                    else
-                        return 1;
-                })
-                .orElse(null);
+        if (N >= 0) {
+            Animal oldestAnimal = animalStorage.entrySet().stream()
+                    .filter(entry -> entry.getKey() != null)
+                    .flatMap(entry -> entry.getValue().stream()).min((animal1, animal2) -> {
+                        if (animal1.getBirthDate().isBefore(animal2.getBirthDate()))
+                            return -1;
+                        else if (animal1.getBirthDate().equals(animal2.getBirthDate()))
+                            return 0;
+                        else
+                            return 1;
+                    })
+                    .orElse(null);
 
-        Map<Animal, Integer> olderAnimals =  animalStorage.entrySet().stream()
-                .filter(entry -> entry.getKey() != null)
-                .flatMap(entry -> entry.getValue().stream()
-                        .filter(animal -> Period.between(animal.getBirthDate(), LocalDate.now()).getYears() > N)
-                        .map(animal -> Map.entry(animal, Period.between(animal.getBirthDate(), LocalDate.now()).getYears())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            Map<Animal, Integer> olderAnimals = animalStorage.entrySet().stream()
+                    .filter(entry -> entry.getKey() != null)
+                    .flatMap(entry -> entry.getValue().stream()
+                            .filter(animal -> Period.between(animal.getBirthDate(), LocalDate.now()).getYears() > N)
+                            .map(animal -> Map.entry(animal, Period.between(animal.getBirthDate(), LocalDate.now()).getYears())))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        if (olderAnimals.isEmpty() && oldestAnimal != null)
-            olderAnimals.put(oldestAnimal, Period.between(oldestAnimal.getBirthDate(), LocalDate.now()).getYears());
+            if (olderAnimals.isEmpty() && oldestAnimal != null)
+                olderAnimals.put(oldestAnimal, Period.between(oldestAnimal.getBirthDate(), LocalDate.now()).getYears());
 
-        return olderAnimals;
+            return olderAnimals;
+        } else {
+            throw new NegativeArgumentException("Age can't be a negative");
+        }
     }
 
     /**
@@ -96,6 +102,7 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     private void printSetOfDuplicates(Set<Animal> dupl) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         int counter = 0;
+
 
         System.out.println("Animal duplicates: ");
         for (Animal animal : dupl) {
@@ -160,14 +167,22 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     }
 
     @Override
-    public List<String> findMinCostAnimals() {
-        return animalStorage.entrySet().stream()
-                .filter(entry -> entry.getKey() != null)
-                .flatMap(entry -> entry.getValue().stream())
-                .sorted(Comparator.comparingDouble(animal -> animal.getCost().doubleValue()))
-                .map(Animal::getName)
-                .limit(3)
-                .sorted(Comparator.reverseOrder())
-                .toList();
+    public List<String> findMinCostAnimals() throws IllegalCollectionSizeException {
+        long numOfAnimals = animalStorage.values().stream()
+                .mapToLong(List::size)
+                .sum();
+
+        if (numOfAnimals >= 3) {
+            return animalStorage.entrySet().stream()
+                    .filter(entry -> entry.getKey() != null)
+                    .flatMap(entry -> entry.getValue().stream())
+                    .sorted(Comparator.comparingDouble(animal -> animal.getCost().doubleValue()))
+                    .map(Animal::getName)
+                    .limit(3)
+                    .sorted(Comparator.reverseOrder())
+                    .toList();
+        } else {
+            throw new IllegalCollectionSizeException("Low number of animals; Expected: 3, actual: ", numOfAnimals);
+        }
     }
 }
