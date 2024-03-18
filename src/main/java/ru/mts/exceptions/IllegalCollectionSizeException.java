@@ -1,8 +1,6 @@
 package ru.mts.exceptions;
 
-import java.io.IOException;
-
-public class IllegalCollectionSizeException extends IOException {
+public class IllegalCollectionSizeException extends Exception {
     public IllegalCollectionSizeException(String message, long size) {
         super(message + size);
     }

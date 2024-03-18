@@ -1,6 +1,8 @@
 package ru.mts.repository;
 
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
@@ -19,6 +21,9 @@ import java.util.stream.Collectors;
 
 @Repository
 public class AnimalsRepositoryImpl implements AnimalsRepository {
+
+    private static Logger logger = LoggerFactory.getLogger(AnimalsRepositoryImpl.class);
+
     private Map<AnimalEnum, List<Animal>> animalStorage;
 
     private CreateAnimalService createAnimalService;
@@ -43,8 +48,9 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     public void fillStorage() {
         animalStorage = createAnimalService.receiveCreatedAnimals();
 
+        logger.info("Типы созданных животных");
         for (AnimalEnum type : createAnimalService.receiveAnimalTypes()) {
-            System.out.println(type);
+            logger.info(String.valueOf(type));
         }
         System.out.println();
     }

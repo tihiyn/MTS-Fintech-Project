@@ -1,5 +1,7 @@
 package ru.mts.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -20,6 +22,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @Scope("prototype")
 @EnableConfigurationProperties(AnimalsProperties.class)
 public class CreateAnimalServiceImpl implements CreateAnimalService {
+
+    private static Logger logger = LoggerFactory.getLogger(CreateAnimalServiceImpl.class);
     private List<AnimalEnum> animalTypes;
     private Map<AnimalEnum, List<Animal>> createdAnimals;
 
@@ -81,14 +85,13 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
             default -> null;
         };
 
-        System.out.format("%d-ое животное: %s\n", counter, animal.getClass().getName());
-        System.out.println("Порода: " + animal.getBreed());
-        System.out.println("Кличка: " + animal.getName());
-        System.out.println("Цена: " + animal.getCost());
-        System.out.println("Характер: " + animal.getCharacter());
-        System.out.println("Голос: " + animal.getVoice());
-        System.out.println("День рождения животного: " + animal.getBirthDate().format(formatter));
-        System.out.println();
+        logger.info("{}-ое животное: {}", counter, animal.getClass().getName());
+        logger.info("Порода: {}", animal.getBreed());
+        logger.info("Кличка: {}", animal.getName());
+        logger.info("Цена: {}", animal.getCost());
+        logger.info("Характер: {}", animal.getCharacter());
+        logger.info("Голос: {}", animal.getVoice());
+        logger.info("День рождения животного: {}", animal.getBirthDate().format(formatter));
 
         return animal;
     }

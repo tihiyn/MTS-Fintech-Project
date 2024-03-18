@@ -1,5 +1,8 @@
 package ru.mts;
 
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ru.mts.exceptions.IllegalCollectionSizeException;
@@ -14,6 +17,8 @@ import java.util.Map;
 
 @Component
 public class Scheduler {
+    private static Logger logger = LoggerFactory.getLogger(Scheduler.class);
+
     private AnimalsRepository animalsRepository;
 
     public Scheduler(AnimalsRepositoryImpl animalsRepository) {
@@ -30,42 +35,37 @@ public class Scheduler {
     @Scheduled(fixedRate = 60000)
     public void printResults() {
         try {
-            System.out.println("Names of animals that were born in a leap year: ");
+            logger.info("Names of animals that were born in a leap year");
             for (Map.Entry<String, LocalDate> node : animalsRepository.findLeapYearNames().entrySet()) {
-                System.out.format("Name: %s, Birth Date: %s %n", node.getKey(), node.getValue());
+                logger.info("Name: {}, Birth Date: {}", node.getKey(), node.getValue());
             }
-            System.out.println();
 
             int N = 25;
-            System.out.format("Names of animals that are more than %d y.o.: %n", N);
+            logger.info("Names of animals that are more than {} y.o.", N);
             for (Map.Entry<Animal, Integer> node : animalsRepository.findOlderAnimal(N).entrySet()) {
-                System.out.format("Name: %s, Age: %d %n", node.getKey().getName(), node.getValue());
+                logger.info("Name: {}, Age: {}", node.getKey().getName(), node.getValue());
             }
-            System.out.println();
 
-            System.out.println("Duplicates of animals: ");
+            logger.info("Duplicates of animals");
             for (Map.Entry<String, List<Animal>> node : animalsRepository.findDuplicate().entrySet()) {
-                System.out.format("Type: %s, Duplicates: %s %n", node.getKey(), node.getValue());
+                logger.info("Type: {}, Duplicates: {}", node.getKey(), node.getValue());
             }
-            System.out.println();
 
-            System.out.format("Average animal age: %.2f %n", animalsRepository.findAverageAge());
-            System.out.println();
+            logger.info("Average animal age: {}", animalsRepository.findAverageAge());
 
-            System.out.println("Old and expensive: ");
+            logger.info("Old and expensive");
             for (Animal animal : animalsRepository.findOldAndExpensive()) {
-                System.out.println(animal.getName());
+                logger.info(animal.getName());
             }
-            System.out.println();
 
-            System.out.println("Min cost animals: ");
+            logger.info("Min cost animals");
             for (String animalsName : animalsRepository.findMinCostAnimals()) {
-                System.out.println(animalsName);
+                logger.info(animalsName);
             }
         } catch (NegativeArgumentException e) {
-            System.out.println(e.getMessage());
+            logger.warn(e.getMessage());
         } catch (IllegalCollectionSizeException e) {
-            System.out.format(e.getMessage());
+            logger.warn(e.getMessage());
         }
     }
 }
