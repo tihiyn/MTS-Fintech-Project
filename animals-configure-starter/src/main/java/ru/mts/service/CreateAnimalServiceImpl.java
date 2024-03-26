@@ -101,7 +101,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     }
 
     @Override
-    public synchronized void defineTypeOfAnimals() {
+    public void defineTypeOfAnimals() {
         createdAnimals = createAnimals();
 
         animalTypes = new CopyOnWriteArrayList<>();

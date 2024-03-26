@@ -15,6 +15,11 @@ import ru.mts.repository.AnimalsRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
 public class Scheduler {
@@ -29,37 +34,28 @@ public class Scheduler {
 
     @PostConstruct
     public void runThreads() {
-        Thread thread1 = new Thread(() -> {
-            while (true) {
-                animalsRepository = animalsRepositoryObjectFactory.getObject();
-                logger.info("Duplicates of animals");
-                for (Map.Entry<String, List<Animal>> node : animalsRepository.findDuplicate().entrySet()) {
-                    logger.info("Type: {}, Duplicates: {}", node.getKey(), node.getValue());
-                }
-                try {
-                    Thread.sleep(10000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
+        ScheduledExecutorService service = Executors.newScheduledThreadPool(2, new NamedThreadFactory());
+        service.scheduleWithFixedDelay(() -> {
+            animalsRepository = animalsRepositoryObjectFactory.getObject();
+            logger.info("Duplicates of animals");
+            for (Map.Entry<String, List<Animal>> node : animalsRepository.findDuplicate().entrySet()) {
+                logger.info("Type: {}, Duplicates: {}", node.getKey(), node.getValue());
             }
-        });
-        thread1.setName("printDuplicateTread");
+        }, 0, 10, TimeUnit.SECONDS);
 
-        Thread thread2 = new Thread(() -> {
-            while (true) {
-                animalsRepository = animalsRepositoryObjectFactory.getObject();
-                logger.info("Average animal age: {}", animalsRepository.findAverageAge());
-                try {
-                    Thread.sleep(20000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
-        thread2.setName("findAverageAgeTread");
+        service.scheduleWithFixedDelay(() -> {
+            animalsRepository = animalsRepositoryObjectFactory.getObject();
+            logger.info("Average animal age: {}", animalsRepository.findAverageAge());
+        }, 0, 20, TimeUnit.SECONDS);
+    }
 
-        thread1.start();
-        thread2.start();
+    static class NamedThreadFactory implements ThreadFactory {
+        private final AtomicInteger threadsCounter = new AtomicInteger(0);
+
+        @Override
+        public Thread newThread(Runnable r) {
+            return new Thread(r, "MyThread-" + threadsCounter.incrementAndGet());
+        }
     }
 
     /**
