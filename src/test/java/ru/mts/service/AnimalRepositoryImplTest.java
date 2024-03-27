@@ -6,7 +6,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.test.context.ActiveProfiles;
 import ru.mts.AnimalsProperties;
 import ru.mts.exceptions.IllegalCollectionSizeException;
@@ -28,10 +28,11 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 @ActiveProfiles("test")
 public class AnimalRepositoryImplTest {
-    Animal cat1, cat2, cat3, dog1, dog2, wolf1, wolf2, shark1, shark2, sameCat2, sameShark1, sameCat3;
+    Animal cat1, cat2, cat3, cat4, dog1, dog2, wolf1, wolf2, shark1, shark2, sameCat2, sameShark1, sameCat3;
     @MockBean
     private CreateAnimalService createAnimalService;
     @Autowired
+    @Lazy
     private AnimalsRepository animalsRepository;
     @Autowired
     private AnimalsProperties animalsProperties;
@@ -66,6 +67,7 @@ public class AnimalRepositoryImplTest {
         cat1 = new Cat("Британская", animalsProperties.getCatNames().get(1), BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Добрый", LocalDate.now().minusYears(10).minusDays(1));
         cat2 = new Cat("Шотландская", animalsProperties.getCatNames().get(0), BigDecimal.valueOf(12000.05).setScale(2, RoundingMode.HALF_UP), "Верный", LocalDate.of(2013, 4, 18));
         cat3 = new Cat("Сфинкс", animalsProperties.getCatNames().get(2), BigDecimal.valueOf(7000.2).setScale(2, RoundingMode.HALF_UP), "Вредный", LocalDate.of(2008, 9, 9));
+        cat4 = new Cat("Сфинкс", animalsProperties.getCatNames().get(2), BigDecimal.valueOf(13760.23).setScale(2, RoundingMode.HALF_UP), "Злой", LocalDate.of(2004, 2, 14));
 
         dog1 = new Dog("Доберман", animalsProperties.getDogNames().get(2), BigDecimal.valueOf(25000).setScale(2, RoundingMode.HALF_UP), "Злой", LocalDate.now().minusYears(10));
         dog2 = new Dog("Лабрадор", animalsProperties.getDogNames().get(1), BigDecimal.valueOf(32000.33).setScale(2, RoundingMode.HALF_UP), "Верный", LocalDate.of(2020, 2, 15));
@@ -84,7 +86,7 @@ public class AnimalRepositoryImplTest {
 
     @DisplayName("Test findLeapYearNames method")
     @ParameterizedTest(name = "Test {arguments}")
-    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
     public void findLeapYearNames(int value) {
         ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
         CopyOnWriteArrayList<AnimalEnum> animalTypes;
@@ -134,6 +136,15 @@ public class AnimalRepositoryImplTest {
             case 5:
                 animalTypes = new CopyOnWriteArrayList<>();
                 break;
+            case 6:
+                animals.put(AnimalEnum.CAT, List.of(cat3, cat1, cat4));
+                animals.put(AnimalEnum.SHARK, List.of(shark1));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.SHARK));
+
+                leapYearAnimals.put("CAT " + cat3.getName(), LocalDate.of(2008, 9, 9));
+                leapYearAnimals.put("SHARK " + shark1.getName(), LocalDate.of(1996, 6, 13));
+                break;
             default:
                 throw new IllegalStateException("Unexpected value: " + value);
         }
@@ -151,477 +162,412 @@ public class AnimalRepositoryImplTest {
         }
     }
 
-//    @DisplayName("Test findOlderAnimal method")
-//    @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
-//    @ValueSource(ints = {50, 10, 9, 20, 24, 12, 18, 5, 0, -2})
-//    public void findOlderAnimal(int value) {
-//        Map<AnimalEnum, List<Animal>> animals = new HashMap<>();
-//
-//        initAnimals();
-//        animals.put(AnimalEnum.CAT, List.of(cat1, cat3, cat2));
-//        animals.put(AnimalEnum.DOG, List.of(dog1));
-//        animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
-//        animals.put(AnimalEnum.SHARK, List.of(shark1));
-//
-//        List<AnimalEnum> animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF, AnimalEnum.SHARK);
-//
-//        List<HashMap<Animal, Integer>> outputResults = List.of(
-//                new HashMap<>() {{
-//                    put(cat3, 15);
-//                    put(wolf2, 27);
-//                    put(shark1, 27);
-//                }},
-//                new HashMap<>() {{
-//                    put(cat1, 10);
-//                    put(cat2, 10);
-//                    put(cat3, 15);
-//                    put(dog1, 10);
-//                    put(wolf2, 27);
-//                    put(shark1, 27);
-//                }},
-//                new HashMap<>() {{
-//                    put(wolf2, 27);
-//                    put(shark1, 27);
-//                }},
-//                new HashMap<>() {{
-//                    put(shark1, 27);
-//                }},
-//                new HashMap<>() {{
-//                    put(null, 0);
-//                }},
-//
-//                new HashMap<>() {{
-//                    put(dog1, 10);
-//                }},
-//
-//                new HashMap<>() {{
-//                    put(cat1, 10);
-//                    put(cat2, 10);
-//                    put(dog1, 10);
-//                }},
-//
-//                new HashMap<>()
-//        );
-//
-//        switch (value) {
-//            case 24:
-//                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new HashMap<>() {{
-//                    put(AnimalEnum.CAT, Arrays.asList(cat1, null));
-//                    put(AnimalEnum.DOG, List.of(dog1));
-//                }});
-//                when(createAnimalService.receiveAnimalTypes()).thenReturn(Arrays.asList(AnimalEnum.CAT, null, AnimalEnum.DOG));
-//                break;
-//            case 12:
-//                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new HashMap<>() {{
-//                    put(AnimalEnum.CAT, new ArrayList<>());
-//                    put(AnimalEnum.DOG, new ArrayList<>());
-//                }});
-//                when(createAnimalService.receiveAnimalTypes()).thenReturn(new ArrayList<>());
-//                break;
-//            case 18:
-//                when(createAnimalService.receiveCreatedAnimals()).thenReturn(null);
-//                when(createAnimalService.receiveAnimalTypes()).thenReturn(new ArrayList<>());
-//                break;
-//            case 5:
-//                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new HashMap<>() {{
-//                    put(null, new ArrayList<>(List.of(cat1, cat2)));
-//                    put(AnimalEnum.DOG, new ArrayList<>(List.of(dog1)));
-//                }});
-//                when(createAnimalService.receiveAnimalTypes()).thenReturn(List.of(AnimalEnum.DOG));
-//                break;
-//            case 0:
-//                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new HashMap<>() {{
-//                    put(AnimalEnum.CAT, new ArrayList<>(List.of(cat1, cat2)));
-//                    put(AnimalEnum.DOG, new ArrayList<>(List.of(dog1)));
-//                }});
-//                when(createAnimalService.receiveAnimalTypes()).thenReturn(List.of(AnimalEnum.CAT, AnimalEnum.DOG));
-//                break;
-//            default:
-//                when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
-//                when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
-//                break;
-//        }
-//
-//        animalsRepository.fillStorage();
-//        if (value == 24 || value == 18) {
-//            assertThrows(NullPointerException.class, () -> {
-//                animalsRepository.findOlderAnimal(value);
-//            });
-//        } else if (value == -2) {
-//            assertThrows(NegativeArgumentException.class, () -> {
-//                animalsRepository.findOlderAnimal(value);
-//            });
-//        }
-//        else {
-//            assertTrue(containsHashMap(outputResults, animalsRepository.findOlderAnimal(value)));
-//        }
-//    }
-//
-//    @DisplayName("Test findDuplicate method")
-//    @ParameterizedTest(name = "Test {arguments}")
-//    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7, 8})
-//    public void findDuplicate(int value) {
-//        Map<AnimalEnum, List<Animal>> animals = new HashMap<>();
-//        List<AnimalEnum> animalTypes;
-//        Map<String, List<Animal>> duplicates = new HashMap<>();
-//
-//        initAnimals();
-//        switch (value) {
-//            case 0:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat3, sameCat3, cat3, cat2, sameCat2));
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
-//                animals.put(AnimalEnum.SHARK, List.of(shark1, sameShark1, shark1, sameShark1));
-//
-//                animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT,
-//                        AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF,
-//                        AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK);
-//
-//                duplicates.put("class ru.mts.model.Cat", List.of(cat3, sameCat3, cat3, cat2, sameCat2));
-//                duplicates.put("class ru.mts.model.Shark", List.of(shark1, sameShark1, shark1, sameShark1));
-//                break;
-//            case 1:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat3, cat2));
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
-//                animals.put(AnimalEnum.SHARK, List.of(shark1, shark1, shark1));
-//
-//                animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF,
-//                        AnimalEnum.WOLF, AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK);
-//
-//                duplicates.put("class ru.mts.model.Shark", List.of(shark1, shark1, shark1));
-//                break;
-//            case 2:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat3, cat2));
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
-//                animals.put(AnimalEnum.SHARK, List.of(shark1));
-//
-//                animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF,
-//                        AnimalEnum.WOLF, AnimalEnum.SHARK);
-//                break;
-//            case 3:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat3));
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//                animals.put(AnimalEnum.WOLF, Arrays.asList(null, null));
-//
-//                animalTypes = Arrays.asList(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF);
-//
-//                break;
-//            case 4:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat3));
-//                animals.put(AnimalEnum.DOG, null);
-//
-//                animalTypes = Arrays.asList(AnimalEnum.CAT, AnimalEnum.CAT);
-//                break;
-//            case 5:
-//                // случай, когда key равен null
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat3));
-//                animals.put(null, List.of(dog1));
-//
-//                animalTypes = Arrays.asList(AnimalEnum.CAT, AnimalEnum.CAT);
-//                break;
-//            case 6:
-//                animals = null;
-//
-//                animalTypes = new ArrayList<>();
-//                break;
-//            case 7:
-//                animalTypes = new ArrayList<>();
-//                break;
-//            case 8:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat2, cat3, sameCat2, cat2, cat1));
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
-//                animals.put(AnimalEnum.SHARK, List.of(shark1, shark1));
-//
-//                animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT,
-//                        AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF,
-//                        AnimalEnum.SHARK, AnimalEnum.SHARK);
-//
-//                duplicates.put("class ru.mts.model.Cat", List.of(cat1, cat2, sameCat2, cat2, cat1));
-//                duplicates.put("class ru.mts.model.Shark", List.of(shark1, shark1));
-//                break;
-//            default:
-//                throw new IllegalStateException("Unexpected value: " + value);
-//        }
-//
-//        when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
-//        when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
-//
-//        animalsRepository.fillStorage();
-//        if (value == 6 || value == 3 || value == 4) {
-//            assertThrows(NullPointerException.class, () -> {
-//                animalsRepository.findDuplicate();
-//            });
-//        } else {
-//            assertEquals(duplicates, animalsRepository.findDuplicate());
-//        }
-//    }
-//
-//    @DisplayName("Test findAverageAge method")
-//    @ParameterizedTest(name = "Test {arguments}")
-//    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7})
-//    public void findAverageAge(int value) {
-//        Map<AnimalEnum, List<Animal>> animals = new HashMap<>();
-//        List<AnimalEnum> animalTypes;
-//        double averageAge = 0;
-//
-//        initAnimals();
-//        switch (value) {
-//            case 0:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat3, cat2));
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
-//                animals.put(AnimalEnum.SHARK, List.of(shark1));
-//
-//                animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF, AnimalEnum.SHARK);
-//
-//                averageAge = 15.43;
-//                break;
-//            case 1:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat2));
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
-//
-//                animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF);
-//
-//                averageAge = 13.2;
-//                break;
-//            case 2:
-//                animals.put(AnimalEnum.SHARK, List.of(shark1));
-//                animals.put(AnimalEnum.DOG, new ArrayList<>());
-//                animals.put(AnimalEnum.WOLF, Arrays.asList(wolf1, null));
-//                animals.put(AnimalEnum.CAT, new ArrayList<>());
-//
-//                animalTypes = Arrays.asList(AnimalEnum.SHARK, AnimalEnum.WOLF, null);
-//                break;
-//            case 3:
-//                animals.put(AnimalEnum.CAT, new ArrayList<>());
-//                animals.put(AnimalEnum.DOG, new ArrayList<>());
-//                animals.put(AnimalEnum.WOLF, new ArrayList<>());
-//                animals.put(AnimalEnum.SHARK, new ArrayList<>());
-//
-//                animalTypes = new ArrayList<>();
-//                break;
-//            case 4:
-//                animals.put(AnimalEnum.CAT, null);
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//
-//                animalTypes = List.of(AnimalEnum.DOG);
-//                break;
-//            case 5:
-//                animals.put(null, Arrays.asList(cat1));
-//                animals.put(AnimalEnum.SHARK, List.of(shark1));
-//
-//                animalTypes = List.of(AnimalEnum.SHARK);
-//
-//                averageAge = 27;
-//                break;
-//            case 6:
-//                animals = null;
-//
-//                animalTypes = new ArrayList<>();
-//                break;
-//            case 7:
-//                animalTypes = new ArrayList<>();
-//                break;
-//            default:
-//                throw new IllegalStateException("Unexpected value: " + value);
-//        }
-//
-//        when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
-//        when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
-//
-//        animalsRepository.fillStorage();
-//        if (value == 2 || value == 4 || value == 6) {
-//            assertThrows(NullPointerException.class, () -> {
-//                animalsRepository.findAverageAge();
-//            });
-//        } else {
-//            assertEquals(averageAge, animalsRepository.findAverageAge());
-//        }
-//    }
-//
-//    @DisplayName("Test findOldAndExpensive method")
-//    @ParameterizedTest(name = "Test {arguments}")
-//    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7})
-//    public void findOldAndExpensive(int value) {
-//        Map<AnimalEnum, List<Animal>> animals = new HashMap<>();
-//        List<AnimalEnum> animalTypes;
-//        List<Animal> oldAndExpensiveAnimals = new ArrayList<>();
-//
-//        initAnimals();
-//        switch (value) {
-//            case 0:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat3));
-//                animals.put(AnimalEnum.DOG, List.of(dog1, dog2));
-//                animals.put(AnimalEnum.WOLF, List.of(wolf1));
-//                animals.put(AnimalEnum.SHARK, List.of(shark1, shark2));
-//
-//                animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.SHARK, AnimalEnum.SHARK);
-//
-//                oldAndExpensiveAnimals = List.of(shark1, wolf1);
-//                break;
-//            case 1:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat2));
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//                animals.put(AnimalEnum.SHARK, List.of(shark2));
-//
-//                animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.SHARK);
-//
-//                break;
-//            case 2:
-//                animals.put(AnimalEnum.SHARK, List.of(shark1));
-//                animals.put(AnimalEnum.DOG, new ArrayList<>());
-//                animals.put(AnimalEnum.WOLF, Arrays.asList(wolf1, null));
-//                animals.put(AnimalEnum.CAT, new ArrayList<>());
-//
-//                animalTypes = Arrays.asList(AnimalEnum.SHARK, AnimalEnum.WOLF, null);
-//                break;
-//            case 3:
-//                animals.put(AnimalEnum.CAT, new ArrayList<>());
-//                animals.put(AnimalEnum.DOG, new ArrayList<>());
-//                animals.put(AnimalEnum.WOLF, new ArrayList<>());
-//                animals.put(AnimalEnum.SHARK, new ArrayList<>());
-//
-//                animalTypes = new ArrayList<>();
-//                break;
-//            case 4:
-//                animals.put(AnimalEnum.CAT, null);
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//
-//                animalTypes = List.of(AnimalEnum.DOG);
-//                break;
-//            case 5:
-//                animals.put(null, Arrays.asList(cat1));
-//                animals.put(AnimalEnum.SHARK, List.of(shark1));
-//                animals.put(AnimalEnum.DOG, List.of(dog2));
-//
-//                animalTypes = List.of(AnimalEnum.SHARK, AnimalEnum.DOG);
-//
-//                oldAndExpensiveAnimals = List.of(shark1);
-//                break;
-//            case 6:
-//                animals = null;
-//
-//                animalTypes = new ArrayList<>();
-//                break;
-//            case 7:
-//                animalTypes = new ArrayList<>();
-//                break;
-//            default:
-//                throw new IllegalStateException("Unexpected value: " + value);
-//        }
-//
-//        when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
-//        when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
-//
-//        animalsRepository.fillStorage();
-//        if (value == 2 || value == 4 || value == 6) {
-//            assertThrows(NullPointerException.class, () -> {
-//                animalsRepository.findOldAndExpensive();
-//            });
-//        } else {
-//            assertEquals(oldAndExpensiveAnimals, animalsRepository.findOldAndExpensive());
-//        }
-//    }
-//
-//    @DisplayName("Test findMinCostAnimals method")
-//    @ParameterizedTest(name = "Test {arguments}")
-//    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6, 7})
-//    public void findMinCostAnimals(int value) throws IllegalCollectionSizeException {
-//        Map<AnimalEnum, List<Animal>> animals = new HashMap<>();
-//        List<AnimalEnum> animalTypes;
-//        List<String> minCostAnimals = new ArrayList<>();
-//
-//        initAnimals();
-//        switch (value) {
-//            case 0:
-//                animals.put(AnimalEnum.CAT, List.of(cat3));
-//                animals.put(AnimalEnum.DOG, List.of(dog1, dog2));
-//                animals.put(AnimalEnum.WOLF, List.of(wolf1));
-//                animals.put(AnimalEnum.SHARK, List.of(shark1, shark2));
-//
-//                animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.SHARK, AnimalEnum.SHARK);
-//
-//                // cat3, dog1, dog2
-//                // Ричард, Бобик, Дружок
-//                // Ричард, Дружок, Бобик
-//                minCostAnimals = List.of(cat3.getName(), dog2.getName(), dog1.getName());
-//                break;
-//            case 1:
-//                animals.put(AnimalEnum.CAT, List.of(cat1, cat2));
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//                animals.put(AnimalEnum.SHARK, List.of(shark2));
-//
-//                animalTypes = List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.SHARK);
-//
-//                // cat1, cat2, dog1
-//                // Миса, Лёлик, Бобик
-//                minCostAnimals = List.of(cat1.getName(), cat2.getName(), dog1.getName());
-//                break;
-//            case 2:
-//                animals.put(AnimalEnum.SHARK, List.of(shark1));
-//                animals.put(AnimalEnum.DOG, new ArrayList<>());
-//                animals.put(AnimalEnum.WOLF, Arrays.asList(wolf1, null));
-//                animals.put(AnimalEnum.CAT, new ArrayList<>());
-//
-//                animalTypes = Arrays.asList(AnimalEnum.SHARK, AnimalEnum.WOLF, null);
-//                break;
-//            case 3:
-//                animals.put(AnimalEnum.CAT, new ArrayList<>());
-//                animals.put(AnimalEnum.DOG, new ArrayList<>());
-//                animals.put(AnimalEnum.WOLF, new ArrayList<>());
-//                animals.put(AnimalEnum.SHARK, new ArrayList<>());
-//
-//                animalTypes = new ArrayList<>();
-//                break;
-//            case 4:
-//                animals.put(AnimalEnum.CAT, null);
-//                animals.put(AnimalEnum.DOG, List.of(dog1));
-//
-//                animalTypes = List.of(AnimalEnum.DOG);
-//                break;
-//            case 5:
-//                animals.put(null, Arrays.asList(cat1));
-//                animals.put(AnimalEnum.SHARK, List.of(shark1));
-//                animals.put(AnimalEnum.DOG, List.of(dog2));
-//
-//                animalTypes = List.of(AnimalEnum.SHARK, AnimalEnum.DOG);
-//
-//                // dog2, shark1
-//                // Дружок, Шарки
-//                // Шарки, Дружок
-//                minCostAnimals = List.of(shark1.getName(), dog2.getName());
-//                break;
-//            case 6:
-//                animals = null;
-//
-//                animalTypes = new ArrayList<>();
-//                break;
-//            case 7:
-//                animalTypes = new ArrayList<>();
-//                break;
-//            default:
-//                throw new IllegalStateException("Unexpected value: " + value);
-//        }
-//
-//        when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
-//        when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
-//
-//        animalsRepository.fillStorage();
-//        if (value == 2 || value == 4 || value == 6) {
-//            assertThrows(NullPointerException.class, () -> {
-//                animalsRepository.findMinCostAnimals();
-//            });
-//        } else if (value == 3 || value == 7) {
-//            assertThrows(IllegalCollectionSizeException.class, () -> {
-//                animalsRepository.findMinCostAnimals();
-//            });
-//        }
-//        else {
-//            assertEquals(minCostAnimals, animalsRepository.findMinCostAnimals());
-//        }
-//    }
+    @DisplayName("Test findOlderAnimal method")
+    @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
+    @ValueSource(ints = {10, 9, 20, 50, 24, 12, 18, 0, -2})
+    public void findOlderAnimal(int value) {
+        ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
+
+        initAnimals();
+        animals.put(AnimalEnum.CAT, List.of(cat1, cat3, cat2));
+        animals.put(AnimalEnum.DOG, List.of(dog1));
+        animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
+        animals.put(AnimalEnum.SHARK, List.of(shark1));
+
+        CopyOnWriteArrayList<AnimalEnum> animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF, AnimalEnum.SHARK));
+
+        List<HashMap<Animal, Integer>> outputResults = List.of(
+                new HashMap<>() {{
+                    put(cat3, 15);
+                    put(wolf2, 27);
+                    put(shark1, 27);
+                }},
+                new HashMap<>() {{
+                    put(cat1, 10);
+                    put(cat2, 10);
+                    put(cat3, 15);
+                    put(dog1, 10);
+                    put(wolf2, 27);
+                    put(shark1, 27);
+                }},
+                new HashMap<>() {{
+                    put(wolf2, 27);
+                    put(shark1, 27);
+                }},
+                new HashMap<>() {{
+                    put(shark1, 27);
+                }},
+                new HashMap<>() {{
+                    put(null, 0);
+                }},
+
+                new HashMap<>() {{
+                    put(dog1, 10);
+                }},
+
+                new HashMap<>() {{
+                    put(cat1, 10);
+                    put(cat2, 10);
+                    put(dog1, 10);
+                }},
+
+                new HashMap<>()
+        );
+
+        switch (value) {
+            case 24:
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new ConcurrentHashMap<>() {{
+                    put(AnimalEnum.CAT, Arrays.asList(cat1, null));
+                    put(AnimalEnum.DOG, List.of(dog1));
+                }});
+                when(createAnimalService.receiveAnimalTypes()).thenReturn(new CopyOnWriteArrayList<>(Arrays.asList(AnimalEnum.CAT, null, AnimalEnum.DOG)));
+                break;
+            case 12:
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new ConcurrentHashMap<>() {{
+                    put(AnimalEnum.CAT, new ArrayList<>());
+                    put(AnimalEnum.DOG, new ArrayList<>());
+                }});
+                when(createAnimalService.receiveAnimalTypes()).thenReturn(new CopyOnWriteArrayList<>());
+                break;
+            case 18:
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(null);
+                when(createAnimalService.receiveAnimalTypes()).thenReturn(new CopyOnWriteArrayList<>());
+                break;
+            case 0:
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(new ConcurrentHashMap<>() {{
+                    put(AnimalEnum.CAT, new ArrayList<>(List.of(cat1, cat2)));
+                    put(AnimalEnum.DOG, new ArrayList<>(List.of(dog1)));
+                }});
+                when(createAnimalService.receiveAnimalTypes()).thenReturn(new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.DOG)));
+                break;
+            default:
+                when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
+                when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
+                break;
+        }
+
+        animalsRepository.fillStorage();
+        if (value == 24 || value == 18) {
+            assertThrows(NullPointerException.class, () -> {
+                animalsRepository.findOlderAnimal(value);
+            });
+        } else if (value == -2) {
+            assertThrows(NegativeArgumentException.class, () -> {
+                animalsRepository.findOlderAnimal(value);
+            });
+        } else {
+            assertTrue(containsHashMap(outputResults, animalsRepository.findOlderAnimal(value)));
+        }
+    }
+
+    @DisplayName("Test findDuplicate method")
+    @ParameterizedTest(name = "Test {arguments}")
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
+    public void findDuplicate(int value) {
+        ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
+        CopyOnWriteArrayList<AnimalEnum> animalTypes;
+        Map<String, List<Animal>> duplicates = new HashMap<>();
+
+        initAnimals();
+        switch (value) {
+            case 0:
+                animals.put(AnimalEnum.CAT, List.of(cat1, cat3, sameCat3, cat3, cat2, sameCat2));
+                animals.put(AnimalEnum.DOG, List.of(dog1));
+                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
+                animals.put(AnimalEnum.SHARK, List.of(shark1, sameShark1, shark1, sameShark1));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT,
+                        AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF,
+                        AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK));
+
+                duplicates.put("class ru.mts.model.Cat", List.of(cat3, sameCat3, cat3, cat2, sameCat2));
+                duplicates.put("class ru.mts.model.Shark", List.of(shark1, sameShark1, shark1, sameShark1));
+                break;
+            case 1:
+                animals.put(AnimalEnum.CAT, List.of(cat1, cat3, cat2));
+                animals.put(AnimalEnum.DOG, List.of(dog1));
+                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
+                animals.put(AnimalEnum.SHARK, List.of(shark1, shark1, shark1));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF,
+                        AnimalEnum.WOLF, AnimalEnum.SHARK, AnimalEnum.SHARK, AnimalEnum.SHARK));
+
+                duplicates.put("class ru.mts.model.Shark", List.of(shark1, shark1, shark1));
+                break;
+            case 2:
+                animals.put(AnimalEnum.CAT, List.of(cat1, cat3, cat2));
+                animals.put(AnimalEnum.DOG, List.of(dog1));
+                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
+                animals.put(AnimalEnum.SHARK, List.of(shark1));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF,
+                        AnimalEnum.WOLF, AnimalEnum.SHARK));
+                break;
+            case 3:
+                animals.put(AnimalEnum.CAT, List.of(cat1, cat3));
+                animals.put(AnimalEnum.DOG, List.of(dog1));
+                animals.put(AnimalEnum.WOLF, Arrays.asList(null, null));
+
+                animalTypes = new CopyOnWriteArrayList<>(Arrays.asList(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF));
+
+                break;
+            case 4:
+                animals = null;
+
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            case 5:
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            case 6:
+                animals.put(AnimalEnum.CAT, List.of(cat1, cat2, cat3, sameCat2, cat2, cat1));
+                animals.put(AnimalEnum.DOG, List.of(dog1));
+                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
+                animals.put(AnimalEnum.SHARK, List.of(shark1, shark1));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT,
+                        AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF,
+                        AnimalEnum.SHARK, AnimalEnum.SHARK));
+
+                duplicates.put("class ru.mts.model.Cat", List.of(cat1, cat2, sameCat2, cat2, cat1));
+                duplicates.put("class ru.mts.model.Shark", List.of(shark1, shark1));
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + value);
+        }
+
+        when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
+        when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
+
+        animalsRepository.fillStorage();
+        if (value == 3 || value == 4) {
+            assertThrows(NullPointerException.class, () -> {
+                animalsRepository.findDuplicate();
+            });
+        } else {
+            assertEquals(duplicates, animalsRepository.findDuplicate());
+        }
+    }
+
+    @DisplayName("Test findAverageAge method")
+    @ParameterizedTest(name = "Test {arguments}")
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
+    public void findAverageAge(int value) {
+        ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
+        CopyOnWriteArrayList<AnimalEnum> animalTypes;
+        double averageAge = 0;
+
+        initAnimals();
+        switch (value) {
+            case 0:
+                animals.put(AnimalEnum.CAT, List.of(cat1, cat3, cat2));
+                animals.put(AnimalEnum.DOG, List.of(dog1));
+                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
+                animals.put(AnimalEnum.SHARK, List.of(shark1));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF, AnimalEnum.SHARK));
+
+                averageAge = 15.43;
+                break;
+            case 1:
+                animals.put(AnimalEnum.CAT, List.of(cat1, cat2));
+                animals.put(AnimalEnum.DOG, List.of(dog1));
+                animals.put(AnimalEnum.WOLF, List.of(wolf1, wolf2));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.WOLF));
+
+                averageAge = 13.2;
+                break;
+            case 2:
+                animals.put(AnimalEnum.SHARK, List.of(shark1));
+                animals.put(AnimalEnum.DOG, new ArrayList<>());
+                animals.put(AnimalEnum.WOLF, Arrays.asList(wolf1, null));
+                animals.put(AnimalEnum.CAT, new ArrayList<>());
+
+                animalTypes = new CopyOnWriteArrayList<>(Arrays.asList(AnimalEnum.SHARK, AnimalEnum.WOLF, null));
+                break;
+            case 3:
+                animals.put(AnimalEnum.CAT, new ArrayList<>());
+                animals.put(AnimalEnum.DOG, new ArrayList<>());
+                animals.put(AnimalEnum.WOLF, new ArrayList<>());
+                animals.put(AnimalEnum.SHARK, new ArrayList<>());
+
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            case 4:
+                animals = null;
+
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            case 5:
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + value);
+        }
+
+        when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
+        when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
+
+        animalsRepository.fillStorage();
+        if (value == 2 || value == 4) {
+            assertThrows(NullPointerException.class, () -> {
+                animalsRepository.findAverageAge();
+            });
+        } else {
+            assertEquals(averageAge, animalsRepository.findAverageAge());
+        }
+    }
+
+    @DisplayName("Test findOldAndExpensive method")
+    @ParameterizedTest(name = "Test {arguments}")
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
+    public void findOldAndExpensive(int value) {
+        ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
+        CopyOnWriteArrayList<AnimalEnum> animalTypes;
+        List<Animal> oldAndExpensiveAnimals = new ArrayList<>();
+
+        initAnimals();
+        switch (value) {
+            case 0:
+                animals.put(AnimalEnum.CAT, List.of(cat1, cat3));
+                animals.put(AnimalEnum.DOG, List.of(dog1, dog2));
+                animals.put(AnimalEnum.WOLF, List.of(wolf1));
+                animals.put(AnimalEnum.SHARK, List.of(shark1, shark2));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT,
+                        AnimalEnum.DOG, AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.SHARK, AnimalEnum.SHARK));
+
+                oldAndExpensiveAnimals = List.of(shark1, wolf1);
+                break;
+            case 1:
+                animals.put(AnimalEnum.CAT, List.of(cat1, cat2));
+                animals.put(AnimalEnum.DOG, List.of(dog1));
+                animals.put(AnimalEnum.SHARK, List.of(shark2));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT,
+                        AnimalEnum.DOG, AnimalEnum.SHARK));
+
+                break;
+            case 2:
+                animals.put(AnimalEnum.SHARK, List.of(shark1));
+                animals.put(AnimalEnum.DOG, new ArrayList<>());
+                animals.put(AnimalEnum.WOLF, Arrays.asList(wolf1, null));
+                animals.put(AnimalEnum.CAT, new ArrayList<>());
+
+                animalTypes = new CopyOnWriteArrayList<>(Arrays.asList(AnimalEnum.SHARK, AnimalEnum.WOLF, null));
+                break;
+            case 3:
+                animals.put(AnimalEnum.CAT, new ArrayList<>());
+                animals.put(AnimalEnum.DOG, new ArrayList<>());
+                animals.put(AnimalEnum.WOLF, new ArrayList<>());
+                animals.put(AnimalEnum.SHARK, new ArrayList<>());
+
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            case 4:
+                animals = null;
+
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            case 5:
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + value);
+        }
+
+        when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
+        when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
+
+        animalsRepository.fillStorage();
+        if (value == 2 || value == 4) {
+            assertThrows(NullPointerException.class, () -> {
+                animalsRepository.findOldAndExpensive();
+            });
+        } else {
+            assertEquals(oldAndExpensiveAnimals, animalsRepository.findOldAndExpensive());
+        }
+    }
+
+    @DisplayName("Test findMinCostAnimals method")
+    @ParameterizedTest(name = "Test {arguments}")
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
+    public void findMinCostAnimals(int value) throws IllegalCollectionSizeException {
+        ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
+        CopyOnWriteArrayList<AnimalEnum> animalTypes;
+        List<String> minCostAnimals = new ArrayList<>();
+
+        initAnimals();
+        switch (value) {
+            case 0:
+                animals.put(AnimalEnum.CAT, List.of(cat3));
+                animals.put(AnimalEnum.DOG, List.of(dog1, dog2));
+                animals.put(AnimalEnum.WOLF, List.of(wolf1));
+                animals.put(AnimalEnum.SHARK, List.of(shark1, shark2));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.DOG,
+                        AnimalEnum.DOG, AnimalEnum.WOLF, AnimalEnum.SHARK, AnimalEnum.SHARK));
+
+                // cat3, dog1, dog2
+                // Richard, Bobik, Druzhok
+                // Richard, Druzhok, Bobik
+                minCostAnimals = List.of(cat3.getName(), dog2.getName(), dog1.getName());
+                break;
+            case 1:
+                animals.put(AnimalEnum.CAT, List.of(cat1, cat2));
+                animals.put(AnimalEnum.DOG, List.of(dog1));
+                animals.put(AnimalEnum.SHARK, List.of(shark2));
+
+                animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT,
+                        AnimalEnum.DOG, AnimalEnum.SHARK));
+
+                // cat1, cat2, dog1
+                // Misa, Lelik, Bobik
+                minCostAnimals = List.of(cat1.getName(), cat2.getName(), dog1.getName());
+                break;
+            case 2:
+                animals.put(AnimalEnum.SHARK, List.of(shark1));
+                animals.put(AnimalEnum.DOG, new ArrayList<>());
+                animals.put(AnimalEnum.WOLF, Arrays.asList(wolf1, null));
+                animals.put(AnimalEnum.CAT, new ArrayList<>());
+
+                animalTypes = new CopyOnWriteArrayList<>(Arrays.asList(AnimalEnum.SHARK, AnimalEnum.WOLF, null));
+                break;
+            case 3:
+                animals.put(AnimalEnum.CAT, new ArrayList<>());
+                animals.put(AnimalEnum.DOG, new ArrayList<>());
+                animals.put(AnimalEnum.WOLF, new ArrayList<>());
+                animals.put(AnimalEnum.SHARK, new ArrayList<>());
+
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            case 4:
+                animals = null;
+
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            case 5:
+                animalTypes = new CopyOnWriteArrayList<>();
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + value);
+        }
+
+        when(createAnimalService.receiveCreatedAnimals()).thenReturn(animals);
+        when(createAnimalService.receiveAnimalTypes()).thenReturn(animalTypes);
+
+        animalsRepository.fillStorage();
+        if (value == 2 || value == 4) {
+            assertThrows(NullPointerException.class, () -> {
+                animalsRepository.findMinCostAnimals();
+            });
+        } else if (value == 3 || value == 5) {
+            assertThrows(IllegalCollectionSizeException.class, () -> {
+                animalsRepository.findMinCostAnimals();
+            });
+        } else {
+            assertEquals(minCostAnimals, animalsRepository.findMinCostAnimals());
+        }
+    }
 }

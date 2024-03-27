@@ -24,7 +24,7 @@ public interface CreateAnimalService {
     /**
      * Метод для создания животных при помощи цикла do-while
      *
-     * @return HashMap с созданными животными
+     * @return ConcurrentHashMap с созданными животными
      * @author Nikita
      * @since 1.5
      */
@@ -33,7 +33,7 @@ public interface CreateAnimalService {
     /**
      * Метод для получения списка типов животных
      *
-     * @return список типов созданных животных
+     * @return  потокобезопасный список типов созданных животных
      * @author Nikita
      * @since 1.4
      */
@@ -42,7 +42,7 @@ public interface CreateAnimalService {
     /**
      * Метод для получения созданных животных
      *
-     * @return HashMap из созданных животных
+     * @return ConcurrentHashMap из созданных животных
      * @author Nikita
      * @since 1.4
      */

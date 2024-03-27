@@ -32,6 +32,14 @@ public class Scheduler {
         this.animalsRepositoryObjectFactory = animalsRepositoryObjectFactory;
     }
 
+    /**
+     * PostConstruct метод, который создаёт 2 потока с помощью ScheduledExecutorService и задаёт им имена, используя ThreadFactory.
+     * Первый поток раз в 10 секунд вызывает метод findDuplicate из AnimalsRepositoryImpl.
+     * Второй поток раз в 20 секунд вызывает метод findAverageAge из AnimalsRepositoryImpl.
+     *
+     * @author Nikita
+     * @since 1.8
+     */
     @PostConstruct
     public void runThreads() {
         ScheduledExecutorService service = Executors.newScheduledThreadPool(2, new NamedThreadFactory());
@@ -59,48 +67,47 @@ public class Scheduler {
     }
 
     /**
-     * Метод, который раз в минуту будет делать вызов методов
+     * Метод, который раз в 30 секунд будет делать вызов методов
      * AnimalsRepository и выводить результаты в лог
      *
      * @author Nikita
      * @since 1.1
      */
-    @Scheduled(fixedRate = 20000)
+    @Scheduled(fixedRate = 30000)
     public void printResults() {
-        System.out.println("Hello world");
-//        try {
-//            animalsRepository = animalsRepositoryObjectFactory.getObject();
-//            logger.info("Names of animals that were born in a leap year");
-//            for (Map.Entry<String, LocalDate> node : animalsRepository.findLeapYearNames().entrySet()) {
-//                logger.info("Name: {}, Birth Date: {}", node.getKey(), node.getValue());
-//            }
-//
-//            int N = 25;
-//            logger.info("Names of animals that are more than {} y.o.", N);
-//            for (Map.Entry<Animal, Integer> node : animalsRepository.findOlderAnimal(N).entrySet()) {
-//                logger.info("Name: {}, Age: {}", node.getKey().getName(), node.getValue());
-//            }
-//
+        try {
+            animalsRepository = animalsRepositoryObjectFactory.getObject();
+            logger.info("Names of animals that were born in a leap year");
+            for (Map.Entry<String, LocalDate> node : animalsRepository.findLeapYearNames().entrySet()) {
+                logger.info("Name: {}, Birth Date: {}", node.getKey(), node.getValue());
+            }
+
+            int N = 25;
+            logger.info("Names of animals that are more than {} y.o.", N);
+            for (Map.Entry<Animal, Integer> node : animalsRepository.findOlderAnimal(N).entrySet()) {
+                logger.info("Name: {}, Age: {}", node.getKey().getName(), node.getValue());
+            }
+
 //            logger.info("Duplicates of animals");
 //            for (Map.Entry<String, List<Animal>> node : animalsRepository.findDuplicate().entrySet()) {
 //                logger.info("Type: {}, Duplicates: {}", node.getKey(), node.getValue());
 //            }
-//
+
 //            logger.info("Average animal age: {}", animalsRepository.findAverageAge());
-//
-//            logger.info("Old and expensive");
-//            for (Animal animal : animalsRepository.findOldAndExpensive()) {
-//                logger.info(animal.getName());
-//            }
-//
-//            logger.info("Min cost animals");
-//            for (String animalsName : animalsRepository.findMinCostAnimals()) {
-//                logger.info(animalsName);
-//            }
-//        } catch (NegativeArgumentException e) {
-//            logger.warn(e.getMessage());
-//        } catch (IllegalCollectionSizeException e) {
-//            logger.warn(e.getMessage());
-//        }
+
+            logger.info("Old and expensive");
+            for (Animal animal : animalsRepository.findOldAndExpensive()) {
+                logger.info(animal.getName());
+            }
+
+            logger.info("Min cost animals");
+            for (String animalsName : animalsRepository.findMinCostAnimals()) {
+                logger.info(animalsName);
+            }
+        } catch (NegativeArgumentException e) {
+            logger.warn(e.getMessage());
+        } catch (IllegalCollectionSizeException e) {
+            logger.warn(e.getMessage());
+        }
     }
 }

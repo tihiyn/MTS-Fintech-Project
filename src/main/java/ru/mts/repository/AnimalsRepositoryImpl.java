@@ -19,6 +19,7 @@ import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Repository
@@ -66,7 +67,7 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
                 .flatMap(entry -> entry.getValue().stream()
                         .filter(animal -> Year.of(animal.getBirthDate().getYear()).isLeap())
                         .map(animal -> Map.entry(entry.getKey().toString() + " " + animal.getName(), animal.getBirthDate())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (existing, replacement) -> existing));
     }
 
     @Override

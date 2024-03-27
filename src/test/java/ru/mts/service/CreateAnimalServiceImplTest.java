@@ -98,19 +98,6 @@ public class CreateAnimalServiceImplTest {
                 animals.put(AnimalEnum.WOLF, new ArrayList<>());
                 animals.put(AnimalEnum.SHARK, new ArrayList<>());
                 break;
-//            В ConcurrentHashMap нельзя положить null
-//            case 4:
-//                animals.put(AnimalEnum.CAT, null);
-//                animals.put(AnimalEnum.DOG, new ArrayList<>());
-//                animals.put(AnimalEnum.WOLF, new ArrayList<>());
-//                animals.put(AnimalEnum.SHARK, new ArrayList<>());
-//                break;
-//            case 5:
-//                animals.put(null, Arrays.asList(cat1));
-//                animals.put(AnimalEnum.DOG, Arrays.asList(dog1));
-//                animals.put(AnimalEnum.WOLF, new ArrayList<>());
-//                animals.put(AnimalEnum.SHARK, new ArrayList<>());
-//                break;
             case 4:
                 animals = null;
                 break;

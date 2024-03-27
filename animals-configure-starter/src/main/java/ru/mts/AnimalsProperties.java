@@ -9,7 +9,6 @@ import java.util.List;
 
 @ConfigurationProperties(prefix = "animal")
 @Validated
-@Scope("prototype")
 public class AnimalsProperties {
     @NotEmpty
     private List<String> catNames;

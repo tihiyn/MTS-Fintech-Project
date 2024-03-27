@@ -64,7 +64,7 @@ class JUnitTest {
     public class AnimalsRepositoryImplTest {
         @Mock
         CreateAnimalService createAnimalService;
-        Animal cat1, cat2, cat3, dog1, dog2, wolf1, wolf2, shark1, shark2, sameCat2, sameShark1, sameCat3;
+        Animal cat1, cat2, cat3, cat4, dog1, dog2, wolf1, wolf2, shark1, shark2, sameCat2, sameShark1, sameCat3;
 
         /**
          * Своя реализация метода contains.
@@ -95,6 +95,8 @@ class JUnitTest {
             cat1 = new Cat("Британская", "Misa", BigDecimal.valueOf(10000).setScale(2, RoundingMode.HALF_UP), "Добрый", LocalDate.now().minusYears(10).minusDays(1));
             cat2 = new Cat("Шотландская", "Lelik", BigDecimal.valueOf(12000.05).setScale(2, RoundingMode.HALF_UP), "Верный", LocalDate.of(2013, 4, 18));
             cat3 = new Cat("Сфинкс", "Richard", BigDecimal.valueOf(7000.2).setScale(2, RoundingMode.HALF_UP), "Вредный", LocalDate.of(2008, 9, 9));
+            cat4 = new Cat("Сфинкс", "Richard", BigDecimal.valueOf(13760.23).setScale(2, RoundingMode.HALF_UP), "Злой", LocalDate.of(2004, 2, 14));
+
 
             dog1 = new Dog("Доберман", "Bobik", BigDecimal.valueOf(25000).setScale(2, RoundingMode.HALF_UP), "Злой", LocalDate.now().minusYears(10));
             dog2 = new Dog("Лабрадор", "Druzhok", BigDecimal.valueOf(32000.33).setScale(2, RoundingMode.HALF_UP), "Верный", LocalDate.of(2020, 2, 15));
@@ -113,7 +115,7 @@ class JUnitTest {
 
         @DisplayName("Test method findLeapYearNames")
         @ParameterizedTest(name = "Test {arguments}")
-        @ValueSource(ints = {0, 1, 2, 3, 4, 5})
+        @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
         public void findLeapYearNames(int value) {
             AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(createAnimalService);
 
@@ -164,6 +166,15 @@ class JUnitTest {
                     break;
                 case 5:
                     animalTypes = new CopyOnWriteArrayList<>();
+                    break;
+                case 6:
+                    animals.put(AnimalEnum.CAT, List.of(cat3, cat1, cat4));
+                    animals.put(AnimalEnum.SHARK, List.of(shark1));
+
+                    animalTypes = new CopyOnWriteArrayList<>(List.of(AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.CAT, AnimalEnum.SHARK));
+
+                    leapYearAnimals.put("CAT " + cat3.getName(), LocalDate.of(2008, 9, 9));
+                    leapYearAnimals.put("SHARK " + shark1.getName(), LocalDate.of(1996, 6, 13));
                     break;
                 default:
                     throw new IllegalStateException("Unexpected value: " + value);
