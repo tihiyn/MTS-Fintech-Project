@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -26,10 +27,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class CreateAnimalServiceImpl implements CreateAnimalService {
 
     private static Logger logger = LoggerFactory.getLogger(CreateAnimalServiceImpl.class);
-//    private List<AnimalEnum> animalTypes;
-    private CopyOnWriteArrayList<AnimalEnum> animalTypes;
+    private List<AnimalEnum> animalTypes;
+//    private CopyOnWriteArrayList<AnimalEnum> animalTypes;
 //    private Map<AnimalEnum, List<Animal>> createdAnimals;
-    private ConcurrentHashMap<AnimalEnum, List<Animal>> createdAnimals;
+    private ConcurrentMap<AnimalEnum, List<Animal>> createdAnimals;
 
     private AnimalsProperties animalsProperties;
 
@@ -38,12 +39,12 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     }
 
     @Override
-    public CopyOnWriteArrayList<AnimalEnum> receiveAnimalTypes() {
+    public List<AnimalEnum> receiveAnimalTypes() {
         return animalTypes;
     }
 
     @Override
-    public ConcurrentHashMap<AnimalEnum, List<Animal>> receiveCreatedAnimals() {
+    public ConcurrentMap<AnimalEnum, List<Animal>> receiveCreatedAnimals() {
         return createdAnimals;
     }
 
@@ -115,7 +116,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     }
 
     @Override
-    public ConcurrentHashMap<AnimalEnum, List<Animal>> createAnimals() {
+    public ConcurrentMap<AnimalEnum, List<Animal>> createAnimals() {
         int counter = 1;
 
         createdAnimals = new ConcurrentHashMap<>();
@@ -142,7 +143,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
      * @author Nikita
      * @since 1.1
      */
-    public ConcurrentHashMap<AnimalEnum, List<Animal>> createAnimals(int N) {
+    public ConcurrentMap<AnimalEnum, List<Animal>> createAnimals(int N) {
         createdAnimals = new ConcurrentHashMap<>();
         for (AnimalEnum animalEnum : AnimalEnum.values()) {
             createdAnimals.put(animalEnum, new ArrayList<>());

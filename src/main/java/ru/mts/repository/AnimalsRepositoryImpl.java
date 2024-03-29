@@ -19,6 +19,7 @@ import java.time.Year;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,7 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     private static Logger logger = LoggerFactory.getLogger(AnimalsRepositoryImpl.class);
 
 //    private Map<AnimalEnum, List<Animal>> animalStorage;
-    private ConcurrentHashMap<AnimalEnum, List<Animal>> animalStorage;
+    private ConcurrentMap<AnimalEnum, List<Animal>> animalStorage;
 
     private CreateAnimalService createAnimalService;
 

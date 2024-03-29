@@ -6,6 +6,7 @@ import ru.mts.model.AnimalEnum;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public interface CreateAnimalService {
@@ -28,7 +29,7 @@ public interface CreateAnimalService {
      * @author Nikita
      * @since 1.5
      */
-    ConcurrentHashMap<AnimalEnum, List<Animal>> createAnimals();
+    ConcurrentMap<AnimalEnum, List<Animal>> createAnimals();
 
     /**
      * Метод для получения списка типов животных
@@ -37,7 +38,7 @@ public interface CreateAnimalService {
      * @author Nikita
      * @since 1.4
      */
-    CopyOnWriteArrayList<AnimalEnum> receiveAnimalTypes();
+    List<AnimalEnum> receiveAnimalTypes();
 
     /**
      * Метод для получения созданных животных
@@ -46,5 +47,5 @@ public interface CreateAnimalService {
      * @author Nikita
      * @since 1.4
      */
-    ConcurrentHashMap<AnimalEnum, List<Animal>> receiveCreatedAnimals();
+    ConcurrentMap<AnimalEnum, List<Animal>> receiveCreatedAnimals();
 }
