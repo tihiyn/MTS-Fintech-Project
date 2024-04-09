@@ -8,8 +8,17 @@ import org.springframework.stereotype.Component;
 import ru.mts.AnimalsProperties;
 import ru.mts.model.*;
 
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.nio.Buffer;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -28,8 +37,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
 
     private static Logger logger = LoggerFactory.getLogger(CreateAnimalServiceImpl.class);
     private List<AnimalEnum> animalTypes;
-//    private CopyOnWriteArrayList<AnimalEnum> animalTypes;
-//    private Map<AnimalEnum, List<Animal>> createdAnimals;
+
     private ConcurrentMap<AnimalEnum, List<Animal>> createdAnimals;
 
     private AnimalsProperties animalsProperties;
@@ -64,6 +72,18 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         return LocalDate.of(year, month, day);
     }
 
+    private String getRandomSecretInformation() {
+        Path path = Paths.get("animals-configure-starter", "src", "main", "resources", "secretStore", "secretInformation.txt");
+
+        try {
+            List<String> lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+
+            return lines.get(ThreadLocalRandom.current().nextInt(100));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Метод, отвечающий непосредственно за создание животного.
      *
@@ -80,13 +100,13 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
 
         animal = switch (animalTypeNumber) {
             case 0 ->
-                    new Cat(breeds.get(ThreadLocalRandom.current().nextInt(3)), animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate());
+                    new Cat(breeds.get(ThreadLocalRandom.current().nextInt(3)), animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate(), getRandomSecretInformation());
             case 1 ->
-                    new Dog(breeds.get(ThreadLocalRandom.current().nextInt(3, 6)), animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate());
+                    new Dog(breeds.get(ThreadLocalRandom.current().nextInt(3, 6)), animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate(), getRandomSecretInformation());
             case 2 ->
-                    new Shark(breeds.get(ThreadLocalRandom.current().nextInt(6, 9)), animalsProperties.getSharkNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate());
+                    new Shark(breeds.get(ThreadLocalRandom.current().nextInt(6, 9)), animalsProperties.getSharkNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate(), getRandomSecretInformation());
             case 3 ->
-                    new Wolf(breeds.get(ThreadLocalRandom.current().nextInt(9, 12)), animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate());
+                    new Wolf(breeds.get(ThreadLocalRandom.current().nextInt(9, 12)), animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate(), getRandomSecretInformation());
             default -> null;
         };
 
@@ -97,6 +117,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         logger.info("Характер: {}", animal.getCharacter());
         logger.info("Голос: {}", animal.getVoice());
         logger.info("День рождения животного: {}", animal.getBirthDate().format(formatter));
+        logger.info("Секретная информация: {}", animal.getSecretInformation());
 
         return animal;
     }
@@ -115,6 +136,35 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         }
     }
 
+    private void writeAnimalToFile(Animal animal, int counter) {
+        Path path = Paths.get("animals-configure-starter", "src", "main", "resources", "animals", "logData.txt");
+
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(path.toString(), "rw")) {
+            if (counter == 1) {
+                randomAccessFile.setLength(0);
+            }
+
+            FileChannel fileChannel = randomAccessFile.getChannel();
+
+            ByteBuffer buffer = ByteBuffer.allocate(100);
+            buffer.clear();
+
+            String animalLogInfo = counter + " " + animal.getBreed() + " " + animal.getName() + " " + animal.getCost().toString() + " " + animal.getBirthDate().toString() + "\n";
+
+            buffer.put(animalLogInfo.getBytes());
+
+            buffer.flip();
+
+            randomAccessFile.seek(randomAccessFile.length());
+            while (buffer.hasRemaining()) {
+                fileChannel.write(buffer);
+            }
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     public ConcurrentMap<AnimalEnum, List<Animal>> createAnimals() {
         int counter = 1;
@@ -126,6 +176,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
 
         do {
             Animal animal = commonCreating(counter);
+            writeAnimalToFile(animal, counter);
             String[] splitStr = animal.getClass().toString().split("\\.");
             createdAnimals.get(AnimalEnum.valueOf(splitStr[splitStr.length - 1].toUpperCase())).add(animal);
         }
@@ -148,6 +199,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         for (AnimalEnum animalEnum : AnimalEnum.values()) {
             createdAnimals.put(animalEnum, new ArrayList<>());
         }
+
 
         for (int i = 0; i < N; i++) {
             Animal animal = commonCreating(i + 1);

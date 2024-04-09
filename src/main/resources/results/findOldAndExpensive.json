@@ -1,0 +1,41 @@
+[ {
+  "type" : "Wolf",
+  "breed" : "Полярный",
+  "name" : "Волчок",
+  "cost" : "494973.40",
+  "character" : "Добрый",
+  "birthDate" : "1980-03-14",
+  "secretInformation" : "I1Y5ISg6LCkxdjYz"
+}, {
+  "type" : "Shark",
+  "breed" : "Белая",
+  "name" : "Волна",
+  "cost" : "416585.87",
+  "character" : "Вредный",
+  "birthDate" : "1984-02-02",
+  "secretInformation" : "c1hTLVp9dCY/XjIz"
+}, {
+  "type" : "Cat",
+  "breed" : "Британская",
+  "name" : "Васька",
+  "cost" : "333170.17",
+  "character" : "Вредный",
+  "birthDate" : "1985-03-04",
+  "secretInformation" : "SzRtOHhHKzRBc3Mz"
+}, {
+  "type" : "Dog",
+  "breed" : "Доберман",
+  "name" : "Матрос",
+  "cost" : "330541.80",
+  "character" : "Добрый",
+  "birthDate" : "2011-12-09",
+  "secretInformation" : "NeKElmx0Ym1ILXLihJZTbQ=="
+}, {
+  "type" : "Shark",
+  "breed" : "Белая",
+  "name" : "Аква",
+  "cost" : "372824.67",
+  "character" : "Добрый",
+  "birthDate" : "2017-07-09",
+  "secretInformation" : "RmlK4oSWWzckbUBKaCk="
+} ]

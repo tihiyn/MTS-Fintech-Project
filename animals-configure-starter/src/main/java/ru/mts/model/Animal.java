@@ -1,8 +1,13 @@
 package ru.mts.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+//@JsonSerialize(using = AnimalSerializer.class)
+//@JsonDeserialize(using = PairDeserializer.class)
 public interface Animal {
     /**
      * Метод, который возвращает породу животного.
@@ -57,4 +62,8 @@ public interface Animal {
      * @since 1.0
      */
     LocalDate getBirthDate();
+
+    String getSecretInformation();
+
+    String toString();
 }

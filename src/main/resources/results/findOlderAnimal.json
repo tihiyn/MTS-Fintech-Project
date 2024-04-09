@@ -1,0 +1,6 @@
+{
+  "Wolf{'breed':'Полярный', 'name':'Волчок', 'cost':494973.40, 'character':'Добрый', 'birthDate':'1980-03-14', 'secretInformation':'I1Y5ISg6LCkxdjYz'}" : 44,
+  "Shark{'breed':'Белая', 'name':'Волна', 'cost':416585.87, 'character':'Вредный', 'birthDate':'1984-02-02', 'secretInformation':'c1hTLVp9dCY/XjIz'}" : 40,
+  "Cat{'breed':'Британская', 'name':'Васька', 'cost':333170.17, 'character':'Вредный', 'birthDate':'1985-03-04', 'secretInformation':'SzRtOHhHKzRBc3Mz'}" : 39,
+  "Dog{'breed':'Немецкая овчарка', 'name':'Матрос', 'cost':167703.81, 'character':'Злой', 'birthDate':'1975-10-05', 'secretInformation':'SCEwZ1U3LnlrQS5t'}" : 48
+}
