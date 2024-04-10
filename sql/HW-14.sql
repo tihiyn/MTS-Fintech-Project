@@ -22,3 +22,6 @@ CREATE TABLE animals.animal_type (
 	"type" varchar(50),
 	is_wild bool
 );
+
+ALTER TABLE animals.creature RENAME COLUMN id_creature TO id;
+ALTER TABLE animals.animal_type RENAME COLUMN id_type TO id;
