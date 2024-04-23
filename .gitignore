@@ -41,3 +41,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### DB Credentials ###
+src/main/resources/application.properties

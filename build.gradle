@@ -24,6 +24,8 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.17.0'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.17.0'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.3'
+
 
 
 

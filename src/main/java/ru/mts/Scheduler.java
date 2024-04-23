@@ -9,11 +9,13 @@ import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
+import ru.mts.models.Creature;
 import ru.mts.repository.AnimalsRepository;
 
 import java.io.File;
@@ -21,7 +23,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +43,15 @@ public class Scheduler {
     private ObjectFactory<AnimalsRepository> animalsRepositoryObjectFactory;
 
     private ObjectMapper objectMapper;
+
+    @Value("${spring.datasource.url}")
+    private String url;
+
+    @Value("${spring.datasource.username}")
+    private String username;
+
+    @Value("${spring.datasource.password}")
+    private String password;
 
     public Scheduler(ObjectFactory<AnimalsRepository> animalsRepositoryObjectFactory, ObjectMapper objectMapper) {
         this.animalsRepositoryObjectFactory = animalsRepositoryObjectFactory;
@@ -98,7 +111,7 @@ public class Scheduler {
     }
 
     /**
-     * Метод, который раз в 30 секунд будет делать вызов методов
+     * Метод, который раз в 60 секунд будет делать вызов методов
      * AnimalsRepository и выводить результаты в лог
      *
      * @author Nikita
@@ -188,6 +201,44 @@ public class Scheduler {
             throw new RuntimeException(e);
         } catch (IllegalCollectionSizeException e) {
             logger.warn(e.getMessage());
+        }
+    }
+
+    /**
+     * Метод, который раз в 40 секунд создаёт объекты класса Creature из БД при помощи JDBC.
+     * Созданные животные сохраняются в ArrayList.
+     *
+     * @author Nikita
+     * @since 1.16
+     */
+    @Scheduled(fixedRate = 40000)
+    public void jdbcCreating() {
+        List<Creature> creatures = new ArrayList<>();
+
+        try {
+            Connection connection = DriverManager.getConnection(url, username, password);
+            Statement statement = connection.createStatement();
+
+            String SQl = "SELECT * FROM animals.creature";
+            ResultSet resultSet = statement.executeQuery(SQl);
+
+            while (resultSet.next()) {
+                Creature creature = new Creature();
+
+                creature.setId(resultSet.getLong("id"));
+                creature.setName(resultSet.getString("name"));
+                creature.setTypeId(resultSet.getInt("type_id"));
+                creature.setAge(resultSet.getShort("age"));
+
+                creatures.add(creature);
+            }
+
+            for (Creature creature: creatures) {
+                logger.info(creature.toString());
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 }
