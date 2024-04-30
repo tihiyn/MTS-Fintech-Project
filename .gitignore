@@ -43,4 +43,4 @@ bin/
 .DS_Store
 
 ### DB Credentials ###
-src/main/resources/application.properties
+src/main/resources/application-local.properties

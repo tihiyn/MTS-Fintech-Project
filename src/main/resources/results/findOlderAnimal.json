@@ -1,6 +1,7 @@
 {
-  "Wolf{'breed':'Полярный', 'name':'Волчок', 'cost':494973.40, 'character':'Добрый', 'birthDate':'1980-03-14', 'secretInformation':'I1Y5ISg6LCkxdjYz'}" : 44,
-  "Shark{'breed':'Белая', 'name':'Волна', 'cost':416585.87, 'character':'Вредный', 'birthDate':'1984-02-02', 'secretInformation':'c1hTLVp9dCY/XjIz'}" : 40,
-  "Cat{'breed':'Британская', 'name':'Васька', 'cost':333170.17, 'character':'Вредный', 'birthDate':'1985-03-04', 'secretInformation':'SzRtOHhHKzRBc3Mz'}" : 39,
-  "Dog{'breed':'Немецкая овчарка', 'name':'Матрос', 'cost':167703.81, 'character':'Злой', 'birthDate':'1975-10-05', 'secretInformation':'SCEwZ1U3LnlrQS5t'}" : 48
+  "Dog{'breed':'Доберман', 'name':'Шарик', 'cost':84469.72, 'character':'Верный', 'birthDate':'1978-10-15', 'secretInformation':'V2pXUC1SITU5Vk0m'}" : 45,
+  "Shark{'breed':'Молот', 'name':'Аква', 'cost':22890.57, 'character':'Пугливый', 'birthDate':'1984-09-26', 'secretInformation':'WUFPbHU4OFtQXTpJ'}" : 39,
+  "Shark{'breed':'Белая', 'name':'Волна', 'cost':277405.33, 'character':'Вредный', 'birthDate':'1984-06-11', 'secretInformation':'czhWXztDdTQwWixy'}" : 39,
+  "Dog{'breed':'Немецкая овчарка', 'name':'Мухтар', 'cost':46358.65, 'character':'Верный', 'birthDate':'1996-11-03', 'secretInformation':'RHpea2trNFBjeT9G'}" : 27,
+  "Cat{'breed':'Шотландская', 'name':'Васька', 'cost':51812.58, 'character':'Вредный', 'birthDate':'1976-12-20', 'secretInformation':'eEohNk1LKWM/NllH'}" : 47
 }

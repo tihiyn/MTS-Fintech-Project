@@ -1,17 +1,15 @@
 package ru.mts;
 
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import ru.mts.dao.CreatureDAO;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
@@ -26,7 +24,6 @@ import java.nio.file.Paths;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -43,19 +40,12 @@ public class Scheduler {
     private ObjectFactory<AnimalsRepository> animalsRepositoryObjectFactory;
 
     private ObjectMapper objectMapper;
+    private final CreatureDAO creatureDAO;
 
-    @Value("${spring.datasource.url}")
-    private String url;
-
-    @Value("${spring.datasource.username}")
-    private String username;
-
-    @Value("${spring.datasource.password}")
-    private String password;
-
-    public Scheduler(ObjectFactory<AnimalsRepository> animalsRepositoryObjectFactory, ObjectMapper objectMapper) {
+    public Scheduler(ObjectFactory<AnimalsRepository> animalsRepositoryObjectFactory, ObjectMapper objectMapper, CreatureDAO creatureDAO) {
         this.animalsRepositoryObjectFactory = animalsRepositoryObjectFactory;
         this.objectMapper = objectMapper;
+        this.creatureDAO = creatureDAO;
     }
 
     /**
@@ -205,7 +195,7 @@ public class Scheduler {
     }
 
     /**
-     * Метод, который раз в 40 секунд создаёт объекты класса Creature из БД при помощи JDBC.
+     * Метод, который раз в 40 секунд создаёт объекты класса Creature из БД при помощи JdbcTemplate и выводит их в лог.
      * Созданные животные сохраняются в ArrayList.
      *
      * @author Nikita
@@ -213,32 +203,8 @@ public class Scheduler {
      */
     @Scheduled(fixedRate = 40000)
     public void jdbcCreating() {
-        List<Creature> creatures = new ArrayList<>();
+        List<Creature> creatures = creatureDAO.listCreatures();
 
-        try {
-            Connection connection = DriverManager.getConnection(url, username, password);
-            Statement statement = connection.createStatement();
-
-            String SQl = "SELECT * FROM animals.creature";
-            ResultSet resultSet = statement.executeQuery(SQl);
-
-            while (resultSet.next()) {
-                Creature creature = new Creature();
-
-                creature.setId(resultSet.getLong("id"));
-                creature.setName(resultSet.getString("name"));
-                creature.setTypeId(resultSet.getInt("type_id"));
-                creature.setAge(resultSet.getShort("age"));
-
-                creatures.add(creature);
-            }
-
-            for (Creature creature: creatures) {
-                logger.info(creature.toString());
-            }
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        creatures.forEach(creature -> logger.info(creature.toString()));
     }
 }
