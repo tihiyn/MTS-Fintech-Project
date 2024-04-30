@@ -1,25 +1,41 @@
 [ {
-  "type" : "Shark",
-  "breed" : "Белая",
-  "name" : "Волна",
-  "cost" : "277405.33",
+  "type" : "Cat",
+  "breed" : "Сфинкс",
+  "name" : "Васька",
+  "cost" : "445929.82",
+  "character" : "Злой",
+  "birthDate" : "1973-07-24",
+  "secretInformation" : "SjR44oSWUFN9bXA2Y3U="
+}, {
+  "type" : "Cat",
+  "breed" : "Шотландская",
+  "name" : "Матроскин",
+  "cost" : "391203.02",
+  "character" : "Злой",
+  "birthDate" : "1991-06-28",
+  "secretInformation" : "dDhEW2UsaDZBeUch"
+}, {
+  "type" : "Wolf",
+  "breed" : "Японский",
+  "name" : "Волчок",
+  "cost" : "488026.56",
   "character" : "Вредный",
-  "birthDate" : "1984-06-11",
-  "secretInformation" : "czhWXztDdTQwWixy"
+  "birthDate" : "1994-04-27",
+  "secretInformation" : "dGl0U0BWQm5RQzFv"
 }, {
   "type" : "Dog",
   "breed" : "Лабрадор",
-  "name" : "Шарик",
-  "cost" : "423221.34",
-  "character" : "Добрый",
-  "birthDate" : "2001-02-14",
-  "secretInformation" : "JCE1cilNJmxNaHFW"
+  "name" : "Матрос",
+  "cost" : "404612.34",
+  "character" : "Пугливый",
+  "birthDate" : "2000-05-24",
+  "secretInformation" : "SSwtIX55RTd3JCs0"
 }, {
-  "type" : "Cat",
-  "breed" : "Сфинкс",
-  "name" : "Матроскин",
-  "cost" : "307904.35",
-  "character" : "Верный",
-  "birthDate" : "2017-02-28",
-  "secretInformation" : "MHhiUC1iOjcsUyZW"
+  "type" : "Dog",
+  "breed" : "Лабрадор",
+  "name" : "Матрос",
+  "cost" : "429396.32",
+  "character" : "Игривый",
+  "birthDate" : "2015-05-24",
+  "secretInformation" : "NeKElmx0Ym1ILXLihJZTbQ=="
 } ]
