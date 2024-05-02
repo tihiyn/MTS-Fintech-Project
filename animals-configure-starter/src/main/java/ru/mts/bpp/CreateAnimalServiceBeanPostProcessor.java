@@ -13,7 +13,7 @@ public class CreateAnimalServiceBeanPostProcessor implements BeanPostProcessor {
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         if (bean instanceof CreateAnimalServiceImpl) {
             CreateAnimalServiceImpl animalService = (CreateAnimalServiceImpl) bean;
-            animalService.defineTypeOfAnimals();
+            animalService.createAnimals();
         }
 
         return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);

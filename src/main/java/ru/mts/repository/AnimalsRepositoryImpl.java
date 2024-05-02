@@ -1,8 +1,9 @@
 package ru.mts.repository;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +12,6 @@ import org.springframework.stereotype.Repository;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
-import ru.mts.model.AnimalEnum;
-import ru.mts.model.Cat;
 import ru.mts.service.CreateAnimalService;
 
 import java.io.File;
@@ -24,8 +23,10 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.Year;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
@@ -34,20 +35,20 @@ import java.util.stream.Collectors;
 public class AnimalsRepositoryImpl implements AnimalsRepository {
 
     private static Logger logger = LoggerFactory.getLogger(AnimalsRepositoryImpl.class);
-
+    private final SessionFactory sessionFactory;
     @Autowired
     private ObjectMapper objectMapper;
-
-    private ConcurrentMap<AnimalEnum, List<Animal>> animalStorage;
+    private ConcurrentMap<String, List<Animal>> animalStorage;
 
     private CreateAnimalService createAnimalService;
 
-    public AnimalsRepositoryImpl(CreateAnimalService createAnimalService) {
+    public AnimalsRepositoryImpl(SessionFactory sessionFactory, CreateAnimalService createAnimalService) {
+        this.sessionFactory = sessionFactory;
         this.createAnimalService = createAnimalService;
     }
 
     @Override
-    public Map<AnimalEnum, List<Animal>> getAnimalStorage() {
+    public Map<String, List<Animal>> getAnimalStorage() {
         return animalStorage;
     }
 
@@ -60,12 +61,23 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     @PostConstruct
     @Override
     public void fillStorage() {
-        animalStorage = createAnimalService.receiveCreatedAnimals();
+        Session session = sessionFactory.getCurrentSession();
+        try {
+            session.beginTransaction();
 
-        logger.info("Типы созданных животных");
-        for (AnimalEnum type : createAnimalService.receiveAnimalTypes()) {
-            logger.info(String.valueOf(type));
+            animalStorage = session.createQuery("FROM Animal", Animal.class).list().stream()
+                    .collect(Collectors.groupingByConcurrent(animal -> animal.getAnimalType().getType()));
+
+            session.getTransaction().commit();
+        } finally {
+            session.close();
         }
+
+
+//        logger.info("Типы созданных животных");
+//        for (AnimalEnum type : createAnimalService.receiveAnimalTypes()) {
+//            logger.info(String.valueOf(type));
+//        }
     }
 
     @Override
@@ -77,7 +89,7 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
                 .filter(entry -> entry.getKey() != null)
                 .flatMap(entry -> entry.getValue().stream()
                         .filter(animal -> Year.of(animal.getBirthDate().getYear()).isLeap())
-                        .map(animal -> Map.entry(entry.getKey().toString() + " " + animal.getName(), animal.getBirthDate())))
+                        .map(animal -> Map.entry(entry.getKey() + " " + animal.getName(), animal.getBirthDate())))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (existing, replacement) -> existing));
 
         try {
@@ -96,7 +108,7 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     }
 
     @Override
-    public Map<Animal, Integer> findOlderAnimal(int N) {
+    public Map<Animal, Short> findOlderAnimal(int N) {
         Path path = Paths.get("src/main/resources/results/findOlderAnimal.json");
         File file = new File(path.toString());
 
@@ -113,15 +125,15 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
                     })
                     .orElse(null);
 
-            Map<Animal, Integer> olderAnimals = animalStorage.entrySet().stream()
+            Map<Animal, Short> olderAnimals = animalStorage.entrySet().stream()
                     .filter(entry -> entry.getKey() != null)
-                    .flatMap(entry -> entry.getValue().stream()
-                            .filter(animal -> Period.between(animal.getBirthDate(), LocalDate.now()).getYears() > N)
-                            .map(animal -> Map.entry(animal, Period.between(animal.getBirthDate(), LocalDate.now()).getYears())))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    .map(Map.Entry::getValue)
+                    .flatMap(List::stream)
+                    .filter(animal -> animal.getAge() > N)
+                    .collect(Collectors.toMap(animal -> animal, Animal::getAge));
 
             if (olderAnimals.isEmpty() && oldestAnimal != null)
-                olderAnimals.put(oldestAnimal, Period.between(oldestAnimal.getBirthDate(), LocalDate.now()).getYears());
+                olderAnimals.put(oldestAnimal, oldestAnimal.getAge());
 
 
             try {
@@ -143,34 +155,6 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         } else {
             throw new NegativeArgumentException("Age can't be a negative");
         }
-    }
-
-    /**
-     * Метод выводит на экран множество дубликатов животных.
-     * Метод может быть вызван только из метода findDuplicate().
-     *
-     * @param dupl множество дубликатов
-     * @author Nikita
-     * @since 1.2
-     */
-    private void printSetOfDuplicates(Set<Animal> dupl) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        int counter = 0;
-
-
-        System.out.println("Animal duplicates: ");
-        for (Animal animal : dupl) {
-            System.out.format("%d-ый дубликат: %s\n", counter + 1, animal.getClass().getName());
-            System.out.println("Порода: " + animal.getBreed());
-            System.out.println("Кличка: " + animal.getName());
-            System.out.println("Цена: " + animal.getCost());
-            System.out.println("Характер: " + animal.getCharacter());
-            System.out.println("Голос: " + animal.getVoice());
-            System.out.println("День рождения животного: " + animal.getBirthDate().format(formatter));
-            System.out.println();
-            counter++;
-        }
-
     }
 
     @Override
@@ -200,13 +184,11 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         double averageAge = animalStorage.entrySet().stream()
                 .filter(entry -> entry.getKey() != null)
                 .flatMap(entry -> entry.getValue().stream())
-                .mapToInt(animal -> Period.between(animal.getBirthDate(), LocalDate.now()).getYears())
+                .mapToInt(Animal::getAge)
                 .average()
                 .orElse(0);
 
         BigDecimal result = new BigDecimal(averageAge).setScale(2, RoundingMode.HALF_UP);
-//        Map<String, BigDecimal> averageAgeMap = new HashMap<>(1);
-//        averageAgeMap.put("Average age", result);
         try {
             objectMapper.writeValue(file, result);
         } catch (IOException e) {

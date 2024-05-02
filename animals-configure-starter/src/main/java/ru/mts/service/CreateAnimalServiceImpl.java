@@ -1,28 +1,30 @@
 package ru.mts.service;
 
+import jakarta.annotation.PostConstruct;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import ru.mts.AnimalsProperties;
 import ru.mts.model.*;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -34,26 +36,70 @@ import java.util.concurrent.ThreadLocalRandom;
 @Scope("prototype")
 @EnableConfigurationProperties(AnimalsProperties.class)
 public class CreateAnimalServiceImpl implements CreateAnimalService {
-
+    private SessionFactory sessionFactory;
     private static Logger logger = LoggerFactory.getLogger(CreateAnimalServiceImpl.class);
-    private List<AnimalEnum> animalTypes;
-
-    private ConcurrentMap<AnimalEnum, List<Animal>> createdAnimals;
-
     private AnimalsProperties animalsProperties;
 
-    public CreateAnimalServiceImpl(AnimalsProperties animalsProperties) {
+    public CreateAnimalServiceImpl(SessionFactory sessionFactory, AnimalsProperties animalsProperties) {
+        this.sessionFactory = sessionFactory;
         this.animalsProperties = animalsProperties;
     }
 
+    @PostConstruct
     @Override
-    public List<AnimalEnum> receiveAnimalTypes() {
-        return animalTypes;
-    }
+    @Transactional
+    public void initDB() {
+        Session session = sessionFactory.getCurrentSession();
+        try {
+            session.beginTransaction();
 
-    @Override
-    public ConcurrentMap<AnimalEnum, List<Animal>> receiveCreatedAnimals() {
-        return createdAnimals;
+            AnimalType catType = new AnimalType("cat", false);
+            AnimalType dogType = new AnimalType("dog", false);
+            AnimalType wolfType = new AnimalType("wolf", true);
+            AnimalType sharkType = new AnimalType("shark", true);
+
+            Breed breed1 = new Breed(breeds.get(0), catType);
+            Breed breed2 = new Breed(breeds.get(1), catType);
+            Breed breed3 = new Breed(breeds.get(2), catType);
+            catType.setBreeds(new ArrayList<>(List.of(breed1, breed2, breed3)));
+
+            Breed breed4 = new Breed(breeds.get(3), dogType);
+            Breed breed5 = new Breed(breeds.get(4), dogType);
+            Breed breed6 = new Breed(breeds.get(5), dogType);
+            dogType.setBreeds(new ArrayList<>(List.of(breed4, breed5, breed6)));
+
+            Breed breed7 = new Breed(breeds.get(6), sharkType);
+            Breed breed8 = new Breed(breeds.get(7), sharkType);
+            Breed breed9 = new Breed(breeds.get(8), sharkType);
+            sharkType.setBreeds(new ArrayList<>(List.of(breed7, breed8, breed9)));
+
+            Breed breed10 = new Breed(breeds.get(9), wolfType);
+            Breed breed11 = new Breed(breeds.get(10), wolfType);
+            Breed breed12 = new Breed(breeds.get(11), wolfType);
+            sharkType.setBreeds(new ArrayList<>(List.of(breed10, breed11, breed12)));
+
+            session.persist(catType);
+            session.persist(dogType);
+            session.persist(wolfType);
+            session.persist(sharkType);
+
+            session.persist(breed1);
+            session.persist(breed2);
+            session.persist(breed3);
+            session.persist(breed4);
+            session.persist(breed5);
+            session.persist(breed6);
+            session.persist(breed7);
+            session.persist(breed8);
+            session.persist(breed9);
+            session.persist(breed10);
+            session.persist(breed11);
+            session.persist(breed12);
+
+            session.getTransaction().commit();
+        } finally {
+            session.close();
+        }
     }
 
     /**
@@ -95,45 +141,81 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         Animal animal;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        int animalTypeNumber = ThreadLocalRandom.current().nextInt(4);
-        BigDecimal randCost = new BigDecimal(ThreadLocalRandom.current().nextDouble(10000, 500000)).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal cost = new BigDecimal(ThreadLocalRandom.current().nextDouble(10000, 500000)).setScale(2, RoundingMode.HALF_UP);
+        LocalDate birthDate = createRandomDate();
 
-        animal = switch (animalTypeNumber) {
-            case 0 ->
-                    new Cat(breeds.get(ThreadLocalRandom.current().nextInt(3)), animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate(), getRandomSecretInformation());
-            case 1 ->
-                    new Dog(breeds.get(ThreadLocalRandom.current().nextInt(3, 6)), animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate(), getRandomSecretInformation());
-            case 2 ->
-                    new Shark(breeds.get(ThreadLocalRandom.current().nextInt(6, 9)), animalsProperties.getSharkNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate(), getRandomSecretInformation());
-            case 3 ->
-                    new Wolf(breeds.get(ThreadLocalRandom.current().nextInt(9, 12)), animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)), randCost, characters.get(ThreadLocalRandom.current().nextInt(6)), createRandomDate(), getRandomSecretInformation());
-            default -> null;
-        };
+        Session session = sessionFactory.getCurrentSession();
+        try {
+            session.beginTransaction();
 
-        logger.info("{}-ое животное: {}", counter, animal.getClass().getName());
-        logger.info("Порода: {}", animal.getBreed());
-        logger.info("Кличка: {}", animal.getName());
+            List<AnimalType> animalTypes = session.createQuery("FROM AnimalType", AnimalType.class).list();
+            AnimalType animalType = animalTypes.get(ThreadLocalRandom.current().nextInt(animalTypes.size()));
+
+            List<Breed> breeds = animalType.getBreeds();
+            Breed breed = breeds.get(ThreadLocalRandom.current().nextInt(breeds.size()));
+
+            animal = switch (animalType.getType()) {
+                case "cat" ->
+                    new Animal(animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)),
+                            cost,
+                            characters.get(ThreadLocalRandom.current().nextInt(6)),
+                            birthDate,
+                            animalType,
+                            (short) Period.between(birthDate, LocalDate.now()).getYears(),
+                            breed,
+                            getRandomSecretInformation());
+                case "dog" ->
+                        new Animal(animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)),
+                                cost,
+                                characters.get(ThreadLocalRandom.current().nextInt(6)),
+                                birthDate,
+                                animalType,
+                                (short) Period.between(birthDate, LocalDate.now()).getYears(),
+                                breed,
+                                getRandomSecretInformation());
+                case "wolf" ->
+                        new Animal(animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)),
+                                cost,
+                                characters.get(ThreadLocalRandom.current().nextInt(6)),
+                                birthDate,
+                                animalType,
+                                (short) Period.between(birthDate, LocalDate.now()).getYears(),
+                                breed,
+                                getRandomSecretInformation());
+                case "shark" ->
+                        new Animal(animalsProperties.getSharkNames().get(ThreadLocalRandom.current().nextInt(3)),
+                                cost,
+                                characters.get(ThreadLocalRandom.current().nextInt(6)),
+                                birthDate,
+                                animalType,
+                                (short) Period.between(birthDate, LocalDate.now()).getYears(),
+                                breed,
+                                getRandomSecretInformation());
+                default -> null;
+            };
+
+            animalType.getAnimals().add(animal);
+            breed.getAnimals().add(animal);
+
+//            session.persist(animalType);
+//            session.persist(breeds);
+
+            session.getTransaction().commit();
+        } finally {
+            session.close();
+        }
+
+        logger.info("{}-ое животное:", counter);
+        logger.info("Имя: {}", animal.getName());
         logger.info("Цена: {}", animal.getCost());
         logger.info("Характер: {}", animal.getCharacter());
-        logger.info("Голос: {}", animal.getVoice());
         logger.info("День рождения животного: {}", animal.getBirthDate().format(formatter));
+        logger.info("Тип: {}", animal.getAnimalType().getType());
+        logger.info("Возраст: {}", animal.getAge());
+        logger.info("Порода: {}", animal.getBreed().getBreed());
         logger.info("Секретная информация: {}", animal.getSecretInformation());
 
         return animal;
-    }
-
-    @Override
-    public void defineTypeOfAnimals() {
-        createdAnimals = createAnimals();
-
-        animalTypes = new CopyOnWriteArrayList<>();
-        for (Map.Entry<AnimalEnum, List<Animal>> node : createdAnimals.entrySet()) {
-            if (node.getKey() != null) {
-                for (Animal animal : node.getValue()) {
-                    animalTypes.add(node.getKey());
-                }
-            }
-        }
     }
 
     private void writeAnimalToFile(Animal animal, int counter) {
@@ -149,7 +231,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
             ByteBuffer buffer = ByteBuffer.allocate(100);
             buffer.clear();
 
-            String animalLogInfo = counter + " " + animal.getBreed() + " " + animal.getName() + " " + animal.getCost().toString() + " " + animal.getBirthDate().toString() + "\n";
+            String animalLogInfo = counter + " " + animal.getBreed().getBreed() + " " + animal.getName() + " " + animal.getCost().toString() + " " + animal.getBirthDate().toString() + "\n";
 
             buffer.put(animalLogInfo.getBytes());
 
@@ -166,23 +248,15 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     }
 
     @Override
-    public ConcurrentMap<AnimalEnum, List<Animal>> createAnimals() {
+    public void createAnimals() {
         int counter = 1;
-
-        createdAnimals = new ConcurrentHashMap<>();
-        for (AnimalEnum animalEnum : AnimalEnum.values()) {
-            createdAnimals.put(animalEnum, new ArrayList<>());
-        }
 
         do {
             Animal animal = commonCreating(counter);
             writeAnimalToFile(animal, counter);
-            String[] splitStr = animal.getClass().toString().split("\\.");
-            createdAnimals.get(AnimalEnum.valueOf(splitStr[splitStr.length - 1].toUpperCase())).add(animal);
         }
         while (counter++ < 10);
 
-        return createdAnimals;
     }
 
 
@@ -194,19 +268,10 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
      * @author Nikita
      * @since 1.1
      */
-    public ConcurrentMap<AnimalEnum, List<Animal>> createAnimals(int N) {
-        createdAnimals = new ConcurrentHashMap<>();
-        for (AnimalEnum animalEnum : AnimalEnum.values()) {
-            createdAnimals.put(animalEnum, new ArrayList<>());
-        }
-
-
+    public void createAnimals(int N) {
         for (int i = 0; i < N; i++) {
             Animal animal = commonCreating(i + 1);
-            String[] splitStr = animal.getClass().toString().split("\\.");
-            createdAnimals.get(AnimalEnum.valueOf(splitStr[splitStr.length - 1].toUpperCase())).add(animal);
+            writeAnimalToFile(animal, i + 1);
         }
-
-        return createdAnimals;
     }
 }

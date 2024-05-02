@@ -1,41 +1,65 @@
 [ {
-  "type" : "Cat",
-  "breed" : "Сфинкс",
-  "name" : "Васька",
-  "cost" : "445929.82",
-  "character" : "Злой",
-  "birthDate" : "1973-07-24",
-  "secretInformation" : "SjR44oSWUFN9bXA2Y3U="
-}, {
-  "type" : "Cat",
-  "breed" : "Шотландская",
-  "name" : "Матроскин",
-  "cost" : "391203.02",
-  "character" : "Злой",
-  "birthDate" : "1991-06-28",
-  "secretInformation" : "dDhEW2UsaDZBeUch"
-}, {
-  "type" : "Wolf",
-  "breed" : "Японский",
-  "name" : "Волчок",
-  "cost" : "488026.56",
-  "character" : "Вредный",
-  "birthDate" : "1994-04-27",
-  "secretInformation" : "dGl0U0BWQm5RQzFv"
-}, {
-  "type" : "Dog",
-  "breed" : "Лабрадор",
   "name" : "Матрос",
-  "cost" : "404612.34",
-  "character" : "Пугливый",
-  "birthDate" : "2000-05-24",
-  "secretInformation" : "SSwtIX55RTd3JCs0"
-}, {
-  "type" : "Dog",
-  "breed" : "Лабрадор",
-  "name" : "Матрос",
-  "cost" : "429396.32",
+  "cost" : "356493.12",
   "character" : "Игривый",
-  "birthDate" : "2015-05-24",
-  "secretInformation" : "NeKElmx0Ym1ILXLihJZTbQ=="
+  "birthDate" : "1989-07-28",
+  "animalType" : {
+    "id" : 2,
+    "type" : "dog",
+    "wild" : false
+  },
+  "age" : 34,
+  "breed" : {
+    "id" : 4,
+    "breed" : "Немецкая овчарка"
+  },
+  "secretInformation" : "K3l4SGVWNEBNbjVB"
+}, {
+  "name" : "Серый",
+  "cost" : "306627.41",
+  "character" : "Добрый",
+  "birthDate" : "2010-01-03",
+  "animalType" : {
+    "id" : 3,
+    "type" : "wolf",
+    "wild" : true
+  },
+  "age" : 14,
+  "breed" : {
+    "id" : 8,
+    "breed" : "Ньюфаундлендский"
+  },
+  "secretInformation" : "bjpDXj0zdnVfOHpr"
+}, {
+  "name" : "Клык",
+  "cost" : "232362.79",
+  "character" : "Добрый",
+  "birthDate" : "2010-02-09",
+  "animalType" : {
+    "id" : 3,
+    "type" : "wolf",
+    "wild" : true
+  },
+  "age" : 14,
+  "breed" : {
+    "id" : 9,
+    "breed" : "Японский"
+  },
+  "secretInformation" : "SDp7dTJ0TV0lKWlB"
+}, {
+  "name" : "Клык",
+  "cost" : "329338.89",
+  "character" : "Вредный",
+  "birthDate" : "2010-08-16",
+  "animalType" : {
+    "id" : 3,
+    "type" : "wolf",
+    "wild" : true
+  },
+  "age" : 13,
+  "breed" : {
+    "id" : 9,
+    "breed" : "Японский"
+  },
+  "secretInformation" : "QyRLQDFOdzNHeXVR"
 } ]

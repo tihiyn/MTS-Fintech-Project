@@ -1,69 +1,76 @@
 package ru.mts.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-//@JsonSerialize(using = AnimalSerializer.class)
-//@JsonDeserialize(using = PairDeserializer.class)
-public interface Animal {
-    /**
-     * Метод, который возвращает породу животного.
-     *
-     * @return порода животного.
-     * @author Nikita
-     * @since 1.0
-     */
-    String getBreed();
+@Entity
+@Table(name = "creature")
+@Getter
+@Setter
+@NoArgsConstructor
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class Animal {
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-    /**
-     * Метод, который возвращает имя животного.
-     *
-     * @return имя животного.
-     * @author Nikita
-     * @since 1.0
-     */
-    String getName();
+    @Column(name = "name")
+    private String name;
 
-    /**
-     * Метод, который возвращает цену животного в магазине.
-     *
-     * @return цена животного в магазине.
-     * @author Nikita
-     * @since 1.0
-     */
-    BigDecimal getCost();
+    @Column(name = "cost")
+    private BigDecimal cost;
 
-    /**
-     * Метод, который возвращает характер животного.
-     *
-     * @return характер животного.
-     * @author Nikita
-     * @since 1.0
-     */
-    String getCharacter();
+    @Column(name = "character")
+    private String character;
 
-    /**
-     * Метод, который возвращает голос животного.
-     *
-     * @return голос животного.
-     * @author Nikita
-     * @since 1.0
-     */
-    String getVoice();
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 
-    /**
-     * Метод, который возвращает дату рождения животного.
-     *
-     * @return дата рождения животного.
-     * @author Nikita
-     * @since 1.0
-     */
-    LocalDate getBirthDate();
+    @Column(name = "age")
+    private short age;
 
-    String getSecretInformation();
+    @ManyToOne
+    @JoinColumn(name = "type_id", referencedColumnName = "id")
+    private AnimalType animalType;
 
-    String toString();
+    @ManyToOne
+    @JoinColumn(name = "breed_id", referencedColumnName = "id")
+    private Breed breed;
+
+    @Column(name = "secret_information")
+    private String secretInformation;
+
+
+    public Animal(String name, BigDecimal cost, String character, LocalDate birthDate, AnimalType animalType, short age, Breed breed, String secretInformation) {
+        this.name = name;
+        this.cost = cost;
+        this.character = character;
+        this.birthDate = birthDate;
+        this.animalType = animalType;
+        this.age = age;
+        this.breed = breed;
+        this.secretInformation = secretInformation;
+    }
+
+    @Override
+    public String toString() {
+        return "Animal{" +
+                "name:'" + name + '\'' +
+                ", cost:" + cost +
+                ", character:'" + character + '\'' +
+                ", birthDate:" + birthDate +
+                ", age:" + age +
+                ", animalType:" + animalType +
+                ", breed:" + breed +
+                ", secretInformation:'" + secretInformation + '\'' +
+                '}';
+    }
 }

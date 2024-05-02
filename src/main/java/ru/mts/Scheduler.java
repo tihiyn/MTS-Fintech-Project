@@ -13,7 +13,6 @@ import ru.mts.dao.CreatureDAO;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
-import ru.mts.models.Creature;
 import ru.mts.repository.AnimalsRepository;
 
 import java.io.File;
@@ -21,9 +20,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -48,57 +45,57 @@ public class Scheduler {
         this.creatureDAO = creatureDAO;
     }
 
-    /**
-     * PostConstruct метод, который создаёт 2 потока с помощью ScheduledExecutorService и задаёт им имена, используя ThreadFactory.
-     * Первый поток раз в 10 секунд вызывает метод findDuplicate из AnimalsRepositoryImpl.
-     * Второй поток раз в 20 секунд вызывает метод findAverageAge из AnimalsRepositoryImpl.
-     *
-     * @author Nikita
-     * @since 1.8
-     */
-    @PostConstruct
-    public void runThreads() {
-        ScheduledExecutorService service = Executors.newScheduledThreadPool(2, new NamedThreadFactory());
-        service.scheduleWithFixedDelay(() -> {
-            Path path = Paths.get("src/main/resources/results/findDuplicate.json");
-            File file = new File(path.toString());
-
-            animalsRepository.findDuplicate();
-
-            try {
-                Map<String, List<Animal>> duplicateMap = objectMapper.readValue(file, new TypeReference<>() {});
-                logger.info("Duplicates of animals");
-                for (Map.Entry<String, List<Animal>> node : duplicateMap.entrySet()) {
-                    logger.info("Type: {}, Duplicates: {}", node.getKey(), node.getValue());
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }, 0, 10, TimeUnit.SECONDS);
-
-        service.scheduleWithFixedDelay(() -> {
-            Path path = Paths.get("src/main/resources/results/findAverageAge.json");
-            File file = new File(path.toString());
-
-            animalsRepository.findAverageAge();
-
-            try {
-                BigDecimal averageAge = objectMapper.readValue(file, BigDecimal.class);
-                logger.info("Average animal age: {}", averageAge);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }, 0, 20, TimeUnit.SECONDS);
-    }
-
-    static class NamedThreadFactory implements ThreadFactory {
-        private final AtomicInteger threadsCounter = new AtomicInteger(0);
-
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, "MyThread-" + threadsCounter.incrementAndGet());
-        }
-    }
+//    /**
+//     * PostConstruct метод, который создаёт 2 потока с помощью ScheduledExecutorService и задаёт им имена, используя ThreadFactory.
+//     * Первый поток раз в 10 секунд вызывает метод findDuplicate из AnimalsRepositoryImpl.
+//     * Второй поток раз в 20 секунд вызывает метод findAverageAge из AnimalsRepositoryImpl.
+//     *
+//     * @author Nikita
+//     * @since 1.8
+//     */
+//    @PostConstruct
+//    public void runThreads() {
+//        ScheduledExecutorService service = Executors.newScheduledThreadPool(2, new NamedThreadFactory());
+//        service.scheduleWithFixedDelay(() -> {
+//            Path path = Paths.get("src/main/resources/results/findDuplicate.json");
+//            File file = new File(path.toString());
+//
+//            animalsRepository.findDuplicate();
+//
+//            try {
+//                Map<String, List<Animal>> duplicateMap = objectMapper.readValue(file, new TypeReference<>() {});
+//                logger.info("Duplicates of animals");
+//                for (Map.Entry<String, List<Animal>> node : duplicateMap.entrySet()) {
+//                    logger.info("Type: {}, Duplicates: {}", node.getKey(), node.getValue());
+//                }
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }, 0, 10, TimeUnit.SECONDS);
+//
+//        service.scheduleWithFixedDelay(() -> {
+//            Path path = Paths.get("src/main/resources/results/findAverageAge.json");
+//            File file = new File(path.toString());
+//
+//            animalsRepository.findAverageAge();
+//
+//            try {
+//                BigDecimal averageAge = objectMapper.readValue(file, BigDecimal.class);
+//                logger.info("Average animal age: {}", averageAge);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e);
+//            }
+//        }, 0, 20, TimeUnit.SECONDS);
+//    }
+//
+//    static class NamedThreadFactory implements ThreadFactory {
+//        private final AtomicInteger threadsCounter = new AtomicInteger(0);
+//
+//        @Override
+//        public Thread newThread(Runnable r) {
+//            return new Thread(r, "MyThread-" + threadsCounter.incrementAndGet());
+//        }
+//    }
 
     /**
      * Метод, который раз в 60 секунд будет делать вызов методов
@@ -107,7 +104,7 @@ public class Scheduler {
      * @author Nikita
      * @since 1.1
      */
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 180000)
     public void printResults() {
         try {
             animalsRepository = animalsRepositoryObjectFactory.getObject();
@@ -130,10 +127,10 @@ public class Scheduler {
             int N = 25;
             animalsRepository.findOlderAnimal(N);
 
-            Map<Animal, Integer> olderAnimalMap = objectMapper.readValue(file, new TypeReference<>() {});
+            Map<Animal, Short> olderAnimalMap = objectMapper.readValue(file, new TypeReference<>() {});
 
             logger.info("Names of animals that are more than {} y.o.", N);
-            for (Map.Entry<Animal, Integer> node : olderAnimalMap.entrySet()) {
+            for (Map.Entry<Animal, Short> node : olderAnimalMap.entrySet()) {
                 logger.info("{}, Age: {}", node.getKey(), node.getValue());
             }
 
@@ -151,14 +148,14 @@ public class Scheduler {
 //            }
 
 
-//            path = Paths.get("src/main/resources/results/findAverageAge.json");
-//            file = new File(path.toString());
-//
-//            animalsRepository.findAverageAge();
-//
-//            BigDecimal averageAge = objectMapper.readValue(file, BigDecimal.class);
-//
-//            logger.info("Average animal age: {}", averageAge);
+            path = Paths.get("src/main/resources/results/findAverageAge.json");
+            file = new File(path.toString());
+
+            animalsRepository.findAverageAge();
+
+            BigDecimal averageAge = objectMapper.readValue(file, BigDecimal.class);
+
+            logger.info("Average animal age: {}", averageAge);
 
 
             path = Paths.get("src/main/resources/results/findOldAndExpensive.json");
@@ -194,17 +191,17 @@ public class Scheduler {
         }
     }
 
-    /**
-     * Метод, который раз в 40 секунд создаёт объекты класса Creature из БД при помощи JdbcTemplate и выводит их в лог.
-     * Созданные животные сохраняются в ArrayList.
-     *
-     * @author Nikita
-     * @since 1.16
-     */
-    @Scheduled(fixedRate = 40000)
-    public void jdbcCreating() {
-        List<Creature> creatures = creatureDAO.listCreatures();
-
-        creatures.forEach(creature -> logger.info(creature.toString()));
-    }
+//    /**
+//     * Метод, который раз в 40 секунд создаёт объекты класса Creature из БД при помощи JdbcTemplate и выводит их в лог.
+//     * Созданные животные сохраняются в ArrayList.
+//     *
+//     * @author Nikita
+//     * @since 1.16
+//     */
+//    @Scheduled(fixedRate = 40000)
+//    public void jdbcCreating() {
+//        List<Animal> animals = creatureDAO.listCreatures();
+//
+//        animals.forEach(animal -> logger.info(animal.toString()));
+//    }
 }

@@ -1,7 +1,8 @@
 {
-  "Cat{'breed':'Шотландская', 'name':'Матроскин', 'cost':391203.02, 'character':'Злой', 'birthDate':'1991-06-28', 'secretInformation':'dDhEW2UsaDZBeUch'}" : 32,
-  "Shark{'breed':'Тигровая', 'name':'Шарки', 'cost':97716.52, 'character':'Вредный', 'birthDate':'1974-12-29', 'secretInformation':'K0EhXTJtUT9WY1t6'}" : 49,
-  "Wolf{'breed':'Японский', 'name':'Волчок', 'cost':488026.56, 'character':'Вредный', 'birthDate':'1994-04-27', 'secretInformation':'dGl0U0BWQm5RQzFv'}" : 30,
-  "Cat{'breed':'Британская', 'name':'Васька', 'cost':320526.64, 'character':'Пугливый', 'birthDate':'1991-10-16', 'secretInformation':'ZnBdfTR4WkRMYjNd'}" : 32,
-  "Cat{'breed':'Сфинкс', 'name':'Васька', 'cost':445929.82, 'character':'Злой', 'birthDate':'1973-07-24', 'secretInformation':'SjR44oSWUFN9bXA2Y3U='}" : 50
+  "Animal{name:'Клык', cost:151343.55, character:'Добрый', birthDate:1978-01-17, age:46, animalType:AnimalType{id:3, type:'wolf', isWild:true}, breed:Breed{id:8, breed:'Ньюфаундлендский'}, secretInformation:'TFosO0MsITZ9e284'}" : 46,
+  "Animal{name:'Васька', cost:188394.68, character:'Пугливый', birthDate:1971-06-03, age:52, animalType:AnimalType{id:1, type:'cat', isWild:false}, breed:Breed{id:2, breed:'Шотландская'}, secretInformation:'I1Y5ISg6LCkxdjYz'}" : 52,
+  "Animal{name:'Клык', cost:182613.92, character:'Добрый', birthDate:1976-09-17, age:47, animalType:AnimalType{id:3, type:'wolf', isWild:true}, breed:Breed{id:8, breed:'Ньюфаундлендский'}, secretInformation:'T0laV15eWjUwMlNo'}" : 47,
+  "Animal{name:'Матрос', cost:356493.12, character:'Игривый', birthDate:1989-07-28, age:34, animalType:AnimalType{id:2, type:'dog', isWild:false}, breed:Breed{id:4, breed:'Немецкая овчарка'}, secretInformation:'K3l4SGVWNEBNbjVB'}" : 34,
+  "Animal{name:'Серый', cost:157220.55, character:'Добрый', birthDate:1990-09-10, age:33, animalType:AnimalType{id:3, type:'wolf', isWild:true}, breed:Breed{id:7, breed:'Полярный'}, secretInformation:'cUNDNmNuIXxRcuKElmo='}" : 33,
+  "Animal{name:'Васька', cost:37059.51, character:'Злой', birthDate:1991-01-28, age:33, animalType:AnimalType{id:1, type:'cat', isWild:false}, breed:Breed{id:3, breed:'Сфинкс'}, secretInformation:'N3VwRUY3KeKElkpJcGQ='}" : 33
 }

@@ -66,7 +66,7 @@ public class CreateAnimalServiceImplTest {
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3, 4, 5})
     public void starterTest(int value) {
-        animalsRepository = new AnimalsRepositoryImpl(createAnimalService);
+        animalsRepository = new AnimalsRepositoryImpl(sessionFactory, createAnimalService);
 
         when(createAnimalService.receiveAnimalTypes()).thenCallRealMethod();
         when(createAnimalService.receiveCreatedAnimals()).thenCallRealMethod();
