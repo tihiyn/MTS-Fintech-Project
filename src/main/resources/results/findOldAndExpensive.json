@@ -1,65 +1,177 @@
 [ {
-  "name" : "Матрос",
-  "cost" : "356493.12",
-  "character" : "Игривый",
-  "birthDate" : "1989-07-28",
+  "name" : "Мурзик",
+  "cost" : "495332.84",
+  "character" : "Добрый",
+  "birthDate" : "1977-07-13",
   "animalType" : {
-    "id" : 2,
+    "id" : 1,
+    "type" : "cat",
+    "wild" : false
+  },
+  "age" : 46,
+  "breed" : {
+    "id" : 1,
+    "breed" : "Британская"
+  },
+  "secretInformation" : "VF4sX31PcUgqN3B2"
+}, {
+  "name" : "Мухтар",
+  "cost" : "252881.32",
+  "character" : "Верный",
+  "birthDate" : "1989-08-30",
+  "animalType" : {
+    "id" : 10,
     "type" : "dog",
     "wild" : false
   },
   "age" : 34,
   "breed" : {
-    "id" : 4,
-    "breed" : "Немецкая овчарка"
+    "id" : 30,
+    "breed" : "Лабрадор"
   },
-  "secretInformation" : "K3l4SGVWNEBNbjVB"
+  "secretInformation" : "fD0kLHA4WzNDRzkx"
 }, {
-  "name" : "Серый",
-  "cost" : "306627.41",
-  "character" : "Добрый",
-  "birthDate" : "2010-01-03",
+  "name" : "Клык",
+  "cost" : "398721.17",
+  "character" : "Игривый",
+  "birthDate" : "1994-04-30",
   "animalType" : {
-    "id" : 3,
+    "id" : 5,
     "type" : "wolf",
     "wild" : true
   },
-  "age" : 14,
+  "age" : 30,
   "breed" : {
+    "id" : 17,
+    "breed" : "Японский"
+  },
+  "secretInformation" : "VHBXJnJuME96TSxS"
+}, {
+  "name" : "Шарки",
+  "cost" : "407515.45",
+  "character" : "Добрый",
+  "birthDate" : "1995-04-21",
+  "animalType" : {
     "id" : 8,
-    "breed" : "Ньюфаундлендский"
+    "type" : "shark",
+    "wild" : true
+  },
+  "age" : 29,
+  "breed" : {
+    "id" : 24,
+    "breed" : "Молот"
   },
   "secretInformation" : "bjpDXj0zdnVfOHpr"
 }, {
-  "name" : "Клык",
-  "cost" : "232362.79",
-  "character" : "Добрый",
-  "birthDate" : "2010-02-09",
+  "name" : "Матроскин",
+  "cost" : "430572.90",
+  "character" : "Вредный",
+  "birthDate" : "1996-02-23",
   "animalType" : {
-    "id" : 3,
-    "type" : "wolf",
-    "wild" : true
+    "id" : 1,
+    "type" : "cat",
+    "wild" : false
   },
-  "age" : 14,
+  "age" : 28,
   "breed" : {
-    "id" : 9,
-    "breed" : "Японский"
+    "id" : 3,
+    "breed" : "Шотландская"
   },
-  "secretInformation" : "SDp7dTJ0TV0lKWlB"
+  "secretInformation" : "N2tBTDVVMmU6UGVG"
+}, {
+  "name" : "Матрос",
+  "cost" : "435465.21",
+  "character" : "Пугливый",
+  "birthDate" : "2001-08-21",
+  "animalType" : {
+    "id" : 10,
+    "type" : "dog",
+    "wild" : false
+  },
+  "age" : 22,
+  "breed" : {
+    "id" : 28,
+    "breed" : "Немецкая овчарка"
+  },
+  "secretInformation" : "cUNDNmNuIXxRcuKElmo="
 }, {
   "name" : "Клык",
-  "cost" : "329338.89",
-  "character" : "Вредный",
-  "birthDate" : "2010-08-16",
+  "cost" : "267525.62",
+  "character" : "Пугливый",
+  "birthDate" : "2002-12-02",
   "animalType" : {
-    "id" : 3,
+    "id" : 5,
     "type" : "wolf",
     "wild" : true
   },
-  "age" : 13,
+  "age" : 21,
   "breed" : {
-    "id" : 9,
-    "breed" : "Японский"
+    "id" : 14,
+    "breed" : "Ньюфаундлендский"
   },
-  "secretInformation" : "QyRLQDFOdzNHeXVR"
+  "secretInformation" : "ZnBdfTR4WkRMYjNd"
+}, {
+  "name" : "Клык",
+  "cost" : "415743.21",
+  "character" : "Вредный",
+  "birthDate" : "2007-04-10",
+  "animalType" : {
+    "id" : 5,
+    "type" : "wolf",
+    "wild" : true
+  },
+  "age" : 17,
+  "breed" : {
+    "id" : 13,
+    "breed" : "Полярный"
+  },
+  "secretInformation" : "KSFRUjJRcjY4NWsy"
+}, {
+  "name" : "Волна",
+  "cost" : "291969.59",
+  "character" : "Верный",
+  "birthDate" : "2013-08-15",
+  "animalType" : {
+    "id" : 7,
+    "type" : "shark",
+    "wild" : true
+  },
+  "age" : 10,
+  "breed" : {
+    "id" : 19,
+    "breed" : "Тигровая"
+  },
+  "secretInformation" : "OD0jXjVGRCU0d2VX"
+}, {
+  "name" : "Шарки",
+  "cost" : "311087.66",
+  "character" : "Игривый",
+  "birthDate" : "2013-09-24",
+  "animalType" : {
+    "id" : 12,
+    "type" : "shark",
+    "wild" : true
+  },
+  "age" : 10,
+  "breed" : {
+    "id" : 35,
+    "breed" : "Белая"
+  },
+  "secretInformation" : "MSs0SiE3JXpkIyE5"
+}, {
+  "name" : "Мухтар",
+  "cost" : "472217.10",
+  "character" : "Вредный",
+  "birthDate" : "2017-07-19",
+  "animalType" : {
+    "id" : 4,
+    "type" : "dog",
+    "wild" : false
+  },
+  "age" : 6,
+  "breed" : {
+    "id" : 11,
+    "breed" : "Доберман"
+  },
+  "secretInformation" : "QjkhdlBAd2MpOiFm"
 } ]

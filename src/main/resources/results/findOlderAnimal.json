@@ -1,8 +1,14 @@
 {
-  "Animal{name:'Клык', cost:151343.55, character:'Добрый', birthDate:1978-01-17, age:46, animalType:AnimalType{id:3, type:'wolf', isWild:true}, breed:Breed{id:8, breed:'Ньюфаундлендский'}, secretInformation:'TFosO0MsITZ9e284'}" : 46,
-  "Animal{name:'Васька', cost:188394.68, character:'Пугливый', birthDate:1971-06-03, age:52, animalType:AnimalType{id:1, type:'cat', isWild:false}, breed:Breed{id:2, breed:'Шотландская'}, secretInformation:'I1Y5ISg6LCkxdjYz'}" : 52,
-  "Animal{name:'Клык', cost:182613.92, character:'Добрый', birthDate:1976-09-17, age:47, animalType:AnimalType{id:3, type:'wolf', isWild:true}, breed:Breed{id:8, breed:'Ньюфаундлендский'}, secretInformation:'T0laV15eWjUwMlNo'}" : 47,
-  "Animal{name:'Матрос', cost:356493.12, character:'Игривый', birthDate:1989-07-28, age:34, animalType:AnimalType{id:2, type:'dog', isWild:false}, breed:Breed{id:4, breed:'Немецкая овчарка'}, secretInformation:'K3l4SGVWNEBNbjVB'}" : 34,
-  "Animal{name:'Серый', cost:157220.55, character:'Добрый', birthDate:1990-09-10, age:33, animalType:AnimalType{id:3, type:'wolf', isWild:true}, breed:Breed{id:7, breed:'Полярный'}, secretInformation:'cUNDNmNuIXxRcuKElmo='}" : 33,
-  "Animal{name:'Васька', cost:37059.51, character:'Злой', birthDate:1991-01-28, age:33, animalType:AnimalType{id:1, type:'cat', isWild:false}, breed:Breed{id:3, breed:'Сфинкс'}, secretInformation:'N3VwRUY3KeKElkpJcGQ='}" : 33
+  "Animal{name:'Клык', cost:158398.20, character:'Злой', birthDate:1975-07-04, age:48, animalType:AnimalType{id:5, type:'wolf', isWild:true}, breed:Breed{id:13, breed:'Полярный'}, secretInformation:'ZnBdfTR4WkRMYjNd'}" : 48,
+  "Animal{name:'Мурзик', cost:495332.84, character:'Добрый', birthDate:1977-07-13, age:46, animalType:AnimalType{id:1, type:'cat', isWild:false}, breed:Breed{id:1, breed:'Британская'}, secretInformation:'VF4sX31PcUgqN3B2'}" : 46,
+  "Animal{name:'Аква', cost:82865.09, character:'Добрый', birthDate:1993-09-04, age:30, animalType:AnimalType{id:12, type:'shark', isWild:true}, breed:Breed{id:35, breed:'Белая'}, secretInformation:'RGZFS1thIVhNIzIs'}" : 30,
+  "Animal{name:'Мухтар', cost:252881.32, character:'Верный', birthDate:1989-08-30, age:34, animalType:AnimalType{id:10, type:'dog', isWild:false}, breed:Breed{id:30, breed:'Лабрадор'}, secretInformation:'fD0kLHA4WzNDRzkx'}" : 34,
+  "Animal{name:'Волна', cost:191607.56, character:'Игривый', birthDate:1996-11-23, age:27, animalType:AnimalType{id:8, type:'shark', isWild:true}, breed:Breed{id:24, breed:'Молот'}, secretInformation:'OD0jXjVGRCU0d2VX'}" : 27,
+  "Animal{name:'Васька', cost:78185.07, character:'Верный', birthDate:1980-10-12, age:43, animalType:AnimalType{id:9, type:'cat', isWild:false}, breed:Breed{id:25, breed:'Британская'}, secretInformation:'MUptND1jWEIjYjFm'}" : 43,
+  "Animal{name:'Мухтар', cost:46288.61, character:'Пугливый', birthDate:1994-06-06, age:29, animalType:AnimalType{id:3, type:'dog', isWild:false}, breed:Breed{id:7, breed:'Немецкая овчарка'}, secretInformation:'Wjkx4oSWcSRrKEFDNzQ='}" : 29,
+  "Animal{name:'Мухтар', cost:96825.09, character:'Пугливый', birthDate:1992-04-19, age:32, animalType:AnimalType{id:10, type:'dog', isWild:false}, breed:Breed{id:29, breed:'Доберман'}, secretInformation:'YU1GVylnXyYuYlI2'}" : 32,
+  "Animal{name:'Матроскин', cost:430572.90, character:'Вредный', birthDate:1996-02-23, age:28, animalType:AnimalType{id:1, type:'cat', isWild:false}, breed:Breed{id:3, breed:'Шотландская'}, secretInformation:'N2tBTDVVMmU6UGVG'}" : 28,
+  "Animal{name:'Шарки', cost:407515.45, character:'Добрый', birthDate:1995-04-21, age:29, animalType:AnimalType{id:8, type:'shark', isWild:true}, breed:Breed{id:24, breed:'Молот'}, secretInformation:'bjpDXj0zdnVfOHpr'}" : 29,
+  "Animal{name:'Клык', cost:398721.17, character:'Игривый', birthDate:1994-04-30, age:30, animalType:AnimalType{id:5, type:'wolf', isWild:true}, breed:Breed{id:17, breed:'Японский'}, secretInformation:'VHBXJnJuME96TSxS'}" : 30,
+  "Animal{name:'Шарик', cost:241591.86, character:'Злой', birthDate:1997-06-02, age:26, animalType:AnimalType{id:10, type:'dog', isWild:false}, breed:Breed{id:30, breed:'Лабрадор'}, secretInformation:'aU1RMTBwUCFbWTpx'}" : 26
 }
