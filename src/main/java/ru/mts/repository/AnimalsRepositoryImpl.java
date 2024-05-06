@@ -2,17 +2,21 @@ package ru.mts.repository;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
-import org.hibernate.Session;
+import jakarta.persistence.NoResultException;
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
+import ru.mts.dao.AnimalDAO;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
 import ru.mts.service.CreateAnimalService;
+import ru.mts.util.DBService;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,15 +39,16 @@ import java.util.stream.Collectors;
 public class AnimalsRepositoryImpl implements AnimalsRepository {
 
     private static Logger logger = LoggerFactory.getLogger(AnimalsRepositoryImpl.class);
-    private final SessionFactory sessionFactory;
+
+    private final AnimalDAO animalDAO;
     @Autowired
     private ObjectMapper objectMapper;
     private ConcurrentMap<String, List<Animal>> animalStorage;
 
     private CreateAnimalService createAnimalService;
 
-    public AnimalsRepositoryImpl(SessionFactory sessionFactory, CreateAnimalService createAnimalService) {
-        this.sessionFactory = sessionFactory;
+    public AnimalsRepositoryImpl(AnimalDAO animalDAO, SessionFactory sessionFactory, CreateAnimalService createAnimalService) {
+        this.animalDAO = animalDAO;
         this.createAnimalService = createAnimalService;
     }
 
@@ -61,18 +66,20 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     @PostConstruct
     @Override
     public void fillStorage() {
-        Session session = sessionFactory.getCurrentSession();
-        try {
-            session.beginTransaction();
+        Transaction transaction = DBService.getTransaction();
 
-            animalStorage = session.createQuery("FROM Animal", Animal.class).list().stream()
+        try {
+            animalStorage = animalDAO.listAnimals().stream()
                     .collect(Collectors.groupingByConcurrent(animal -> animal.getAnimalType().getType()));
 
-            session.getTransaction().commit();
-        } finally {
-            session.close();
+            transaction.commit();
+        } catch (HibernateException | NoResultException | NullPointerException e) {
+            DBService.transactionRollback(transaction);
+            throw new RuntimeException();
         }
 
+//        animalStorage = animalDAO.listAnimals().stream()
+//                .collect(Collectors.groupingByConcurrent(animal -> animal.getAnimalType().getType()));
 
 //        logger.info("Типы созданных животных");
 //        for (AnimalEnum type : createAnimalService.receiveAnimalTypes()) {

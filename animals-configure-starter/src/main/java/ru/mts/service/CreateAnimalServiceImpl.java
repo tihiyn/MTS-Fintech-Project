@@ -1,18 +1,24 @@
 package ru.mts.service;
 
 import jakarta.annotation.PostConstruct;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import jakarta.persistence.NoResultException;
+import org.hibernate.HibernateException;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import ru.mts.AnimalsProperties;
-import ru.mts.model.*;
+import ru.mts.dao.AnimalTypeDAO;
+import ru.mts.dao.BreedDAO;
+import ru.mts.model.Animal;
+import ru.mts.model.AnimalType;
+import ru.mts.model.Breed;
+import ru.mts.util.DBService;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.ByteBuffer;
@@ -26,33 +32,29 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
 @Scope("prototype")
 @EnableConfigurationProperties(AnimalsProperties.class)
 public class CreateAnimalServiceImpl implements CreateAnimalService {
-    private SessionFactory sessionFactory;
-    private static Logger logger = LoggerFactory.getLogger(CreateAnimalServiceImpl.class);
-    private AnimalsProperties animalsProperties;
+    private static final Logger logger = LoggerFactory.getLogger(CreateAnimalServiceImpl.class);
+    private final AnimalTypeDAO animalTypeDAO;
+    private final BreedDAO breedDAO;
+    private final AnimalsProperties animalsProperties;
 
-    public CreateAnimalServiceImpl(SessionFactory sessionFactory, AnimalsProperties animalsProperties) {
-        this.sessionFactory = sessionFactory;
+    public CreateAnimalServiceImpl(AnimalTypeDAO animalTypeDAO, BreedDAO breedDAO, AnimalsProperties animalsProperties) {
+        this.animalTypeDAO = animalTypeDAO;
+        this.breedDAO = breedDAO;
         this.animalsProperties = animalsProperties;
     }
 
     @PostConstruct
     @Override
-    @Transactional
     public void initDB() {
-        Session session = sessionFactory.getCurrentSession();
-        try {
-            session.beginTransaction();
+        Transaction transaction = DBService.getTransaction();
 
+        try {
             AnimalType catType = new AnimalType("cat", false);
             AnimalType dogType = new AnimalType("dog", false);
             AnimalType wolfType = new AnimalType("wolf", true);
@@ -78,27 +80,16 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
             Breed breed12 = new Breed(breeds.get(11), wolfType);
             sharkType.setBreeds(new ArrayList<>(List.of(breed10, breed11, breed12)));
 
-            session.persist(catType);
-            session.persist(dogType);
-            session.persist(wolfType);
-            session.persist(sharkType);
+            List<AnimalType> animalTypes = List.of(catType, dogType, wolfType, sharkType);
+            animalTypeDAO.saveListAnimalType(animalTypes);
 
-            session.persist(breed1);
-            session.persist(breed2);
-            session.persist(breed3);
-            session.persist(breed4);
-            session.persist(breed5);
-            session.persist(breed6);
-            session.persist(breed7);
-            session.persist(breed8);
-            session.persist(breed9);
-            session.persist(breed10);
-            session.persist(breed11);
-            session.persist(breed12);
+            List<Breed> breeds = List.of(breed1, breed2, breed3, breed4, breed5, breed6, breed7, breed8, breed9, breed10, breed11, breed12);
+            breedDAO.saveListBreed(breeds);
 
-            session.getTransaction().commit();
-        } finally {
-            session.close();
+            transaction.commit();
+        } catch (HibernateException | NoResultException | NullPointerException e) {
+            DBService.transactionRollback(transaction);
+            throw new RuntimeException();
         }
     }
 
@@ -141,47 +132,43 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         Animal animal;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-        BigDecimal cost = new BigDecimal(ThreadLocalRandom.current().nextDouble(10000, 500000)).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal cost = BigDecimal.valueOf(ThreadLocalRandom.current().nextDouble(10000, 500000)).setScale(2, RoundingMode.HALF_UP);
         LocalDate birthDate = createRandomDate();
 
-        Session session = sessionFactory.getCurrentSession();
-        try {
-            session.beginTransaction();
+        Transaction transaction = DBService.getTransaction();
 
-            List<AnimalType> animalTypes = session.createQuery("FROM AnimalType", AnimalType.class).list();
+        try {
+            List<AnimalType> animalTypes = animalTypeDAO.listAnimalTypes();
             AnimalType animalType = animalTypes.get(ThreadLocalRandom.current().nextInt(animalTypes.size()));
 
             List<Breed> breeds = animalType.getBreeds();
             Breed breed = breeds.get(ThreadLocalRandom.current().nextInt(breeds.size()));
 
             animal = switch (animalType.getType()) {
-                case "cat" ->
-                    new Animal(animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)),
-                            cost,
-                            characters.get(ThreadLocalRandom.current().nextInt(6)),
-                            birthDate,
-                            animalType,
-                            (short) Period.between(birthDate, LocalDate.now()).getYears(),
-                            breed,
-                            getRandomSecretInformation());
-                case "dog" ->
-                        new Animal(animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)),
-                                cost,
-                                characters.get(ThreadLocalRandom.current().nextInt(6)),
-                                birthDate,
-                                animalType,
-                                (short) Period.between(birthDate, LocalDate.now()).getYears(),
-                                breed,
-                                getRandomSecretInformation());
-                case "wolf" ->
-                        new Animal(animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)),
-                                cost,
-                                characters.get(ThreadLocalRandom.current().nextInt(6)),
-                                birthDate,
-                                animalType,
-                                (short) Period.between(birthDate, LocalDate.now()).getYears(),
-                                breed,
-                                getRandomSecretInformation());
+                case "cat" -> new Animal(animalsProperties.getCatNames().get(ThreadLocalRandom.current().nextInt(3)),
+                        cost,
+                        characters.get(ThreadLocalRandom.current().nextInt(6)),
+                        birthDate,
+                        animalType,
+                        (short) Period.between(birthDate, LocalDate.now()).getYears(),
+                        breed,
+                        getRandomSecretInformation());
+                case "dog" -> new Animal(animalsProperties.getDogNames().get(ThreadLocalRandom.current().nextInt(3)),
+                        cost,
+                        characters.get(ThreadLocalRandom.current().nextInt(6)),
+                        birthDate,
+                        animalType,
+                        (short) Period.between(birthDate, LocalDate.now()).getYears(),
+                        breed,
+                        getRandomSecretInformation());
+                case "wolf" -> new Animal(animalsProperties.getWolfNames().get(ThreadLocalRandom.current().nextInt(3)),
+                        cost,
+                        characters.get(ThreadLocalRandom.current().nextInt(6)),
+                        birthDate,
+                        animalType,
+                        (short) Period.between(birthDate, LocalDate.now()).getYears(),
+                        breed,
+                        getRandomSecretInformation());
                 case "shark" ->
                         new Animal(animalsProperties.getSharkNames().get(ThreadLocalRandom.current().nextInt(3)),
                                 cost,
@@ -194,15 +181,13 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
                 default -> null;
             };
 
-            animalType.getAnimals().add(animal);
-            breed.getAnimals().add(animal);
+            animalTypeDAO.addAnimal(animalType, animal);
+            breedDAO.addAnimal(breed, animal);
 
-//            session.persist(animalType);
-//            session.persist(breeds);
-
-            session.getTransaction().commit();
-        } finally {
-            session.close();
+            transaction.commit();
+        } catch (HibernateException | NoResultException | NullPointerException e) {
+            DBService.transactionRollback(transaction);
+            throw new RuntimeException();
         }
 
         logger.info("{}-ое животное:", counter);

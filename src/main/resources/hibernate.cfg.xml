@@ -1,41 +1,41 @@
-<!DOCTYPE hibernate-configuration PUBLIC
-        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<!--<!DOCTYPE hibernate-configuration PUBLIC-->
+<!--        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"-->
+<!--        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">-->
 
-<hibernate-configuration>
+<!--<hibernate-configuration>-->
 
-    <session-factory>
+<!--    <session-factory>-->
 
-        <!-- JDBC Database connection settings -->
-        <property name="connection.driver_class">org.postgresql.Driver</property>
-        <property name="connection.url">jdbc:postgresql://localhost:5432/KinoZOV</property>
-        <property name="connection.username">postgres</property>
-        <property name="connection.password">123456</property>
+<!--        &lt;!&ndash; JDBC Database connection settings &ndash;&gt;-->
+<!--        <property name="connection.driver_class">org.postgresql.Driver</property>-->
+<!--        <property name="connection.url">jdbc:postgresql://localhost:5432/KinoZOV</property>-->
+<!--        <property name="connection.username">postgres</property>-->
+<!--        <property name="connection.password">123456</property>-->
 
-        <!-- JDBC connection pool settings ... using built-in test pool -->
-        <property name="connection.pool_size">3</property>
+<!--        &lt;!&ndash; JDBC connection pool settings ... using built-in test pool &ndash;&gt;-->
+<!--        <property name="connection.pool_size">5</property>-->
 
-        <!-- Echo the SQL to stdout -->
-        <property name="show_sql">true</property>
+<!--        &lt;!&ndash; Echo the SQL to stdout &ndash;&gt;-->
+<!--        <property name="show_sql">true</property>-->
 
-        <!-- Set the current session context -->
-        <property name="current_session_context_class">thread</property>
+<!--        &lt;!&ndash; Set the current session context &ndash;&gt;-->
+<!--        <property name="current_session_context_class">thread</property>-->
 
-        <!-- Drop and re-create the database schema on startup -->
-        <property name="hbm2ddl.auto">create-drop</property>
+<!--        &lt;!&ndash; Drop and re-create the database schema on startup &ndash;&gt;-->
+<!--        <property name="hbm2ddl.auto">create-drop</property>-->
 
-        <!-- dbcp connection pool configuration -->
-        <property name="hibernate.dbcp.initialSize">5</property>
-        <property name="hibernate.dbcp.maxTotal">20</property>
-        <property name="hibernate.dbcp.maxIdle">10</property>
-        <property name="hibernate.dbcp.minIdle">5</property>
-        <property name="hibernate.dbcp.maxWaitMillis">-1</property>
+<!--        &lt;!&ndash; dbcp connection pool configuration &ndash;&gt;-->
+<!--        <property name="hibernate.dbcp.initialSize">5</property>-->
+<!--        <property name="hibernate.dbcp.maxTotal">20</property>-->
+<!--        <property name="hibernate.dbcp.maxIdle">10</property>-->
+<!--        <property name="hibernate.dbcp.minIdle">5</property>-->
+<!--        <property name="hibernate.dbcp.maxWaitMillis">-1</property>-->
 
-        <mapping class="ru.mts.model.Animal"/>
-        <mapping class="ru.mts.model.AnimalType"/>
-        <mapping class="ru.mts.model.Breed"/>
-        <mapping class="ru.mts.model.Habitat"/>
-        <mapping class="ru.mts.model.Provider"/>
+<!--        <mapping class="ru.mts.model.Animal"/>-->
+<!--        <mapping class="ru.mts.model.AnimalType"/>-->
+<!--        <mapping class="ru.mts.model.Breed"/>-->
+<!--        <mapping class="ru.mts.model.Habitat"/>-->
+<!--        <mapping class="ru.mts.model.Provider"/>-->
 
-    </session-factory>
-</hibernate-configuration>
+<!--    </session-factory>-->
+<!--</hibernate-configuration>-->

@@ -117,7 +117,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
         public void findLeapYearNames(int value) {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(sessionFactory, createAnimalService);
+            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, sessionFactory, createAnimalService);
 
             ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
             CopyOnWriteArrayList<AnimalEnum> animalTypes;
@@ -197,7 +197,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
         @ValueSource(ints = {10, 9, 20, 50, 24, 12, 18, 0, -2})
         public void findOlderAnimal(int value) {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(sessionFactory, createAnimalService);
+            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, sessionFactory, createAnimalService);
 
             ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
 
@@ -298,7 +298,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
         public void findDuplicate(int value) {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(sessionFactory, createAnimalService);
+            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, sessionFactory, createAnimalService);
 
             ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
             CopyOnWriteArrayList<AnimalEnum> animalTypes;
@@ -389,7 +389,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5})
         public void findAverageAge(int value) {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(sessionFactory, createAnimalService);
+            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, sessionFactory, createAnimalService);
 
             ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
             CopyOnWriteArrayList<AnimalEnum> animalTypes;
@@ -461,7 +461,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5})
         public void findOldAndExpensive(int value) {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(sessionFactory, createAnimalService);
+            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, sessionFactory, createAnimalService);
 
             ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
             CopyOnWriteArrayList<AnimalEnum> animalTypes;
@@ -534,7 +534,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5})
         public void findMinCostAnimals(int value) throws IllegalCollectionSizeException {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(sessionFactory, createAnimalService);
+            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, sessionFactory, createAnimalService);
 
             ConcurrentHashMap<AnimalEnum, List<Animal>> animals = new ConcurrentHashMap<>();
             CopyOnWriteArrayList<AnimalEnum> animalTypes;
