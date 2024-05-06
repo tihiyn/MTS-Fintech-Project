@@ -17,5 +17,5 @@ public interface CreateAnimalService {
      */
     void createAnimals();
 
-    void initDB();
+//    void initDB();
 }

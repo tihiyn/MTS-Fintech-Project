@@ -24,9 +24,10 @@ public class AnimalTypeDAO {
         animalTypes.forEach(session::persist);
     }
 
-    public void addAnimal(AnimalType animalType, Animal animal) {
+    public Animal addAnimal(AnimalType animalType, Animal animal) {
         Session session = DBService.getSessionFactory().getCurrentSession();
 
         animalType.getAnimals().add(animal);
+        return animal;
     }
 }

@@ -15,3 +15,19 @@ animal:
     - Клык
     - Волчок
     - Серый
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/ANIMAL_SHOP
+    username: postgres
+    password: 123456
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+        current_session_context_class: thread
+        connection:
+          pool_size: 5
+        hbm2ddl:
+          auto: none

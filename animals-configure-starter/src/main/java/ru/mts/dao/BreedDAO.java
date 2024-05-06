@@ -20,8 +20,10 @@ public class BreedDAO {
         breeds.forEach(session::persist);
     }
 
-    public void addAnimal(Breed breed, Animal animal) {
+    public Animal addAnimal(Breed breed, Animal animal) {
         Session session = DBService.getSessionFactory().getCurrentSession();
         breed.getAnimals().add(animal);
+
+        return animal;
     }
 }

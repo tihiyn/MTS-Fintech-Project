@@ -47,7 +47,7 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
 
     private CreateAnimalService createAnimalService;
 
-    public AnimalsRepositoryImpl(AnimalDAO animalDAO, SessionFactory sessionFactory, CreateAnimalService createAnimalService) {
+    public AnimalsRepositoryImpl(AnimalDAO animalDAO, CreateAnimalService createAnimalService) {
         this.animalDAO = animalDAO;
         this.createAnimalService = createAnimalService;
     }

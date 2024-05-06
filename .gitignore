@@ -44,3 +44,9 @@ bin/
 
 ### DB Credentials ###
 src/main/resources/application-local.properties
+src/main/resources/results/findAverageAge.json
+src/main/resources/results/findDuplicate.json
+src/main/resources/results/findLeapYearNames.json
+src/main/resources/results/findMinCostAnimals.json
+src/main/resources/results/findOldAndExpensive.json
+src/main/resources/results/findOlderAnimal.json
