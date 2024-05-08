@@ -12,10 +12,10 @@ import ru.mts.util.DBService;
 import java.util.List;
 
 @Repository
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class AnimalTypeDAO {
     public List<AnimalType> listAnimalTypes() {
-        return DBService.getSessionFactory().getCurrentSession().createQuery("FROM AnimalType ", AnimalType.class).list();
+        return DBService.getSessionFactory().getCurrentSession().createQuery("FROM AnimalType", AnimalType.class).list();
     }
 
     public void saveListAnimalType(List<AnimalType> animalTypes) {

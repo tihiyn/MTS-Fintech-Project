@@ -49,50 +49,50 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         this.animalsProperties = animalsProperties;
     }
 
-//    @PostConstruct
-//    @Override
-//    public void initDB() {
-//        logger.info("Hello from init db");
-//        Transaction transaction = DBService.getTransaction();
-//
-//        try {
-//            AnimalType catType = new AnimalType("cat", false);
-//            AnimalType dogType = new AnimalType("dog", false);
-//            AnimalType wolfType = new AnimalType("wolf", true);
-//            AnimalType sharkType = new AnimalType("shark", true);
-//
-//            Breed breed1 = new Breed(breeds.get(0), catType);
-//            Breed breed2 = new Breed(breeds.get(1), catType);
-//            Breed breed3 = new Breed(breeds.get(2), catType);
-//            catType.setBreeds(new ArrayList<>(List.of(breed1, breed2, breed3)));
-//
-//            Breed breed4 = new Breed(breeds.get(3), dogType);
-//            Breed breed5 = new Breed(breeds.get(4), dogType);
-//            Breed breed6 = new Breed(breeds.get(5), dogType);
-//            dogType.setBreeds(new ArrayList<>(List.of(breed4, breed5, breed6)));
-//
-//            Breed breed7 = new Breed(breeds.get(6), sharkType);
-//            Breed breed8 = new Breed(breeds.get(7), sharkType);
-//            Breed breed9 = new Breed(breeds.get(8), sharkType);
-//            sharkType.setBreeds(new ArrayList<>(List.of(breed7, breed8, breed9)));
-//
-//            Breed breed10 = new Breed(breeds.get(9), wolfType);
-//            Breed breed11 = new Breed(breeds.get(10), wolfType);
-//            Breed breed12 = new Breed(breeds.get(11), wolfType);
-//            sharkType.setBreeds(new ArrayList<>(List.of(breed10, breed11, breed12)));
-//
-//            List<AnimalType> animalTypes = List.of(catType, dogType, wolfType, sharkType);
-//            animalTypeDAO.saveListAnimalType(animalTypes);
-//
-//            List<Breed> breeds = List.of(breed1, breed2, breed3, breed4, breed5, breed6, breed7, breed8, breed9, breed10, breed11, breed12);
-//            breedDAO.saveListBreed(breeds);
-//
-//            transaction.commit();
-//        } catch (HibernateException | NoResultException | NullPointerException e) {
-//            DBService.transactionRollback(transaction);
-//            throw new RuntimeException();
-//        }
-//    }
+    @PostConstruct
+    @Override
+    public void initDB() {
+        logger.info("Hello from init db");
+        Transaction transaction = DBService.getTransaction();
+
+        try {
+            AnimalType catType = new AnimalType("cat", false);
+            AnimalType dogType = new AnimalType("dog", false);
+            AnimalType wolfType = new AnimalType("wolf", true);
+            AnimalType sharkType = new AnimalType("shark", true);
+
+            Breed breed1 = new Breed(breeds.get(0), catType);
+            Breed breed2 = new Breed(breeds.get(1), catType);
+            Breed breed3 = new Breed(breeds.get(2), catType);
+            catType.setBreeds(new ArrayList<>(List.of(breed1, breed2, breed3)));
+
+            Breed breed4 = new Breed(breeds.get(3), dogType);
+            Breed breed5 = new Breed(breeds.get(4), dogType);
+            Breed breed6 = new Breed(breeds.get(5), dogType);
+            dogType.setBreeds(new ArrayList<>(List.of(breed4, breed5, breed6)));
+
+            Breed breed7 = new Breed(breeds.get(6), sharkType);
+            Breed breed8 = new Breed(breeds.get(7), sharkType);
+            Breed breed9 = new Breed(breeds.get(8), sharkType);
+            sharkType.setBreeds(new ArrayList<>(List.of(breed7, breed8, breed9)));
+
+            Breed breed10 = new Breed(breeds.get(9), wolfType);
+            Breed breed11 = new Breed(breeds.get(10), wolfType);
+            Breed breed12 = new Breed(breeds.get(11), wolfType);
+            sharkType.setBreeds(new ArrayList<>(List.of(breed10, breed11, breed12)));
+
+            List<AnimalType> animalTypes = List.of(catType, dogType, wolfType, sharkType);
+            animalTypeDAO.saveListAnimalType(animalTypes);
+
+            List<Breed> breeds = List.of(breed1, breed2, breed3, breed4, breed5, breed6, breed7, breed8, breed9, breed10, breed11, breed12);
+            breedDAO.saveListBreed(breeds);
+
+            transaction.commit();
+        } catch (HibernateException | NoResultException | NullPointerException e) {
+            DBService.transactionRollback(transaction);
+            throw new RuntimeException();
+        }
+    }
 
     /**
      * Метод, который генерирует случайную дату.

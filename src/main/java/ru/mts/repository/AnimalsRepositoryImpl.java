@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.NoResultException;
 import org.hibernate.HibernateException;
-import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 import ru.mts.dao.AnimalDAO;
@@ -41,14 +39,14 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
     private static Logger logger = LoggerFactory.getLogger(AnimalsRepositoryImpl.class);
 
     private final AnimalDAO animalDAO;
-    @Autowired
     private ObjectMapper objectMapper;
     private ConcurrentMap<String, List<Animal>> animalStorage;
 
     private CreateAnimalService createAnimalService;
 
-    public AnimalsRepositoryImpl(AnimalDAO animalDAO, CreateAnimalService createAnimalService) {
+    public AnimalsRepositoryImpl(AnimalDAO animalDAO, ObjectMapper objectMapper, CreateAnimalService createAnimalService) {
         this.animalDAO = animalDAO;
+        this.objectMapper = objectMapper;
         this.createAnimalService = createAnimalService;
     }
 
@@ -57,6 +55,10 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         return animalStorage;
     }
 
+    @Override
+    public void setAnimalStorage(ConcurrentMap<String, List<Animal>> animalStorage) {
+        this.animalStorage = animalStorage;
+    }
     /**
      * PostConstruct-метод для наполнения "хранилища"
      *
@@ -173,7 +175,7 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
                 .filter(entry -> entry.getKey() != null)
                 .flatMap(entry -> entry.getValue().stream()
                         .filter(animal -> Collections.frequency(entry.getValue(), animal) > 1))
-                .collect(Collectors.groupingBy(animal -> animal.getClass().toString(), Collectors.mapping(animal -> animal, Collectors.toList())));
+                .collect(Collectors.groupingBy(animal -> animal.getAnimalType().getType(), Collectors.mapping(animal -> animal, Collectors.toList())));
 
         try {
             objectMapper.writeValue(file, duplicateMap);

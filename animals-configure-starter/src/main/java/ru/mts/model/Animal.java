@@ -9,6 +9,7 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "creature")
@@ -72,5 +73,18 @@ public class Animal {
                 ", breed:" + breed +
                 ", secretInformation:'" + secretInformation + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Animal animal = (Animal) o;
+        return age == animal.age && Objects.equals(name, animal.name) && Objects.equals(cost, animal.cost) && Objects.equals(character, animal.character) && Objects.equals(birthDate, animal.birthDate) && Objects.equals(animalType, animal.animalType) && Objects.equals(breed, animal.breed) && Objects.equals(secretInformation, animal.secretInformation);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, cost, character, birthDate, age, animalType, breed, secretInformation);
     }
 }

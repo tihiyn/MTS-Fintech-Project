@@ -13,7 +13,7 @@ import ru.mts.util.DBService;
 import java.util.List;
 
 @Repository
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class BreedDAO {
     public void saveListBreed(List<Breed> breeds) {
         Session session = DBService.getSessionFactory().getCurrentSession();

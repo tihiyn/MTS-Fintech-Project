@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "animal_type")
@@ -56,5 +57,18 @@ public class AnimalType {
                 ", type:'" + type + '\'' +
                 ", isWild:" + isWild +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AnimalType that = (AnimalType) o;
+        return isWild == that.isWild && Objects.equals(type, that.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(type, isWild);
     }
 }

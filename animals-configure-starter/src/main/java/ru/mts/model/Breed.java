@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "breed")
@@ -46,5 +47,18 @@ public class Breed {
                 "id:" + id +
                 ", breed:'" + breed + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Breed breed1 = (Breed) o;
+        return Objects.equals(breed, breed1.breed) && Objects.equals(animalType, breed1.animalType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(breed, animalType);
     }
 }

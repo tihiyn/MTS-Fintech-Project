@@ -31,6 +31,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.32'
     implementation group: 'org.hibernate.orm', name: 'hibernate-core', version: '6.5.0.Final'
     implementation group: 'org.springframework', name: 'spring-orm', version: '6.1.6'
+    testImplementation group: 'com.h2database', name: 'h2', version: '2.2.224'
+
+
 
 
 

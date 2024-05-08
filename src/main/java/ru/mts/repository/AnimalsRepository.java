@@ -7,6 +7,7 @@ import ru.mts.model.Animal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 public interface AnimalsRepository {
     /**
@@ -17,6 +18,8 @@ public interface AnimalsRepository {
      * @since 1.4
      */
     Map<String, List<Animal>> getAnimalStorage();
+
+    void setAnimalStorage(ConcurrentMap<String, List<Animal>> animalStorage);
 
     void fillStorage();
 
