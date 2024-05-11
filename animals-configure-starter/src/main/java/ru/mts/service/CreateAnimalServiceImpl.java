@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import ru.mts.AnimalsProperties;
+import ru.mts.dao.AnimalDAO;
 import ru.mts.dao.AnimalTypeDAO;
 import ru.mts.dao.BreedDAO;
 import ru.mts.model.Animal;
@@ -30,7 +31,6 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -41,11 +41,13 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     private static final Logger logger = LoggerFactory.getLogger(CreateAnimalServiceImpl.class);
     private final AnimalTypeDAO animalTypeDAO;
     private final BreedDAO breedDAO;
+    private final AnimalDAO animalDAO;
     private final AnimalsProperties animalsProperties;
 
-    public CreateAnimalServiceImpl(AnimalTypeDAO animalTypeDAO, BreedDAO breedDAO, AnimalsProperties animalsProperties) {
+    public CreateAnimalServiceImpl(AnimalTypeDAO animalTypeDAO, BreedDAO breedDAO, AnimalDAO animalDAO, AnimalsProperties animalsProperties) {
         this.animalTypeDAO = animalTypeDAO;
         this.breedDAO = breedDAO;
+        this.animalDAO = animalDAO;
         this.animalsProperties = animalsProperties;
     }
 
@@ -53,45 +55,45 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
     @Override
     public void initDB() {
         logger.info("Hello from init db");
-        Transaction transaction = DBService.getTransaction();
-
-        try {
-            AnimalType catType = new AnimalType("cat", false);
-            AnimalType dogType = new AnimalType("dog", false);
-            AnimalType wolfType = new AnimalType("wolf", true);
-            AnimalType sharkType = new AnimalType("shark", true);
-
-            Breed breed1 = new Breed(breeds.get(0), catType);
-            Breed breed2 = new Breed(breeds.get(1), catType);
-            Breed breed3 = new Breed(breeds.get(2), catType);
-            catType.setBreeds(new ArrayList<>(List.of(breed1, breed2, breed3)));
-
-            Breed breed4 = new Breed(breeds.get(3), dogType);
-            Breed breed5 = new Breed(breeds.get(4), dogType);
-            Breed breed6 = new Breed(breeds.get(5), dogType);
-            dogType.setBreeds(new ArrayList<>(List.of(breed4, breed5, breed6)));
-
-            Breed breed7 = new Breed(breeds.get(6), sharkType);
-            Breed breed8 = new Breed(breeds.get(7), sharkType);
-            Breed breed9 = new Breed(breeds.get(8), sharkType);
-            sharkType.setBreeds(new ArrayList<>(List.of(breed7, breed8, breed9)));
-
-            Breed breed10 = new Breed(breeds.get(9), wolfType);
-            Breed breed11 = new Breed(breeds.get(10), wolfType);
-            Breed breed12 = new Breed(breeds.get(11), wolfType);
-            sharkType.setBreeds(new ArrayList<>(List.of(breed10, breed11, breed12)));
-
-            List<AnimalType> animalTypes = List.of(catType, dogType, wolfType, sharkType);
-            animalTypeDAO.saveListAnimalType(animalTypes);
-
-            List<Breed> breeds = List.of(breed1, breed2, breed3, breed4, breed5, breed6, breed7, breed8, breed9, breed10, breed11, breed12);
-            breedDAO.saveListBreed(breeds);
-
-            transaction.commit();
-        } catch (HibernateException | NoResultException | NullPointerException e) {
-            DBService.transactionRollback(transaction);
-            throw new RuntimeException();
-        }
+//        Transaction transaction = DBService.getTransaction();
+//
+//        try {
+//            AnimalType catType = new AnimalType("cat", false);
+//            AnimalType dogType = new AnimalType("dog", false);
+//            AnimalType wolfType = new AnimalType("wolf", true);
+//            AnimalType sharkType = new AnimalType("shark", true);
+//
+//            Breed breed1 = new Breed(breeds.get(0), catType);
+//            Breed breed2 = new Breed(breeds.get(1), catType);
+//            Breed breed3 = new Breed(breeds.get(2), catType);
+//            catType.setBreeds(new ArrayList<>(List.of(breed1, breed2, breed3)));
+//
+//            Breed breed4 = new Breed(breeds.get(3), dogType);
+//            Breed breed5 = new Breed(breeds.get(4), dogType);
+//            Breed breed6 = new Breed(breeds.get(5), dogType);
+//            dogType.setBreeds(new ArrayList<>(List.of(breed4, breed5, breed6)));
+//
+//            Breed breed7 = new Breed(breeds.get(6), sharkType);
+//            Breed breed8 = new Breed(breeds.get(7), sharkType);
+//            Breed breed9 = new Breed(breeds.get(8), sharkType);
+//            sharkType.setBreeds(new ArrayList<>(List.of(breed7, breed8, breed9)));
+//
+//            Breed breed10 = new Breed(breeds.get(9), wolfType);
+//            Breed breed11 = new Breed(breeds.get(10), wolfType);
+//            Breed breed12 = new Breed(breeds.get(11), wolfType);
+//            sharkType.setBreeds(new ArrayList<>(List.of(breed10, breed11, breed12)));
+//
+//            List<AnimalType> animalTypes = List.of(catType, dogType, wolfType, sharkType);
+//            animalTypeDAO.saveListAnimalType(animalTypes);
+//
+//            List<Breed> breeds = List.of(breed1, breed2, breed3, breed4, breed5, breed6, breed7, breed8, breed9, breed10, breed11, breed12);
+//            breedDAO.saveListOfBreeds(breeds);
+//
+//            transaction.commit();
+//        } catch (HibernateException | NoResultException | NullPointerException e) {
+//            DBService.transactionRollback(transaction);
+//            throw new RuntimeException();
+//        }
     }
 
     /**
@@ -139,7 +141,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
         Transaction transaction = DBService.getTransaction();
 
         try {
-            List<AnimalType> animalTypes = animalTypeDAO.listAnimalTypes();
+            List<AnimalType> animalTypes = animalTypeDAO.getListOfAnimalTypes();
             AnimalType animalType = animalTypes.get(ThreadLocalRandom.current().nextInt(animalTypes.size()));
 
             List<Breed> breeds = animalType.getBreeds();
@@ -182,9 +184,7 @@ public class CreateAnimalServiceImpl implements CreateAnimalService {
                 default -> null;
             };
 
-            animalTypeDAO.addAnimal(animalType, animal);
-            breedDAO.addAnimal(breed, animal);
-
+            animalDAO.saveAnimal(animal);
             transaction.commit();
         } catch (HibernateException | NoResultException | NullPointerException e) {
             DBService.transactionRollback(transaction);

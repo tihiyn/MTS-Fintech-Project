@@ -108,7 +108,7 @@ public class AnimalRepositoryImplTest {
         animalTypeDAO.saveListAnimalType(animalTypes);
 
         List<Breed> breeds = List.of(breed1, breed2, breed3, breed4, breed5, breed6, breed7, breed8, breed9, breed10, breed11, breed12);
-        breedDAO.saveListBreed(breeds);
+        breedDAO.saveListOfBreeds(breeds);
 
         transaction.commit();
 
@@ -179,14 +179,14 @@ public class AnimalRepositoryImplTest {
 
             if (value == 2) {
                 assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else if (value == 4) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else {
-                animalDAO.saveListAnimalType(finalAnimals);
+                animalDAO.saveListOfAnimals(finalAnimals);
                 transaction.commit();
             }
             return null;
@@ -258,7 +258,7 @@ public class AnimalRepositoryImplTest {
                 doAnswer(invocation -> {
                     Transaction transaction = DBService.getTransaction();
                     assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                        animalDAO.saveListAnimalType(Arrays.asList(cat1, null, dog1));
+                        animalDAO.saveListOfAnimals(Arrays.asList(cat1, null, dog1));
                     });
                     transaction.commit();
 
@@ -268,7 +268,7 @@ public class AnimalRepositoryImplTest {
             case 12:
                 doAnswer(invocation -> {
                     Transaction transaction = DBService.getTransaction();
-                    animalDAO.saveListAnimalType(List.of());
+                    animalDAO.saveListOfAnimals(List.of());
                     transaction.commit();
 
                     return null;
@@ -278,7 +278,7 @@ public class AnimalRepositoryImplTest {
                 doAnswer(invocation -> {
                     Transaction transaction = DBService.getTransaction();
                     assertThrows(NullPointerException.class, () -> {
-                        animalDAO.saveListAnimalType(null);
+                        animalDAO.saveListOfAnimals(null);
                     });
                     transaction.commit();
 
@@ -288,7 +288,7 @@ public class AnimalRepositoryImplTest {
             case 0:
                 doAnswer(invocation -> {
                     Transaction transaction = DBService.getTransaction();
-                    animalDAO.saveListAnimalType(List.of(cat1, cat2, dog1));
+                    animalDAO.saveListOfAnimals(List.of(cat1, cat2, dog1));
                     transaction.commit();
 
                     return null;
@@ -297,7 +297,7 @@ public class AnimalRepositoryImplTest {
             default:
                 doAnswer(invocation -> {
                     Transaction transaction = DBService.getTransaction();
-                    animalDAO.saveListAnimalType(animals);
+                    animalDAO.saveListOfAnimals(animals);
                     transaction.commit();
 
                     return null;
@@ -366,14 +366,14 @@ public class AnimalRepositoryImplTest {
             Transaction transaction = DBService.getTransaction();
             if (value == 3) {
                 assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else if (value == 4) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else {
-                animalDAO.saveListAnimalType(finalAnimals);
+                animalDAO.saveListOfAnimals(finalAnimals);
                 transaction.commit();
             }
 
@@ -428,14 +428,14 @@ public class AnimalRepositoryImplTest {
 
             if (value == 2) {
                 assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else if (value == 4) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else {
-                animalDAO.saveListAnimalType(finalAnimals);
+                animalDAO.saveListOfAnimals(finalAnimals);
                 transaction.commit();
             }
             return null;
@@ -488,14 +488,14 @@ public class AnimalRepositoryImplTest {
 
             if (value == 2) {
                 assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else if (value == 4) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else {
-                animalDAO.saveListAnimalType(finalAnimals);
+                animalDAO.saveListOfAnimals(finalAnimals);
                 transaction.commit();
             }
             return null;
@@ -555,14 +555,14 @@ public class AnimalRepositoryImplTest {
 
             if (value == 2) {
                 assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else if (value == 4) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else {
-                animalDAO.saveListAnimalType(finalAnimals);
+                animalDAO.saveListOfAnimals(finalAnimals);
                 transaction.commit();
             }
             return null;

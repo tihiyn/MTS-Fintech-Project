@@ -71,7 +71,7 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         Transaction transaction = DBService.getTransaction();
 
         try {
-            animalStorage = animalDAO.listAnimals().stream()
+            animalStorage = animalDAO.getListOfAnimals().stream()
                     .collect(Collectors.groupingByConcurrent(animal -> animal.getAnimalType().getType()));
 
             transaction.commit();

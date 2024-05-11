@@ -98,8 +98,6 @@ class JUnitTest {
 
         @Mock
         ObjectMapper objectMapper;
-        //        @Mock
-//        AnimalsRepository animalsRepository;
         Animal cat1, cat2, cat3, cat4, dog1, dog2, wolf1, wolf2, shark1, shark2, sameCat2, sameShark1, sameCat3;
         AnimalType catType, dogType, wolfType, sharkType;
         List<String> breeds = List.of("Британская", "Шотландская", "Сфинкс", "Немецкая овчарка", "Доберман", "Лабрадор", "Тигровая", "Белая", "Молот", "Полярный", "Ньюфаундлендский", "Японский");

@@ -42,8 +42,6 @@ public class CreateAnimalServiceImplTest {
     List<String> breeds = List.of("Британская", "Шотландская", "Сфинкс", "Немецкая овчарка", "Доберман", "Лабрадор", "Тигровая", "Белая", "Молот", "Полярный", "Ньюфаундлендский", "Японский");
 
     List<Animal> animals;
-
-    //    private AnimalsRepository animalsRepository;
     @Autowired
     private CreateAnimalServiceBeanPostProcessor createAnimalServiceBeanPostProcessor;
     @Autowired
@@ -95,7 +93,7 @@ public class CreateAnimalServiceImplTest {
         animalTypeDAO.saveListAnimalType(animalTypes);
 
         List<Breed> breeds = List.of(breed1, breed2, breed3, breed4, breed5, breed6, breed7, breed8, breed9, breed10, breed11, breed12);
-        breedDAO.saveListBreed(breeds);
+        breedDAO.saveListOfBreeds(breeds);
 
         transaction.commit();
 
@@ -115,12 +113,6 @@ public class CreateAnimalServiceImplTest {
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3, 4, 5})
     public void starterTest(int value) {
-//        animalsRepository = new AnimalsRepositoryImpl(animalDAO, createAnimalService);
-
-//        when(createAnimalService.receiveAnimalTypes()).thenCallRealMethod();
-//        when(createAnimalService.receiveCreatedAnimals()).thenCallRealMethod();
-//        doCallRealMethod().when(createAnimalService).defineTypeOfAnimals();
-
         initAnimals();
         animals = new ArrayList<>();
         switch (value) {
@@ -145,22 +137,20 @@ public class CreateAnimalServiceImplTest {
                 throw new IllegalStateException("Unexpected value: " + value);
         }
 
-//        when(createAnimalService.createAnimals()).thenReturn(animals);
-
         List<Animal> finalAnimals = animals;
         doAnswer(invocation -> {
             Transaction transaction = DBService.getTransaction();
 
             if (value == 2) {
                 assertThrows(IllegalArgumentException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else if (value == 4) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalDAO.saveListAnimalType(finalAnimals);
+                    animalDAO.saveListOfAnimals(finalAnimals);
                 });
             } else {
-                animalDAO.saveListAnimalType(finalAnimals);
+                animalDAO.saveListOfAnimals(finalAnimals);
                 transaction.commit();
             }
             return null;
@@ -169,12 +159,12 @@ public class CreateAnimalServiceImplTest {
         if (value == 2 || value == 4) {
             createAnimalServiceBeanPostProcessor.postProcessAfterInitialization(createAnimalService, "createAnimalService");
             Transaction transaction = DBService.getTransaction();
-            assertNotEquals(animals, animalDAO.listAnimals());
+            assertNotEquals(animals, animalDAO.getListOfAnimals());
             transaction.commit();
         } else {
             createAnimalServiceBeanPostProcessor.postProcessAfterInitialization(createAnimalService, "createAnimalService");
             Transaction transaction = DBService.getTransaction();
-            assertEquals(animals, animalDAO.listAnimals());
+            assertEquals(animals, animalDAO.getListOfAnimals());
             transaction.commit();
         }
 

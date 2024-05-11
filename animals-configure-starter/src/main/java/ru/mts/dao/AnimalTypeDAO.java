@@ -1,10 +1,7 @@
 package ru.mts.dao;
 
-import lombok.RequiredArgsConstructor;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalType;
 import ru.mts.util.DBService;
@@ -12,9 +9,8 @@ import ru.mts.util.DBService;
 import java.util.List;
 
 @Repository
-//@RequiredArgsConstructor
 public class AnimalTypeDAO {
-    public List<AnimalType> listAnimalTypes() {
+    public List<AnimalType> getListOfAnimalTypes() {
         return DBService.getSessionFactory().getCurrentSession().createQuery("FROM AnimalType", AnimalType.class).list();
     }
 
@@ -22,12 +18,5 @@ public class AnimalTypeDAO {
         Session session = DBService.getSessionFactory().getCurrentSession();
 
         animalTypes.forEach(session::persist);
-    }
-
-    public Animal addAnimal(AnimalType animalType, Animal animal) {
-        Session session = DBService.getSessionFactory().getCurrentSession();
-
-        animalType.getAnimals().add(animal);
-        return animal;
     }
 }
