@@ -220,4 +220,8 @@ public class AnimalService {
     public void saveAnimals(List<Animal> animals) {
         animalRepository.saveAll(animals);
     }
+
+    public void deleteAnimals() {
+        animalRepository.deleteAll();
+    }
 }

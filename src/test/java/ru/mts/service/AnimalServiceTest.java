@@ -1,5 +1,6 @@
 package ru.mts.service;
 
+import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -8,6 +9,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
+import ru.mts.exceptions.IllegalCollectionSizeException;
+import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalType;
 import ru.mts.model.Breed;
@@ -18,8 +21,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Class for testing application")
 @SpringBootTest
@@ -33,6 +35,8 @@ public class AnimalServiceTest {
     private BreedService breedService;
     @Autowired
     private AnimalTypeService animalTypeService;
+    @Autowired
+    private Flyway flyway;
 
     /**
      * Своя реализация метода contains.
@@ -60,6 +64,7 @@ public class AnimalServiceTest {
      * @since 1.4
      */
     private void initAnimals() {
+        flyway.migrate();
         List<Breed> breeds = breedService.getBreeds();
         List<AnimalType> animalTypes = animalTypeService.getAnimalTypes();
 
@@ -97,19 +102,210 @@ public class AnimalServiceTest {
 
         initAnimals();
         switch (value) {
-            case 0:
+            case 0 -> {
                 animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1);
 
                 leapYearAnimals.put("cat " + cat3.getName(), LocalDate.of(2008, 9, 9));
                 leapYearAnimals.put("shark " + shark1.getName(), LocalDate.of(1996, 6, 13));
+            }
+            case 1 -> animals = List.of(cat1, cat2, dog1, wolf1, wolf2);
+            case 2 -> animals = Arrays.asList(shark1, wolf1, null);
+            case 3 -> animals = List.of();
+            case 4 -> animals = null;
+            case 5 -> {}
+            case 6 -> {
+                animals = List.of(cat3, cat1, cat4, shark1);
+                leapYearAnimals.put("cat " + cat3.getName(), LocalDate.of(2008, 9, 9));
+                leapYearAnimals.put("shark " + shark1.getName(), LocalDate.of(1996, 6, 13));
+            }
+            default -> throw new IllegalStateException("Unexpected value: " + value);
+        }
+
+        List<Animal> finalAnimals = animals;
+
+        if (value == 2) {
+            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                animalService.saveAnimals(finalAnimals);
+            });
+        } else if (value == 4) {
+            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                animalService.saveAnimals(finalAnimals);
+            });
+        } else {
+            animalService.saveAnimals(finalAnimals);
+        }
+
+        animalService.fillStorage();
+        assertEquals(leapYearAnimals, animalService.findLeapYearNames());
+
+        animalService.deleteAnimals();
+    }
+
+    @DisplayName("Test findOlderAnimal method")
+    @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
+    @ValueSource(ints = {10, 9, 20, 50, 24, 12, 18, 0, -2})
+    public void findOlderAnimal(int value) {
+        List<Animal> animals;
+
+        initAnimals();
+        animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1);
+
+        List<HashMap<Animal, Short>> outputResults = List.of(
+                new HashMap<>() {{
+                    put(cat3, (short) 15);
+                    put(cat2, (short) 11);
+                    put(wolf2, (short) 27);
+                    put(shark1, (short) 27);
+                }},
+                new HashMap<>() {{
+                    put(cat1, (short) 10);
+                    put(cat2, (short) 11);
+                    put(cat3, (short) 15);
+                    put(dog1, (short) 10);
+                    put(wolf2, (short) 27);
+                    put(shark1, (short) 27);
+                }},
+                new HashMap<>() {{
+                    put(wolf2, (short) 27);
+                    put(shark1, (short) 27);
+                }},
+                new HashMap<>() {{
+                    put(shark1, (short) 27);
+                }},
+                new HashMap<>() {{
+                    put(null, (short) 0);
+                }},
+
+                new HashMap<>() {{
+                    put(dog1, (short) 10);
+                }},
+
+                new HashMap<>() {{
+                    put(cat1, (short) 10);
+                    put(cat2, (short) 11);
+                    put(dog1, (short) 10);
+                }},
+
+                new HashMap<>(),
+
+                new HashMap<>() {{
+                    put(cat1, (short) 10);
+                }}
+        );
+
+        switch (value) {
+            case 24:
+                assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                    animalService.saveAnimals(Arrays.asList(cat1, null, dog1));
+                });
+                break;
+            case 12:
+                animalService.saveAnimals(List.of());
+                break;
+            case 18:
+                assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                    animalService.saveAnimals(null);
+                });
+                break;
+            case 0:
+                animalService.saveAnimals(List.of(cat1, cat2, dog1));
+                break;
+            default:
+                    animalService.saveAnimals(animals);
+                break;
+        }
+
+        animalService.fillStorage();
+        if (value == -2) {
+            assertThrows(NegativeArgumentException.class, () -> {
+                animalService.findOlderAnimal(value);
+            });
+        } else {
+            assertTrue(containsHashMap(outputResults, animalService.findOlderAnimal(value)));
+        }
+
+        animalService.deleteAnimals();
+    }
+
+    @DisplayName("Test findDuplicate method")
+    @ParameterizedTest(name = "Test {arguments}")
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
+    public void findDuplicate(int value) {
+        List<Animal> animals = new ArrayList<>();
+        Map<String, List<Animal>> duplicates = new HashMap<>();
+
+        initAnimals();
+        switch (value) {
+            case 0:
+                animals = List.of(cat1, cat3, sameCat3, cat3, cat2, sameCat2, dog1, wolf1, wolf2, shark1, sameShark1, shark1, sameShark1);
+
+                duplicates.put("cat", List.of(cat3, sameCat3, cat2, sameCat2));
+                duplicates.put("shark", List.of(shark1, sameShark1));
+                break;
+            case 1:
+                animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1, shark1, shark1);
+
+//                duplicates.put("shark", List.of(shark1));
+                break;
+            case 2:
+                animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1);
+                break;
+            case 3:
+                animals = Arrays.asList(cat1, cat3, dog1, null, null);
+                break;
+            case 4:
+                animals = null;
+                break;
+            case 5:
+                break;
+            case 6:
+                animals = List.of(cat1, cat2, cat3, sameCat2, cat2, cat1, dog1, wolf1, wolf2, shark1, shark1);
+
+                duplicates.put("cat", List.of(cat2, sameCat2));
+//                duplicates.put("shark", List.of(shark1));
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + value);
+        }
+
+        List<Animal> finalAnimals = animals;
+        if (value == 3) {
+            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                animalService.saveAnimals(finalAnimals);
+            });
+        } else if (value == 4) {
+            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                animalService.saveAnimals(finalAnimals);
+            });
+        } else {
+            animalService.saveAnimals(finalAnimals);
+        }
+
+        animalService.fillStorage();
+        assertEquals(duplicates, animalService.findDuplicate());
+
+        animalService.deleteAnimals();
+    }
+
+    @DisplayName("Test findAverageAge method")
+    @ParameterizedTest(name = "Test {arguments}")
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
+    public void findAverageAge(int value) {
+        List<Animal> animals = new ArrayList<>();
+        double averageAge = 0;
+
+        initAnimals();
+        switch (value) {
+            case 0:
+                animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1);
+                averageAge = 15.57;
                 break;
             case 1:
                 animals = List.of(cat1, cat2, dog1, wolf1, wolf2);
+                averageAge = 13.4;
                 break;
             case 2:
                 animals = Arrays.asList(shark1, wolf1, null);
-
-                leapYearAnimals.put("shark " + shark1.getName(), shark1.getBirthDate());
                 break;
             case 3:
                 animals = List.of();
@@ -119,11 +315,113 @@ public class AnimalServiceTest {
                 break;
             case 5:
                 break;
-            case 6:
-                animals = List.of(cat3, cat1, cat4, shark1);
+            default:
+                throw new IllegalStateException("Unexpected value: " + value);
+        }
 
-                leapYearAnimals.put("cat " + cat3.getName(), LocalDate.of(2008, 9, 9));
-                leapYearAnimals.put("shark " + shark1.getName(), LocalDate.of(1996, 6, 13));
+        List<Animal> finalAnimals = animals;
+        if (value == 2) {
+            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                animalService.saveAnimals(finalAnimals);
+            });
+        } else if (value == 4) {
+            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                animalService.saveAnimals(finalAnimals);
+            });
+        } else {
+            animalService.saveAnimals(finalAnimals);
+        }
+
+        animalService.fillStorage();
+        assertEquals(averageAge, animalService.findAverageAge());
+
+        animalService.deleteAnimals();
+    }
+
+    @DisplayName("Test findOldAndExpensive method")
+    @ParameterizedTest(name = "Test {arguments}")
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
+    public void findOldAndExpensive(int value) {
+        List<Animal> animals = new ArrayList<>();
+        List<Animal> oldAndExpensiveAnimals = new ArrayList<>();
+
+        initAnimals();
+        switch (value) {
+            case 0:
+                animals = List.of(cat1, cat3, dog1, dog2, wolf1, shark1, shark2);
+                oldAndExpensiveAnimals = List.of(shark1, wolf1);
+                break;
+            case 1:
+                animals = List.of(cat1, cat2, dog1, shark2);
+                break;
+            case 2:
+                animals = Arrays.asList(shark1, wolf1, null);
+                break;
+            case 3:
+                animals = List.of();
+                break;
+            case 4:
+                animals = null;
+                break;
+            case 5:
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + value);
+        }
+
+        List<Animal> finalAnimals = animals;
+        if (value == 2) {
+            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                animalService.saveAnimals(finalAnimals);
+            });
+        } else if (value == 4) {
+            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                animalService.saveAnimals(finalAnimals);
+            });
+        } else {
+            animalService.saveAnimals(finalAnimals);
+        }
+
+        animalService.fillStorage();
+        assertEquals(oldAndExpensiveAnimals, animalService.findOldAndExpensive());
+
+        animalService.deleteAnimals();
+    }
+
+    @DisplayName("Test findMinCostAnimals method")
+    @ParameterizedTest(name = "Test {arguments}")
+    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
+    public void findMinCostAnimals(int value) throws IllegalCollectionSizeException {
+        List<Animal> animals = new ArrayList<>();
+        List<String> minCostAnimals = new ArrayList<>();
+
+        initAnimals();
+        switch (value) {
+            case 0:
+                animals = List.of(cat3, dog1, dog2, wolf1, shark1, shark2);
+
+                // cat3, dog1, dog2
+                // Richard, Bobik, Druzhok
+                // Richard, Druzhok, Bobik
+                minCostAnimals = List.of(cat3.getName(), dog2.getName(), dog1.getName());
+                break;
+            case 1:
+                animals = List.of(cat1, cat2, dog1, shark2);
+
+                // cat1, cat2, dog1
+                // Misa, Lelik, Bobik
+                minCostAnimals = List.of(cat1.getName(), cat2.getName(), dog1.getName());
+                break;
+            case 2:
+                animals = Arrays.asList(shark1, wolf1, null);
+                break;
+            case 3:
+                animals = List.of();
+                break;
+            case 4:
+                animals = null;
+                break;
+            case 5:
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + value);
@@ -136,7 +434,7 @@ public class AnimalServiceTest {
                 animalService.saveAnimals(finalAnimals);
             });
         } else if (value == 4) {
-            assertThrows(NullPointerException.class, () -> {
+            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
                 animalService.saveAnimals(finalAnimals);
             });
         } else {
@@ -144,391 +442,16 @@ public class AnimalServiceTest {
         }
 
         animalService.fillStorage();
-        assertEquals(leapYearAnimals, animalService.findLeapYearNames());
+        if (value == 2 || value == 3 || value == 5) {
+            assertThrows(IllegalCollectionSizeException.class, () -> {
+                animalService.findMinCostAnimals();
+            });
+        } else if (value == 4) {
+            System.out.println();
+        } else {
+            assertEquals(minCostAnimals, animalService.findMinCostAnimals());
+        }
 
+        animalService.deleteAnimals();
     }
-
-//    @DisplayName("Test findOlderAnimal method")
-//    @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
-//    @ValueSource(ints = {10, 9, 20, 50, 24, 12, 18, 0, -2})
-//    public void findOlderAnimal(int value) {
-//        List<Animal> animals;
-//
-//        initAnimals();
-//        animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1);
-//
-//        List<HashMap<Animal, Short>> outputResults = List.of(
-//                new HashMap<>() {{
-//                    put(cat3, (short) 15);
-//                    put(cat2, (short) 11);
-//                    put(wolf2, (short) 27);
-//                    put(shark1, (short) 27);
-//                }},
-//                new HashMap<>() {{
-//                    put(cat1, (short) 10);
-//                    put(cat2, (short) 11);
-//                    put(cat3, (short) 15);
-//                    put(dog1, (short) 10);
-//                    put(wolf2, (short) 27);
-//                    put(shark1, (short) 27);
-//                }},
-//                new HashMap<>() {{
-//                    put(wolf2, (short) 27);
-//                    put(shark1, (short) 27);
-//                }},
-//                new HashMap<>() {{
-//                    put(shark1, (short) 27);
-//                }},
-//                new HashMap<>() {{
-//                    put(null, (short) 0);
-//                }},
-//
-//                new HashMap<>() {{
-//                    put(dog1, (short) 10);
-//                }},
-//
-//                new HashMap<>() {{
-//                    put(cat1, (short) 10);
-//                    put(cat2, (short) 11);
-//                    put(dog1, (short) 10);
-//                }},
-//
-//                new HashMap<>(),
-//
-//                new HashMap<>() {{
-//                    put(cat1, (short) 10);
-//                }}
-//        );
-//
-//        switch (value) {
-//            case 24:
-//                doAnswer(invocation -> {
-//                    Transaction transaction = DBService.getTransaction();
-//                    assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-//                        animalDAO.saveListOfAnimals(Arrays.asList(cat1, null, dog1));
-//                    });
-//                    transaction.commit();
-//
-//                    return null;
-//                }).when(createAnimalService).createAnimals();
-//                break;
-//            case 12:
-//                doAnswer(invocation -> {
-//                    Transaction transaction = DBService.getTransaction();
-//                    animalDAO.saveListOfAnimals(List.of());
-//                    transaction.commit();
-//
-//                    return null;
-//                }).when(createAnimalService).createAnimals();
-//                break;
-//            case 18:
-//                doAnswer(invocation -> {
-//                    Transaction transaction = DBService.getTransaction();
-//                    assertThrows(NullPointerException.class, () -> {
-//                        animalDAO.saveListOfAnimals(null);
-//                    });
-//                    transaction.commit();
-//
-//                    return null;
-//                }).when(createAnimalService).createAnimals();
-//                break;
-//            case 0:
-//                doAnswer(invocation -> {
-//                    Transaction transaction = DBService.getTransaction();
-//                    animalDAO.saveListOfAnimals(List.of(cat1, cat2, dog1));
-//                    transaction.commit();
-//
-//                    return null;
-//                }).when(createAnimalService).createAnimals();
-//                break;
-//            default:
-//                doAnswer(invocation -> {
-//                    Transaction transaction = DBService.getTransaction();
-//                    animalDAO.saveListOfAnimals(animals);
-//                    transaction.commit();
-//
-//                    return null;
-//                }).when(createAnimalService).createAnimals();
-//                break;
-//        }
-//
-//        createAnimalService.createAnimals();
-//        animalRepository.fillStorage();
-//        if (value == -2) {
-//            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-//                animalRepository.findOlderAnimal(value);
-//            });
-//        } else {
-//            assertTrue(containsHashMap(outputResults, animalRepository.findOlderAnimal(value)));
-//        }
-//
-//        Transaction transaction = DBService.getTransaction();
-//        animalDAO.deleteAll();
-//        transaction.commit();
-//    }
-//
-//    @DisplayName("Test findDuplicate method")
-//    @ParameterizedTest(name = "Test {arguments}")
-//    @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
-//    public void findDuplicate(int value) {
-//        List<Animal> animals = new ArrayList<>();
-//        Map<String, List<Animal>> duplicates = new HashMap<>();
-//
-//        initAnimals();
-//        switch (value) {
-//            case 0:
-//                animals = List.of(cat1, cat3, sameCat3, cat3, cat2, sameCat2, dog1, wolf1, wolf2, shark1, sameShark1, shark1, sameShark1);
-//
-//                duplicates.put("cat", List.of(cat3, sameCat3, cat2, sameCat2));
-//                duplicates.put("shark", List.of(shark1, sameShark1));
-//                break;
-//            case 1:
-//                animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1, shark1, shark1);
-//
-////                duplicates.put("shark", List.of(shark1));
-//                break;
-//            case 2:
-//                animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1);
-//                break;
-//            case 3:
-//                animals = Arrays.asList(cat1, cat3, dog1, null, null);
-//                break;
-//            case 4:
-//                animals = null;
-//                break;
-//            case 5:
-//                break;
-//            case 6:
-//                animals = List.of(cat1, cat2, cat3, sameCat2, cat2, cat1, dog1, wolf1, wolf2, shark1, shark1);
-//
-//                duplicates.put("cat", List.of(cat2, sameCat2));
-////                duplicates.put("shark", List.of(shark1));
-//                break;
-//            default:
-//                throw new IllegalStateException("Unexpected value: " + value);
-//        }
-//
-//        List<Animal> finalAnimals = animals;
-//        doAnswer(invocation -> {
-//            Transaction transaction = DBService.getTransaction();
-//            if (value == 3) {
-//                assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-//                    animalDAO.saveListOfAnimals(finalAnimals);
-//                });
-//            } else if (value == 4) {
-//                assertThrows(NullPointerException.class, () -> {
-//                    animalDAO.saveListOfAnimals(finalAnimals);
-//                });
-//            } else {
-//                animalDAO.saveListOfAnimals(finalAnimals);
-//                transaction.commit();
-//            }
-//
-//            return null;
-//        }).when(createAnimalService).createAnimals();
-//
-//        createAnimalService.createAnimals();
-//        animalRepository.fillStorage();
-//        assertEquals(duplicates, animalRepository.findDuplicate());
-//
-//        Transaction transaction = DBService.getTransaction();
-//        animalDAO.deleteAll();
-//        transaction.commit();
-//    }
-//
-//    @DisplayName("Test findAverageAge method")
-//    @ParameterizedTest(name = "Test {arguments}")
-//    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
-//    public void findAverageAge(int value) {
-//        List<Animal> animals = new ArrayList<>();
-//        double averageAge = 0;
-//
-//        initAnimals();
-//        switch (value) {
-//            case 0:
-//                animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1);
-//                averageAge = 15.57;
-//                break;
-//            case 1:
-//                animals = List.of(cat1, cat2, dog1, wolf1, wolf2);
-//                averageAge = 13.4;
-//                break;
-//            case 2:
-//                animals = Arrays.asList(shark1, wolf1, null);
-//                averageAge = 18;
-//                break;
-//            case 3:
-//                animals = List.of();
-//                break;
-//            case 4:
-//                animals = null;
-//                break;
-//            case 5:
-//                break;
-//            default:
-//                throw new IllegalStateException("Unexpected value: " + value);
-//        }
-//
-//        List<Animal> finalAnimals = animals;
-//        doAnswer(invocation -> {
-//            Transaction transaction = DBService.getTransaction();
-//
-//            if (value == 2) {
-//                assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-//                    animalDAO.saveListOfAnimals(finalAnimals);
-//                });
-//            } else if (value == 4) {
-//                assertThrows(NullPointerException.class, () -> {
-//                    animalDAO.saveListOfAnimals(finalAnimals);
-//                });
-//            } else {
-//                animalDAO.saveListOfAnimals(finalAnimals);
-//                transaction.commit();
-//            }
-//            return null;
-//        }).when(createAnimalService).createAnimals();
-//
-//        createAnimalService.createAnimals();
-//        animalRepository.fillStorage();
-//        assertEquals(averageAge, animalRepository.findAverageAge());
-//
-//        Transaction transaction = DBService.getTransaction();
-//        animalDAO.deleteAll();
-//        transaction.commit();
-//    }
-//
-//    @DisplayName("Test findOldAndExpensive method")
-//    @ParameterizedTest(name = "Test {arguments}")
-//    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
-//    public void findOldAndExpensive(int value) {
-//        List<Animal> animals = new ArrayList<>();
-//        List<Animal> oldAndExpensiveAnimals = new ArrayList<>();
-//
-//        initAnimals();
-//        switch (value) {
-//            case 0:
-//                animals = List.of(cat1, cat3, dog1, dog2, wolf1, shark1, shark2);
-//                oldAndExpensiveAnimals = List.of(shark1, wolf1);
-//                break;
-//            case 1:
-//                animals = List.of(cat1, cat2, dog1, shark2);
-//                break;
-//            case 2:
-//                animals = Arrays.asList(shark1, wolf1, null);
-//                oldAndExpensiveAnimals = List.of(shark1);
-//                break;
-//            case 3:
-//                animals = List.of();
-//                break;
-//            case 4:
-//                animals = null;
-//                break;
-//            case 5:
-//                break;
-//            default:
-//                throw new IllegalStateException("Unexpected value: " + value);
-//        }
-//
-//        List<Animal> finalAnimals = animals;
-//        doAnswer(invocation -> {
-//            Transaction transaction = DBService.getTransaction();
-//
-//            if (value == 2) {
-//                assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-//                    animalDAO.saveListOfAnimals(finalAnimals);
-//                });
-//            } else if (value == 4) {
-//                assertThrows(NullPointerException.class, () -> {
-//                    animalDAO.saveListOfAnimals(finalAnimals);
-//                });
-//            } else {
-//                animalDAO.saveListOfAnimals(finalAnimals);
-//                transaction.commit();
-//            }
-//            return null;
-//        }).when(createAnimalService).createAnimals();
-//
-//        createAnimalService.createAnimals();
-//        animalRepository.fillStorage();
-//        assertEquals(oldAndExpensiveAnimals, animalRepository.findOldAndExpensive());
-//
-//        Transaction transaction = DBService.getTransaction();
-//        animalDAO.deleteAll();
-//        transaction.commit();
-//    }
-//
-//    @DisplayName("Test findMinCostAnimals method")
-//    @ParameterizedTest(name = "Test {arguments}")
-//    @ValueSource(ints = {0, 1, 2, 3, 4, 5})
-//    public void findMinCostAnimals(int value) throws IllegalCollectionSizeException {
-//        List<Animal> animals = new ArrayList<>();
-//        List<String> minCostAnimals = new ArrayList<>();
-//
-//        initAnimals();
-//        switch (value) {
-//            case 0:
-//                animals = List.of(cat3, dog1, dog2, wolf1, shark1, shark2);
-//
-//                // cat3, dog1, dog2
-//                // Richard, Bobik, Druzhok
-//                // Richard, Druzhok, Bobik
-//                minCostAnimals = List.of(cat3.getName(), dog2.getName(), dog1.getName());
-//                break;
-//            case 1:
-//                animals = List.of(cat1, cat2, dog1, shark2);
-//
-//                // cat1, cat2, dog1
-//                // Misa, Lelik, Bobik
-//                minCostAnimals = List.of(cat1.getName(), cat2.getName(), dog1.getName());
-//                break;
-//            case 2:
-//                animals = Arrays.asList(shark1, wolf1, null);
-//                break;
-//            case 3:
-//                animals = List.of();
-//                break;
-//            case 4:
-//                animals = null;
-//                break;
-//            case 5:
-//                break;
-//            default:
-//                throw new IllegalStateException("Unexpected value: " + value);
-//        }
-//
-//        List<Animal> finalAnimals = animals;
-//        doAnswer(invocation -> {
-//            Transaction transaction = DBService.getTransaction();
-//
-//            if (value == 2) {
-//                assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-//                    animalDAO.saveListOfAnimals(finalAnimals);
-//                });
-//            } else if (value == 4) {
-//                assertThrows(NullPointerException.class, () -> {
-//                    animalDAO.saveListOfAnimals(finalAnimals);
-//                });
-//            } else {
-//                animalDAO.saveListOfAnimals(finalAnimals);
-//                transaction.commit();
-//            }
-//            return null;
-//        }).when(createAnimalService).createAnimals();
-//
-//        createAnimalService.createAnimals();
-//        animalRepository.fillStorage();
-//        if (value == 2 || value == 3 || value == 5) {
-//            assertThrows(IllegalCollectionSizeException.class, () -> {
-//                animalRepository.findMinCostAnimals();
-//            });
-//        } else if (value == 4) {
-//            System.out.println();
-//        } else {
-//            assertEquals(minCostAnimals, animalRepository.findMinCostAnimals());
-//        }
-//
-//        Transaction transaction = DBService.getTransaction();
-//        animalDAO.deleteAll();
-//        transaction.commit();
-//    }
 }

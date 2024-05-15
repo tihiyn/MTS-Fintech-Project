@@ -36,12 +36,10 @@ public class Scheduler {
     private ObjectMapper objectMapper;
     private AnimalService animalService;
     private ObjectFactory<AnimalService> animalServiceObjectFactory;
-    private Flyway flyway;
 
-    public Scheduler(ObjectMapper objectMapper, ObjectFactory<AnimalService> animalServiceObjectFactory, Flyway flyway) {
+    public Scheduler(ObjectMapper objectMapper, ObjectFactory<AnimalService> animalServiceObjectFactory) {
         this.objectMapper = objectMapper;
         this.animalServiceObjectFactory = animalServiceObjectFactory;
-        this.flyway = flyway;
     }
 
     /**
@@ -55,7 +53,6 @@ public class Scheduler {
     @PostConstruct
     public void runThreads() {
         logger.info("Hello from runThreads");
-        flyway.migrate();
         ScheduledExecutorService service = Executors.newScheduledThreadPool(2, new NamedThreadFactory());
         service.scheduleWithFixedDelay(() -> {
             Path path = Paths.get("src/main/resources/results/findDuplicate.json");
@@ -108,7 +105,6 @@ public class Scheduler {
     @Scheduled(fixedRate = 30000)
     public void printResults() {
         try {
-//            flyway.baseline();
             animalService = animalServiceObjectFactory.getObject();
 
             Path path = Paths.get("src/main/resources/results/findLeapYearNames.json");

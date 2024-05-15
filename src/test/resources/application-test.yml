@@ -17,7 +17,7 @@ spring:
         connection:
           pool_size: 5
         hbm2ddl:
-          auto: create
+          auto: none
         default_schema: animals
     defer-datasource-initialization: false
 
@@ -27,12 +27,9 @@ spring:
       path: /h2-console
 
   flyway:
-    locations: classpath:src/test/resources/db/migration
-    clean-disabled: false
-    baseline-on-migrate: true
+    locations: classpath:db/migrations
     user: sa
     password:
-#    schemas: animals
+    baseline-version: 0
     default-schema: animals
-#    create-schemas: true
-
+    clean-on-validation-error: true
