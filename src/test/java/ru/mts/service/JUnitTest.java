@@ -9,14 +9,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.mts.dao.AnimalDAO;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalType;
 import ru.mts.model.Breed;
-import ru.mts.repository.AnimalsRepository;
-import ru.mts.repository.AnimalsRepositoryImpl;
+import ru.mts.repository.AnimalRepository;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -92,16 +90,15 @@ class JUnitTest {
     @Nested
     @DisplayName("Class for testing methods from AnimalsRepositoryImpl")
     @ExtendWith(MockitoExtension.class)
-    public class AnimalsRepositoryImplTest {
-        @Mock
-        CreateAnimalService createAnimalService;
-
+    public class AnimalRepositoryImplTest {
         @Mock
         ObjectMapper objectMapper;
+        @Mock
+        AnimalRepository animalRepository;
         Animal cat1, cat2, cat3, cat4, dog1, dog2, wolf1, wolf2, shark1, shark2, sameCat2, sameShark1, sameCat3;
         AnimalType catType, dogType, wolfType, sharkType;
         List<String> breeds = List.of("Британская", "Шотландская", "Сфинкс", "Немецкая овчарка", "Доберман", "Лабрадор", "Тигровая", "Белая", "Молот", "Полярный", "Ньюфаундлендский", "Японский");
-        AnimalDAO animalDAO = new AnimalDAO();
+
 
         /**
          * Своя реализация метода contains.
@@ -129,7 +126,6 @@ class JUnitTest {
          * @since 1.4
          */
         private void initAnimals() {
-
             catType = new AnimalType("cat", false);
             dogType = new AnimalType("dog", false);
             wolfType = new AnimalType("wolf", true);
@@ -178,7 +174,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
         public void findLeapYearNames(int value) {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, objectMapper, createAnimalService);
+            AnimalService animalService = new AnimalService(animalRepository, objectMapper);
 
             ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
             Map<String, LocalDate> leapYearAnimals = new HashMap<>();
@@ -229,11 +225,11 @@ class JUnitTest {
                     throw new IllegalStateException("Unexpected value: " + value);
             }
 
-            animalsRepository.setAnimalStorage(animals);
+            animalService.setAnimalStorage(animals);
             if (value == 2 || value == 4) {
-                assertThrows(NullPointerException.class, () -> animalsRepository.findLeapYearNames());
+                assertThrows(NullPointerException.class, () -> animalService.findLeapYearNames());
             } else {
-                assertEquals(leapYearAnimals, animalsRepository.findLeapYearNames());
+                assertEquals(leapYearAnimals, animalService.findLeapYearNames());
             }
         }
 
@@ -241,7 +237,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
         @ValueSource(ints = {10, 9, 20, 50, 24, 12, 18, 0, -2})
         public void findOlderAnimal(int value) {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, objectMapper, createAnimalService);
+            AnimalService animalService = new AnimalService(animalRepository, objectMapper);
 
             ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
 
@@ -314,17 +310,17 @@ class JUnitTest {
                     break;
             }
 
-            animalsRepository.setAnimalStorage(animals);
+            animalService.setAnimalStorage(animals);
             if (value == 24 || value == 18) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalsRepository.findOlderAnimal(value);
+                    animalService.findOlderAnimal(value);
                 });
             } else if (value == -2) {
                 assertThrows(NegativeArgumentException.class, () -> {
-                    animalsRepository.findOlderAnimal(value);
+                    animalService.findOlderAnimal(value);
                 });
             } else {
-                assertTrue(containsHashMap(outputResults, animalsRepository.findOlderAnimal(value)));
+                assertTrue(containsHashMap(outputResults, animalService.findOlderAnimal(value)));
             }
         }
 
@@ -332,7 +328,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
         public void findDuplicate(int value) {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, objectMapper, createAnimalService);
+            AnimalService animalService = new AnimalService(animalRepository, objectMapper);
 
             ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
             Map<String, List<Animal>> duplicates = new HashMap<>();
@@ -385,13 +381,13 @@ class JUnitTest {
                     throw new IllegalStateException("Unexpected value: " + value);
             }
 
-            animalsRepository.setAnimalStorage(animals);
+            animalService.setAnimalStorage(animals);
             if (value == 3 || value == 4) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalsRepository.findDuplicate();
+                    animalService.findDuplicate();
                 });
             } else {
-                assertEquals(duplicates, animalsRepository.findDuplicate());
+                assertEquals(duplicates, animalService.findDuplicate());
             }
         }
 
@@ -399,7 +395,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5})
         public void findAverageAge(int value) {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, objectMapper, createAnimalService);
+            AnimalService animalService = new AnimalService(animalRepository, objectMapper);
 
             ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
             double averageAge = 0;
@@ -443,13 +439,13 @@ class JUnitTest {
                     throw new IllegalStateException("Unexpected value: " + value);
             }
 
-            animalsRepository.setAnimalStorage(animals);
+            animalService.setAnimalStorage(animals);
             if (value == 2 || value == 4) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalsRepository.findAverageAge();
+                    animalService.findAverageAge();
                 });
             } else {
-                assertEquals(averageAge, animalsRepository.findAverageAge());
+                assertEquals(averageAge, animalService.findAverageAge());
             }
         }
 
@@ -457,7 +453,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5})
         public void findOldAndExpensive(int value) {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, objectMapper, createAnimalService);
+            AnimalService animalService = new AnimalService(animalRepository, objectMapper);
 
             ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
             List<Animal> oldAndExpensiveAnimals = new ArrayList<>();
@@ -498,13 +494,13 @@ class JUnitTest {
                     throw new IllegalStateException("Unexpected value: " + value);
             }
 
-            animalsRepository.setAnimalStorage(animals);
+            animalService.setAnimalStorage(animals);
             if (value == 2 || value == 4) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalsRepository.findOldAndExpensive();
+                    animalService.findOldAndExpensive();
                 });
             } else {
-                assertEquals(oldAndExpensiveAnimals, animalsRepository.findOldAndExpensive());
+                assertEquals(oldAndExpensiveAnimals, animalService.findOldAndExpensive());
             }
         }
 
@@ -512,7 +508,7 @@ class JUnitTest {
         @ParameterizedTest(name = "Test {arguments}")
         @ValueSource(ints = {0, 1, 2, 3, 4, 5})
         public void findMinCostAnimals(int value) throws IllegalCollectionSizeException {
-            AnimalsRepository animalsRepository = new AnimalsRepositoryImpl(animalDAO, objectMapper, createAnimalService);
+            AnimalService animalService = new AnimalService(animalRepository, objectMapper);
 
             ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
             List<String> minCostAnimals = new ArrayList<>();
@@ -560,17 +556,17 @@ class JUnitTest {
                     throw new IllegalStateException("Unexpected value: " + value);
             }
 
-            animalsRepository.setAnimalStorage(animals);
+            animalService.setAnimalStorage(animals);
             if (value == 2 || value == 4) {
                 assertThrows(NullPointerException.class, () -> {
-                    animalsRepository.findMinCostAnimals();
+                    animalService.findMinCostAnimals();
                 });
             } else if (value == 3 || value == 5) {
                 assertThrows(IllegalCollectionSizeException.class, () -> {
-                    animalsRepository.findMinCostAnimals();
+                    animalService.findMinCostAnimals();
                 });
             } else {
-                assertEquals(minCostAnimals, animalsRepository.findMinCostAnimals());
+                assertEquals(minCostAnimals, animalService.findMinCostAnimals());
             }
         }
     }

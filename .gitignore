@@ -46,7 +46,6 @@ bin/
 src/main/resources/application-local.properties
 
 ### Results ###
-src/main/resources/results/
 src/main/resources/results/findAverageAge.json
 src/main/resources/results/findDuplicate.json
 src/main/resources/results/findLeapYearNames.json

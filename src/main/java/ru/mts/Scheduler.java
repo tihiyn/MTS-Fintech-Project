@@ -4,16 +4,16 @@ package ru.mts;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import org.flywaydb.core.Flyway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import ru.mts.dao.CreatureDAO;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
-import ru.mts.repository.AnimalsRepository;
+import ru.mts.service.AnimalService;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,16 +33,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Scheduler {
     private static Logger logger = LoggerFactory.getLogger(Scheduler.class);
 
-    private AnimalsRepository animalsRepository;
-    private ObjectFactory<AnimalsRepository> animalsRepositoryObjectFactory;
-
     private ObjectMapper objectMapper;
-    private final CreatureDAO creatureDAO;
+    private AnimalService animalService;
+    private ObjectFactory<AnimalService> animalServiceObjectFactory;
+    private Flyway flyway;
 
-    public Scheduler(ObjectFactory<AnimalsRepository> animalsRepositoryObjectFactory, ObjectMapper objectMapper, CreatureDAO creatureDAO) {
-        this.animalsRepositoryObjectFactory = animalsRepositoryObjectFactory;
+    public Scheduler(ObjectMapper objectMapper, ObjectFactory<AnimalService> animalServiceObjectFactory, Flyway flyway) {
         this.objectMapper = objectMapper;
-        this.creatureDAO = creatureDAO;
+        this.animalServiceObjectFactory = animalServiceObjectFactory;
+        this.flyway = flyway;
     }
 
     /**
@@ -56,12 +55,13 @@ public class Scheduler {
     @PostConstruct
     public void runThreads() {
         logger.info("Hello from runThreads");
+        flyway.migrate();
         ScheduledExecutorService service = Executors.newScheduledThreadPool(2, new NamedThreadFactory());
         service.scheduleWithFixedDelay(() -> {
             Path path = Paths.get("src/main/resources/results/findDuplicate.json");
             File file = new File(path.toString());
 
-            animalsRepositoryObjectFactory.getObject().findDuplicate();
+            animalServiceObjectFactory.getObject().findDuplicate();
 
             try {
                 Map<String, List<Animal>> duplicateMap = objectMapper.readValue(file, new TypeReference<>() {});
@@ -78,7 +78,7 @@ public class Scheduler {
             Path path = Paths.get("src/main/resources/results/findAverageAge.json");
             File file = new File(path.toString());
 
-            animalsRepositoryObjectFactory.getObject().findAverageAge();
+            animalServiceObjectFactory.getObject().findAverageAge();
 
             try {
                 BigDecimal averageAge = objectMapper.readValue(file, BigDecimal.class);
@@ -105,15 +105,16 @@ public class Scheduler {
      * @author Nikita
      * @since 1.1
      */
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(fixedRate = 30000)
     public void printResults() {
         try {
-            animalsRepository = animalsRepositoryObjectFactory.getObject();
+//            flyway.baseline();
+            animalService = animalServiceObjectFactory.getObject();
 
             Path path = Paths.get("src/main/resources/results/findLeapYearNames.json");
             File file = new File(path.toString());
 
-            animalsRepository.findLeapYearNames();
+            animalService.findLeapYearNames();
             Map<String, LocalDate> leapYearNamesMap = objectMapper.readValue(file, new TypeReference<>() {});
 
             logger.info("Names of animals that were born in a leap year");
@@ -126,7 +127,7 @@ public class Scheduler {
             file = new File(path.toString());
 
             int N = 25;
-            animalsRepository.findOlderAnimal(N);
+            animalService.findOlderAnimal(N);
 
             Map<Animal, Short> olderAnimalMap = objectMapper.readValue(file, new TypeReference<>() {});
 
@@ -162,7 +163,7 @@ public class Scheduler {
             path = Paths.get("src/main/resources/results/findOldAndExpensive.json");
             file = new File(path.toString());
 
-            animalsRepository.findOldAndExpensive();
+            animalService.findOldAndExpensive();
 
             List<Animal> oldAndExpensiveList = objectMapper.readValue(file, new TypeReference<>() {});
 
@@ -175,7 +176,7 @@ public class Scheduler {
             path = Paths.get("src/main/resources/results/findMinCostAnimals.json");
             file = new File(path.toString());
 
-            animalsRepository.findMinCostAnimals();
+            animalService.findMinCostAnimals();
 
             List<String> minCostAnimalsList = objectMapper.readValue(file, new TypeReference<>() {});
 
@@ -183,6 +184,7 @@ public class Scheduler {
             for (String animalsName : minCostAnimalsList) {
                 logger.info(animalsName);
             }
+//            flyway.clean();
         } catch (NegativeArgumentException e) {
             logger.warn(e.getMessage());
         } catch (IOException e) {

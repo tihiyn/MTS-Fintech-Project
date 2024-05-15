@@ -16,7 +16,6 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-//@ToString
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Breed {
     @Id

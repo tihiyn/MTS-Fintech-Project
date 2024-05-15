@@ -1,19 +1,18 @@
-package ru.mts.repository;
+package ru.mts.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.NoResultException;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Repository;
-import ru.mts.dao.AnimalDAO;
+import org.springframework.stereotype.Service;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
-import ru.mts.service.CreateAnimalService;
+import ru.mts.repository.AnimalRepository;
 import ru.mts.util.DBService;
 
 import java.io.File;
@@ -32,64 +31,25 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
-@Repository
+@Service
 @Scope("prototype")
-public class AnimalsRepositoryImpl implements AnimalsRepository {
+@RequiredArgsConstructor
+public class AnimalService {
+    private final AnimalRepository animalRepository;
+    private final ObjectMapper objectMapper;
 
-    private static Logger logger = LoggerFactory.getLogger(AnimalsRepositoryImpl.class);
-
-    private final AnimalDAO animalDAO;
-    private ObjectMapper objectMapper;
-    private ConcurrentMap<String, List<Animal>> animalStorage;
-
-    private CreateAnimalService createAnimalService;
-
-    public AnimalsRepositoryImpl(AnimalDAO animalDAO, ObjectMapper objectMapper, CreateAnimalService createAnimalService) {
-        this.animalDAO = animalDAO;
-        this.objectMapper = objectMapper;
-        this.createAnimalService = createAnimalService;
-    }
-
-    @Override
-    public Map<String, List<Animal>> getAnimalStorage() {
-        return animalStorage;
-    }
-
-    @Override
     public void setAnimalStorage(ConcurrentMap<String, List<Animal>> animalStorage) {
         this.animalStorage = animalStorage;
     }
-    /**
-     * PostConstruct-метод для наполнения "хранилища"
-     *
-     * @author Nikita
-     * @since 1.4
-     */
+
+    private ConcurrentMap<String, List<Animal>> animalStorage;
+
     @PostConstruct
-    @Override
     public void fillStorage() {
-        Transaction transaction = DBService.getTransaction();
-
-        try {
-            animalStorage = animalDAO.getListOfAnimals().stream()
-                    .collect(Collectors.groupingByConcurrent(animal -> animal.getAnimalType().getType()));
-
-            transaction.commit();
-        } catch (HibernateException | NoResultException | NullPointerException e) {
-            DBService.transactionRollback(transaction);
-            throw new RuntimeException();
-        }
-
-//        animalStorage = animalDAO.listAnimals().stream()
-//                .collect(Collectors.groupingByConcurrent(animal -> animal.getAnimalType().getType()));
-
-//        logger.info("Типы созданных животных");
-//        for (AnimalEnum type : createAnimalService.receiveAnimalTypes()) {
-//            logger.info(String.valueOf(type));
-//        }
+        animalStorage = animalRepository.findAll().stream()
+                .collect(Collectors.groupingByConcurrent(animal -> animal.getAnimalType().getType()));
     }
 
-    @Override
     public Map<String, LocalDate> findLeapYearNames() {
         Path path = Paths.get("src/main/resources/results/findLeapYearNames.json");
         File file = new File(path.toString());
@@ -104,11 +64,6 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         try {
             objectMapper.writeValue(file, outputMap);
 
-//            Map<String, LocalDate> deserializedMap = objectMapper.readValue(file, Map.class);
-//            for (Map.Entry<String, LocalDate> entry: deserializedMap.entrySet()) {
-//                System.out.println(entry.getKey() + " " + entry.getValue());
-//            }
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -116,7 +71,6 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         return outputMap;
     }
 
-    @Override
     public Map<Animal, Short> findOlderAnimal(int N) {
         Path path = Paths.get("src/main/resources/results/findOlderAnimal.json");
         File file = new File(path.toString());
@@ -148,14 +102,6 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
             try {
                 objectMapper.writeValue(file, olderAnimals);
 
-//                TypeReference<HashMap<Animal, Integer>> typeRef = new TypeReference<>() {};
-//                Map<Animal,Integer> deserializedMap = objectMapper.readValue(file, typeRef);
-//
-////                Map<Animal, Integer> deserializedMap = objectMapper.readValue(file, Map.class);
-//                for (Map.Entry<Animal, Integer> entry: deserializedMap.entrySet()) {
-//                    System.out.println(entry.getKey() + " " + entry.getValue());
-//                }
-
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -166,7 +112,6 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         }
     }
 
-    @Override
     public Map<String, List<Animal>> findDuplicate() {
         Path path = Paths.get("src/main/resources/results/findDuplicate.json");
         File file = new File(path.toString());
@@ -207,7 +152,6 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         return result.doubleValue();
     }
 
-    @Override
     public List<Animal> findOldAndExpensive() {
         Path path = Paths.get("src/main/resources/results/findOldAndExpensive.json");
         File file = new File(path.toString());
@@ -243,7 +187,6 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         return oldAndExpensiveList;
     }
 
-    @Override
     public List<String> findMinCostAnimals() throws IllegalCollectionSizeException {
         Path path = Paths.get("src/main/resources/results/findMinCostAnimals.json");
         File file = new File(path.toString());
@@ -272,5 +215,9 @@ public class AnimalsRepositoryImpl implements AnimalsRepository {
         } else {
             throw new IllegalCollectionSizeException("Low number of animals; Expected: 3, actual: ", numOfAnimals);
         }
+    }
+
+    public void saveAnimals(List<Animal> animals) {
+        animalRepository.saveAll(animals);
     }
 }

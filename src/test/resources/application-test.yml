@@ -1,27 +1,13 @@
-animal:
-  catNames:
-    - Лёлик
-    - Миса
-    - Ричард
-  dogNames:
-    - Жучка
-    - Дружок
-    - Бобик
-  sharkNames:
-    - Аква
-    - Шарки
-    - Волна
-  wolfNames:
-    - Клык
-    - Волчок
-    - Серый
-
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    url: jdbc:h2:mem:testDB;DB_CLOSE_DELAY=-1;MODE=MySQL;INIT=CREATE SCHEMA IF NOT EXISTS ANIMALS
     username: sa
     password:
     driver-class-name: org.h2.Driver
+    dbcp2:
+      default-schema: animals
+    hikari:
+      schema: animals
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     properties:
@@ -31,10 +17,22 @@ spring:
         connection:
           pool_size: 5
         hbm2ddl:
-          auto: create-drop
-    defer-datasource-initialization: true # ???
+          auto: create
+        default_schema: animals
+    defer-datasource-initialization: false
 
   h2:
     console:
       enabled: true
       path: /h2-console
+
+  flyway:
+    locations: classpath:src/test/resources/db/migration
+    clean-disabled: false
+    baseline-on-migrate: true
+    user: sa
+    password:
+#    schemas: animals
+    default-schema: animals
+#    create-schemas: true
+

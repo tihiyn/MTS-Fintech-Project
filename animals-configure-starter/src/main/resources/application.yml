@@ -31,3 +31,14 @@ spring:
           pool_size: 5
         hbm2ddl:
           auto: none
+
+  flyway:
+    placeholders:
+      cat_names: Мурзик, Васька, Матроскин
+      dog_names: Шарик, Матрос, Мухтар
+      wolf_names: Клык, Волчок, Серый
+      shark_names: Аква, Шарки, Волна
+      characters: Добрый, Злой, Игривый, Вредный, Верный, Пугливый
+      secrets: hSE{FD0T_a97, J4x№PS}mp6cu, P?mlx7MHz+#G, 15$K?eKpl,nK, DfEK[a!XM#2,
+
+
