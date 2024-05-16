@@ -2,18 +2,13 @@ package ru.mts.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
-import jakarta.persistence.NoResultException;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.HibernateException;
-import org.hibernate.Transaction;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
 import ru.mts.model.Animal;
 import ru.mts.repository.AnimalRepository;
-import ru.mts.util.DBService;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,12 +32,11 @@ import java.util.stream.Collectors;
 public class AnimalService {
     private final AnimalRepository animalRepository;
     private final ObjectMapper objectMapper;
+    private ConcurrentMap<String, List<Animal>> animalStorage;
 
     public void setAnimalStorage(ConcurrentMap<String, List<Animal>> animalStorage) {
         this.animalStorage = animalStorage;
     }
-
-    private ConcurrentMap<String, List<Animal>> animalStorage;
 
     @PostConstruct
     public void fillStorage() {
