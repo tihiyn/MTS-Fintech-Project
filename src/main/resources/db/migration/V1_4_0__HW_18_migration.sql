@@ -205,3 +205,6 @@ VALUES (round((random() * (500000 - 10000) + 10000)::numeric, 2),
          FROM unnest(string_to_array('${secrets}', ', ')) AS value
          ORDER BY random()
          LIMIT 1));
+
+DROP TRIGGER filling_empty_fields_trigger ON animals.creature;
+DROP FUNCTION filling_empty_fields();

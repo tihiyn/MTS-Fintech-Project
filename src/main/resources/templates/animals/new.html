@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>New person</title>
+</head>
+<body>
+
+<form th:method="POST" th:action="@{/}" th:object="${animal}">
+    <label for="name">Enter name: </label>
+    <input type="text" th:field="*{name}" id="name"/>
+    <br/>
+    <label for="age">Enter age: </label>
+    <input type="number" th:field="*{age}" id="age"/>
+    <br/>
+    <label for="cost">Enter cost: </label>
+    <input type="text" th:field="*{cost}" id="cost"/>
+    <br/>
+    <label for="character">Enter character: </label>
+    <input type="text" th:field="*{character}" id="character"/>
+    <br/>
+    <label for="birthDate">Enter birthdate: </label>
+    <input type="date" th:field="*{birthDate}" id="birthDate"/>
+    <br/>
+    <label for="secretInformation">Enter secret information: </label>
+    <input type="text" th:field="*{secretInformation}" id="secretInformation"/>
+    <br/>
+<!--    <label for="name">Enter name: </label>-->
+<!--    <input type="text" th:field="*{name}" id="name"/>-->
+<!--    <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</div>-->
+<!--    <br/>-->
+<!--    <label for="age">Enter age: </  label>-->
+<!--    <input type="number" th:field="*{age}" id="age"/>-->
+<!--    <div style="color:red" th:if="${#fields.hasErrors('age')}" th:errors="*{age}">Age Error</div>-->
+<!--    <br/>-->
+<!--    <label for="secretInformation">Enter secret information: </label>-->
+<!--    <input type="text" th:field="*{secretInformation}" id="secretInformation"/>-->
+<!--    <div style="color:red" th:if="${#fields.hasErrors('secretInformation')}" th:errors="*{secretInformation}">Secret Information Error</div>-->
+<!--    <br/>-->
+    <input type="submit" value="Create"/>
+</form>
+
+<input type="button" value="Cancel" onclick="window.location.href='/index';" />
+</body>
+</html>

@@ -14,6 +14,7 @@ import org.hibernate.cfg.Environment;
 import org.hibernate.service.ServiceRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -22,6 +23,9 @@ import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import ru.mts.mapper.AnimalDeserializer;
 import ru.mts.mapper.AnimalKeyDeserializer;
 import ru.mts.mapper.AnimalKeySerializer;
@@ -32,7 +36,8 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-public class SpringConfig {
+@EnableWebMvc
+public class SpringConfig implements WebMvcConfigurer {
 
     @Bean
     public ObjectMapper objectMapper() {
@@ -51,6 +56,13 @@ public class SpringConfig {
         objectMapper.registerModule(module);
 
         return objectMapper;
+    }
+
+    @Bean
+    public FilterRegistrationBean<HiddenHttpMethodFilter> hiddenHttpMethodFilter() {
+        FilterRegistrationBean<HiddenHttpMethodFilter> filterRegistrationBean = new FilterRegistrationBean<>(new HiddenHttpMethodFilter());
+        filterRegistrationBean.addUrlPatterns("/*");
+        return filterRegistrationBean;
     }
 }
 

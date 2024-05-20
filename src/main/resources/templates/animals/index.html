@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All animals</title>
+</head>
+
+<table>
+    <tbody>
+    <table>
+        <thead>
+        <th>ID</th>
+        <th>Имя</th>
+        <th>Стоимость</th>
+        <th>Характер</th>
+        <th>Дата рождения</th>
+        <th>Возраст</th>
+        <th>Секретная информация</th>
+        </thead>
+        <tbody>
+        <tr th:each="animal : ${animals}">
+            <th th:text="${animal.id}"></th>
+            <th th:text="${animal.name}"></th>
+            <th th:text="${animal.cost}"></th>
+            <th th:text="${animal.character}"></th>
+            <th th:text="${#temporals.format(animal.birthDate, 'yyyy-MM-dd')}"></th>
+            <th th:text="${animal.age}"></th>
+            <th th:text="${animal.secretInformation}"></th>
+            <th>
+                <form th:method="DELETE" th:action="@{/{id}(id=${animal.getId()})}">
+                    <input type="submit" value="Delete"/>
+                </form>
+            </th>
+        </tr>
+        </tbody>
+    </table>
+    </tbody>
+</table>
+
+<hr/>
+<input type="button" value="Create new animal" onclick="window.location.href='/new';" />
+
+</html>

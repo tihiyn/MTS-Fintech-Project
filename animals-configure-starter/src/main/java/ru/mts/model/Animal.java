@@ -2,6 +2,8 @@ package ru.mts.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,6 +26,7 @@ public class Animal {
     private long id;
 
     @Column(name = "name")
+//    @NotEmpty
     private String name;
 
     @Column(name = "cost")
@@ -36,6 +39,7 @@ public class Animal {
     private LocalDate birthDate;
 
     @Column(name = "age")
+//    @Min(value = 0, message = "Age should be greater than 0")
     private short age;
 
     @ManyToOne
@@ -47,6 +51,7 @@ public class Animal {
     private Breed breed;
 
     @Column(name = "secret_information")
+//    @NotEmpty
     private String secretInformation;
 
 
@@ -60,6 +65,12 @@ public class Animal {
         this.breed = breed;
         this.secretInformation = secretInformation;
     }
+
+//    public Animal(String name) {
+//        this.name = name;
+////        this.age = age;
+////        this.secretInformation = secretInformation;
+//    }
 
     @Override
     public String toString() {

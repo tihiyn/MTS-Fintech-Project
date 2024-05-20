@@ -33,3 +33,4 @@ spring:
     baseline-version: 0
     default-schema: animals
     clean-on-validation-error: true
+

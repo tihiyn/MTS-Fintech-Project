@@ -19,10 +19,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.Year;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 import java.util.stream.Collectors;
 
@@ -212,10 +209,27 @@ public class AnimalService {
     }
 
     public void saveAnimals(List<Animal> animals) {
+        animals.forEach(animal -> animal.setSecretInformation(Base64.getEncoder().encodeToString(animal.getSecretInformation().getBytes())));
         animalRepository.saveAll(animals);
     }
 
     public void deleteAnimals() {
         animalRepository.deleteAll();
     }
+
+    public List<Animal> getAllAnimals() {
+        List<Animal> animals = animalRepository.findAll();
+        animals.forEach(animal -> animal.setSecretInformation(new String(Base64.getDecoder().decode(animal.getSecretInformation()))));
+
+        return animals;
+    }
+
+    public void deleteAnimalById(int id) {
+        animalRepository.deleteById(id);
+    }
+
+    public long countAnimals() {
+        return animalRepository.count();
+    }
+
 }
