@@ -9,8 +9,11 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
+import ru.mts.dto.AnimalDTO;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
+import ru.mts.mapper.dto.AnimalDTOToAnimalMapper;
+import ru.mts.mapper.dto.AnimalToAnimalDTOMapper;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalType;
 import ru.mts.model.Breed;
@@ -20,6 +23,8 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -37,6 +42,8 @@ public class AnimalServiceTest {
     private AnimalTypeService animalTypeService;
     @Autowired
     private Flyway flyway;
+    @Autowired
+    private AnimalToAnimalDTOMapper animalDTOMapper;
 
     /**
      * Своя реализация метода contains.
@@ -122,17 +129,13 @@ public class AnimalServiceTest {
         }
 
         List<Animal> finalAnimals = animals;
-
-        if (value == 2) {
-            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                animalService.saveAnimals(finalAnimals);
+        if (value == 2 || value == 4) {
+            assertThrows(NullPointerException.class, () -> {
+                animalService.saveAnimals(finalAnimals.stream().map(animalDTOMapper).collect(Collectors.toList()));
             });
-        } else if (value == 4) {
-            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                animalService.saveAnimals(finalAnimals);
-            });
-        } else {
-            animalService.saveAnimals(finalAnimals);
+        }
+        else {
+            animalService.saveAnimals(finalAnimals.stream().map(animalDTOMapper).collect(Collectors.toList()));
         }
 
         animalService.fillStorage();
@@ -195,23 +198,23 @@ public class AnimalServiceTest {
 
         switch (value) {
             case 24:
-                assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                    animalService.saveAnimals(Arrays.asList(cat1, null, dog1));
+                assertThrows(NullPointerException.class, () -> {
+                    animalService.saveAnimals(Stream.of(cat1, null, dog1).map(animalDTOMapper).collect(Collectors.toList()));
                 });
                 break;
             case 12:
                 animalService.saveAnimals(List.of());
                 break;
             case 18:
-                assertThrows(InvalidDataAccessApiUsageException.class, () -> {
+                assertThrows(NullPointerException.class, () -> {
                     animalService.saveAnimals(null);
                 });
                 break;
             case 0:
-                animalService.saveAnimals(List.of(cat1, cat2, dog1));
+                animalService.saveAnimals(Stream.of(cat1, cat2, dog1).map(animalDTOMapper).collect(Collectors.toList()));
                 break;
             default:
-                    animalService.saveAnimals(animals);
+                    animalService.saveAnimals(animals.stream().map(animalDTOMapper).collect(Collectors.toList()));
                 break;
         }
 
@@ -239,13 +242,13 @@ public class AnimalServiceTest {
             case 0:
                 animals = List.of(cat1, cat3, sameCat3, cat3, cat2, sameCat2, dog1, wolf1, wolf2, shark1, sameShark1, shark1, sameShark1);
 
-                duplicates.put("cat", List.of(cat3, sameCat3, cat2, sameCat2));
-                duplicates.put("shark", List.of(shark1, sameShark1));
+                duplicates.put("cat", List.of(cat3, sameCat3, cat3, cat2, sameCat2));
+                duplicates.put("shark", List.of(shark1, sameShark1, shark1, sameShark1));
                 break;
             case 1:
                 animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1, shark1, shark1);
 
-//                duplicates.put("shark", List.of(shark1));
+                duplicates.put("shark", List.of(shark1, shark1, shark1));
                 break;
             case 2:
                 animals = List.of(cat1, cat3, cat2, dog1, wolf1, wolf2, shark1);
@@ -261,27 +264,26 @@ public class AnimalServiceTest {
             case 6:
                 animals = List.of(cat1, cat2, cat3, sameCat2, cat2, cat1, dog1, wolf1, wolf2, shark1, shark1);
 
-                duplicates.put("cat", List.of(cat2, sameCat2));
-//                duplicates.put("shark", List.of(shark1));
+                duplicates.put("cat", List.of(cat1, cat2, sameCat2, cat2, cat1));
+                duplicates.put("shark", List.of(shark1, shark1));
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + value);
         }
 
         List<Animal> finalAnimals = animals;
-        if (value == 3) {
-            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                animalService.saveAnimals(finalAnimals);
+        if (value == 3 || value == 4) {
+            assertThrows(NullPointerException.class, () -> {
+                animalService.saveAnimals(finalAnimals.stream().map(animalDTOMapper).collect(Collectors.toList()));
             });
-        } else if (value == 4) {
-            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                animalService.saveAnimals(finalAnimals);
-            });
-        } else {
-            animalService.saveAnimals(finalAnimals);
+        }
+        else {
+            animalService.saveAnimals(finalAnimals.stream().map(animalDTOMapper).collect(Collectors.toList()));
         }
 
+
         animalService.fillStorage();
+
         assertEquals(duplicates, animalService.findDuplicate());
 
         animalService.deleteAnimals();
@@ -320,16 +322,13 @@ public class AnimalServiceTest {
         }
 
         List<Animal> finalAnimals = animals;
-        if (value == 2) {
-            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                animalService.saveAnimals(finalAnimals);
+        if (value == 2 || value == 4) {
+            assertThrows(NullPointerException.class, () -> {
+                animalService.saveAnimals(finalAnimals.stream().map(animalDTOMapper).collect(Collectors.toList()));
             });
-        } else if (value == 4) {
-            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                animalService.saveAnimals(finalAnimals);
-            });
-        } else {
-            animalService.saveAnimals(finalAnimals);
+        }
+        else {
+            animalService.saveAnimals(finalAnimals.stream().map(animalDTOMapper).collect(Collectors.toList()));
         }
 
         animalService.fillStorage();
@@ -370,16 +369,13 @@ public class AnimalServiceTest {
         }
 
         List<Animal> finalAnimals = animals;
-        if (value == 2) {
-            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                animalService.saveAnimals(finalAnimals);
+        if (value == 2 || value == 4) {
+            assertThrows(NullPointerException.class, () -> {
+                animalService.saveAnimals(finalAnimals.stream().map(animalDTOMapper).collect(Collectors.toList()));
             });
-        } else if (value == 4) {
-            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                animalService.saveAnimals(finalAnimals);
-            });
-        } else {
-            animalService.saveAnimals(finalAnimals);
+        }
+        else {
+            animalService.saveAnimals(finalAnimals.stream().map(animalDTOMapper).collect(Collectors.toList()));
         }
 
         animalService.fillStorage();
@@ -428,17 +424,13 @@ public class AnimalServiceTest {
         }
 
         List<Animal> finalAnimals = animals;
-
-        if (value == 2) {
-            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                animalService.saveAnimals(finalAnimals);
+        if (value == 2 || value == 4) {
+            assertThrows(NullPointerException.class, () -> {
+                animalService.saveAnimals(finalAnimals.stream().map(animalDTOMapper).collect(Collectors.toList()));
             });
-        } else if (value == 4) {
-            assertThrows(InvalidDataAccessApiUsageException.class, () -> {
-                animalService.saveAnimals(finalAnimals);
-            });
-        } else {
-            animalService.saveAnimals(finalAnimals);
+        }
+        else {
+            animalService.saveAnimals(finalAnimals.stream().map(animalDTOMapper).collect(Collectors.toList()));
         }
 
         animalService.fillStorage();

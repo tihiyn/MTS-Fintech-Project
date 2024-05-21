@@ -6,12 +6,12 @@
 </head>
 <body>
 
-<form th:method="POST" th:action="@{/}" th:object="${animal}">
+<form th:method="POST" th:action="@{/}" th:object="${animalDTO}">
+<!--    <label for="id">Enter id: </label>-->
+<!--    <input type="number" th:field="*{id}" id="id"/>-->
+<!--    <br/>-->
     <label for="name">Enter name: </label>
     <input type="text" th:field="*{name}" id="name"/>
-    <br/>
-    <label for="age">Enter age: </label>
-    <input type="number" th:field="*{age}" id="age"/>
     <br/>
     <label for="cost">Enter cost: </label>
     <input type="text" th:field="*{cost}" id="cost"/>
@@ -21,6 +21,15 @@
     <br/>
     <label for="birthDate">Enter birthdate: </label>
     <input type="date" th:field="*{birthDate}" id="birthDate"/>
+    <br/>
+    <label for="animalType">Enter type: </label>
+    <input type="text" th:field="*{animalType}" id="animalType"/>
+    <br/>
+    <label for="age">Enter age: </label>
+    <input type="number" th:field="*{age}" id="age"/>
+    <br/>
+    <label for="breed">Enter breed: </label>
+    <input type="text" th:field="*{breed}" id="breed"/>
     <br/>
     <label for="secretInformation">Enter secret information: </label>
     <input type="text" th:field="*{secretInformation}" id="secretInformation"/>

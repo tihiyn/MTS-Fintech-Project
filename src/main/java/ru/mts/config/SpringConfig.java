@@ -36,7 +36,6 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@EnableWebMvc
 public class SpringConfig implements WebMvcConfigurer {
 
     @Bean

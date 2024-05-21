@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.mts.model.Animal;
+import ru.mts.dto.AnimalDTO;
 import ru.mts.service.AnimalService;
 
 import java.util.List;
@@ -16,21 +16,21 @@ public class AnimalRESTController {
     private final AnimalService animalService;
 
     @PostMapping("/add")
-    public ResponseEntity<HttpStatus> createAnimal(@RequestBody Animal animal) {
-        animalService.saveAnimals(List.of(animal));
+    public ResponseEntity<Void> createAnimal(@RequestBody AnimalDTO animalDTO) {
+        animalService.saveAnimals(List.of(animalDTO));
 
-        return ResponseEntity.ok(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping()
-    public List<Animal> getAnimals() {
+    public List<AnimalDTO> getAnimals() {
         return animalService.getAllAnimals();
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteAnimal(@PathVariable("id") int id) {
+    public ResponseEntity<Void> deleteAnimal(@PathVariable("id") int id) {
         animalService.deleteAnimalById(id);
 
-        return ResponseEntity.ok(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

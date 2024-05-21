@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
+import ru.mts.mapper.dto.AnimalDTOToAnimalMapper;
+import ru.mts.mapper.dto.AnimalToAnimalDTOMapper;
 import ru.mts.model.Animal;
 import ru.mts.model.AnimalType;
 import ru.mts.model.Breed;
@@ -31,6 +33,10 @@ class JUnitTest {
     ObjectMapper objectMapper;
     @Mock
     AnimalRepository animalRepository;
+    @Mock
+    AnimalDTOToAnimalMapper animalDTOToAnimalMapper;
+    @Mock
+    AnimalToAnimalDTOMapper animalToAnimalDTOMapper;
     Animal cat1, cat2, cat3, cat4, dog1, dog2, wolf1, wolf2, shark1, shark2, sameCat2, sameShark1, sameCat3;
     AnimalType catType, dogType, wolfType, sharkType;
     List<String> breeds = List.of("Британская", "Шотландская", "Сфинкс", "Немецкая овчарка", "Доберман", "Лабрадор", "Тигровая", "Белая", "Молот", "Полярный", "Ньюфаундлендский", "Японский");
@@ -110,7 +116,7 @@ class JUnitTest {
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
     public void findLeapYearNames(int value) {
-        AnimalService animalService = new AnimalService(animalRepository, objectMapper);
+        AnimalService animalService = new AnimalService(animalRepository, objectMapper, animalToAnimalDTOMapper, animalDTOToAnimalMapper);
 
         ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
         Map<String, LocalDate> leapYearAnimals = new HashMap<>();
@@ -173,7 +179,7 @@ class JUnitTest {
     @ParameterizedTest(name = "Array of animals, more than {arguments} y.o.")
     @ValueSource(ints = {10, 9, 20, 50, 24, 12, 18, 0, -2})
     public void findOlderAnimal(int value) {
-        AnimalService animalService = new AnimalService(animalRepository, objectMapper);
+        AnimalService animalService = new AnimalService(animalRepository, objectMapper, animalToAnimalDTOMapper, animalDTOToAnimalMapper);
 
         ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
 
@@ -264,7 +270,7 @@ class JUnitTest {
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3, 4, 5, 6})
     public void findDuplicate(int value) {
-        AnimalService animalService = new AnimalService(animalRepository, objectMapper);
+        AnimalService animalService = new AnimalService(animalRepository, objectMapper, animalToAnimalDTOMapper, animalDTOToAnimalMapper);
 
         ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
         Map<String, List<Animal>> duplicates = new HashMap<>();
@@ -331,7 +337,7 @@ class JUnitTest {
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3, 4, 5})
     public void findAverageAge(int value) {
-        AnimalService animalService = new AnimalService(animalRepository, objectMapper);
+        AnimalService animalService = new AnimalService(animalRepository, objectMapper, animalToAnimalDTOMapper, animalDTOToAnimalMapper);
 
         ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
         double averageAge = 0;
@@ -389,7 +395,7 @@ class JUnitTest {
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3, 4, 5})
     public void findOldAndExpensive(int value) {
-        AnimalService animalService = new AnimalService(animalRepository, objectMapper);
+        AnimalService animalService = new AnimalService(animalRepository, objectMapper, animalToAnimalDTOMapper, animalDTOToAnimalMapper);
 
         ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
         List<Animal> oldAndExpensiveAnimals = new ArrayList<>();
@@ -444,7 +450,7 @@ class JUnitTest {
     @ParameterizedTest(name = "Test {arguments}")
     @ValueSource(ints = {0, 1, 2, 3, 4, 5})
     public void findMinCostAnimals(int value) throws IllegalCollectionSizeException {
-        AnimalService animalService = new AnimalService(animalRepository, objectMapper);
+        AnimalService animalService = new AnimalService(animalRepository, objectMapper, animalToAnimalDTOMapper, animalDTOToAnimalMapper);
 
         ConcurrentHashMap<String, List<Animal>> animals = new ConcurrentHashMap<>();
         List<String> minCostAnimals = new ArrayList<>();

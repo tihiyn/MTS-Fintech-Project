@@ -5,8 +5,11 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+import ru.mts.dto.AnimalDTO;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
+import ru.mts.mapper.dto.AnimalDTOToAnimalMapper;
+import ru.mts.mapper.dto.AnimalToAnimalDTOMapper;
 import ru.mts.model.Animal;
 import ru.mts.repository.AnimalRepository;
 
@@ -29,7 +32,14 @@ import java.util.stream.Collectors;
 public class AnimalService {
     private final AnimalRepository animalRepository;
     private final ObjectMapper objectMapper;
+    private final AnimalToAnimalDTOMapper animalToAnimalDTOMapper;
+    private final AnimalDTOToAnimalMapper animalDTOToAnimalMapper;
+
     private ConcurrentMap<String, List<Animal>> animalStorage;
+
+    public ConcurrentMap<String, List<Animal>> getAnimalStorage() {
+        return animalStorage;
+    }
 
     public void setAnimalStorage(ConcurrentMap<String, List<Animal>> animalStorage) {
         this.animalStorage = animalStorage;
@@ -37,8 +47,10 @@ public class AnimalService {
 
     @PostConstruct
     public void fillStorage() {
-        animalStorage = animalRepository.findAll().stream()
-                .collect(Collectors.groupingByConcurrent(animal -> animal.getAnimalType().getType()));
+        List<Animal> animals = animalRepository.findAll();
+        animals.forEach(animal -> animal.setSecretInformation(new String(Base64.getDecoder().decode(animal.getSecretInformation()))));
+
+        animalStorage = animals.stream().collect(Collectors.groupingByConcurrent(animal -> animal.getAnimalType().getType()));
     }
 
     public Map<String, LocalDate> findLeapYearNames() {
@@ -208,7 +220,10 @@ public class AnimalService {
         }
     }
 
-    public void saveAnimals(List<Animal> animals) {
+    public void saveAnimals(List<AnimalDTO> animalsDTO) {
+        List<Animal> animals = animalsDTO.stream()
+                .map(animalDTOToAnimalMapper)
+                .collect(Collectors.toList());
         animals.forEach(animal -> animal.setSecretInformation(Base64.getEncoder().encodeToString(animal.getSecretInformation().getBytes())));
         animalRepository.saveAll(animals);
     }
@@ -217,8 +232,8 @@ public class AnimalService {
         animalRepository.deleteAll();
     }
 
-    public List<Animal> getAllAnimals() {
-        List<Animal> animals = animalRepository.findAll();
+    public List<AnimalDTO> getAllAnimals() {
+        List<AnimalDTO> animals = animalRepository.findAll().stream().map(animalToAnimalDTOMapper).collect(Collectors.toList());
         animals.forEach(animal -> animal.setSecretInformation(new String(Base64.getDecoder().decode(animal.getSecretInformation()))));
 
         return animals;

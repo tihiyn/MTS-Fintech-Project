@@ -1,18 +1,17 @@
 package ru.mts.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import ru.mts.dto.AnimalDTO;
 import ru.mts.model.Animal;
 import ru.mts.service.AnimalService;
 
 import java.util.List;
 
 @Controller
-@RequestMapping("")
+@RequestMapping()
 @RequiredArgsConstructor
 public class AnimalController {
     private final AnimalService animalService;
@@ -30,13 +29,13 @@ public class AnimalController {
     }
 
     @GetMapping("/new")
-    public String newPerson(@ModelAttribute("animal") Animal animal) {
+    public String newPerson(@ModelAttribute("animalDTO") Animal animalDTO) {
         return "animals/new";
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("animal") Animal animal) {
-        animalService.saveAnimals(List.of(animal));
+    public String create(@ModelAttribute("animalDTO") AnimalDTO animalDTO) {
+        animalService.saveAnimals(List.of(animalDTO));
         return "redirect:/index";
     }
 }

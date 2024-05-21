@@ -14,7 +14,9 @@
         <th>Стоимость</th>
         <th>Характер</th>
         <th>Дата рождения</th>
+        <th>Тип</th>
         <th>Возраст</th>
+        <th>Порода</th>
         <th>Секретная информация</th>
         </thead>
         <tbody>
@@ -24,7 +26,9 @@
             <th th:text="${animal.cost}"></th>
             <th th:text="${animal.character}"></th>
             <th th:text="${#temporals.format(animal.birthDate, 'yyyy-MM-dd')}"></th>
+            <th th:text="${animal.animalType}"></th>
             <th th:text="${animal.age}"></th>
+            <th th:text="${animal.breed}"></th>
             <th th:text="${animal.secretInformation}"></th>
             <th>
                 <form th:method="DELETE" th:action="@{/{id}(id=${animal.getId()})}">

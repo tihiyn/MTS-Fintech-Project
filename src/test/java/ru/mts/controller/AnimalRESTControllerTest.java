@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.mts.mapper.dto.AnimalToAnimalDTOMapper;
 import ru.mts.model.Animal;
 import ru.mts.service.AnimalService;
 import ru.mts.service.AnimalTypeService;
@@ -19,6 +20,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -38,6 +41,8 @@ class AnimalRESTControllerTest {
     private BreedService breedService;
     @Autowired
     private AnimalTypeService animalTypeService;
+    @Autowired
+    private AnimalToAnimalDTOMapper animalToAnimalDTOMapper;
 
     private Animal animal;
 
@@ -65,24 +70,12 @@ class AnimalRESTControllerTest {
                                 "    \"cost\": 15000.75,\n" +
                                 "    \"character\": \"Игривый\",\n" +
                                 "    \"birthDate\": \"2019-03-15\",\n" +
-                                "    \"animalType\": {\n" +
-                                "        \"id\": 1,\n" +
-                                "        \"type\": \"cat\",\n" +
-                                "        \"isWild\": false\n" +
-                                "    },\n" +
+                                "    \"animalType\": \"cat\",\n" +
                                 "    \"age\": 5,\n" +
-                                "    \"breed\": {\n" +
-                                "        \"id\": 1,\n" +
-                                "        \"breed\": \"Британская\",\n" +
-                                "        \"animalType\": {\n" +
-                                "            \"id\": 1,\n" +
-                                "            \"type\": \"cat\",\n" +
-                                "            \"isWild\": false\n" +
-                                "        }\n" +
-                                "    },\n" +
+                                "    \"breed\": \"Сфинкс\",\n" +
                                 "    \"secretInformation\": \"password\"\n" +
                                 "}"))
-                .andExpect(status().isOk());
+                .andExpect(status().is(204));
 
         long afterCall = animalService.countAnimals();
         assertThat(afterCall, IsEqual.equalTo(beforeCall + 1));
@@ -92,7 +85,7 @@ class AnimalRESTControllerTest {
     @Test
     void getAnimals() throws Exception {
         List<Animal> animals = Collections.singletonList(animal);
-        animalService.saveAnimals(animals);
+        animalService.saveAnimals(animals.stream().map(animalToAnimalDTOMapper).collect(Collectors.toList()));
 
         mockMvc.perform(get("/rest-api"))
                 .andExpect(status().isOk())
@@ -103,10 +96,9 @@ class AnimalRESTControllerTest {
                 .andExpect(jsonPath("$[0].birthDate[0]").value(2019))
                 .andExpect(jsonPath("$[0].birthDate[1]").value(3))
                 .andExpect(jsonPath("$[0].birthDate[2]").value(15))
-                .andExpect(jsonPath("$[0].animalType.type").value("cat"))
-                .andExpect(jsonPath("$[0].animalType.wild").value(false))
+                .andExpect(jsonPath("$[0].animalType").value("cat"))
                 .andExpect(jsonPath("$[0].age").value(5))
-                .andExpect(jsonPath("$[0].breed.breed").value("Британская"))
+                .andExpect(jsonPath("$[0].breed").value("Британская"))
                 .andExpect(jsonPath("$[0].secretInformation").value("password"));
 
         animalService.deleteAnimals();
@@ -114,12 +106,12 @@ class AnimalRESTControllerTest {
 
     @Test
     void deleteAnimal() throws Exception {
-        animalService.saveAnimals(List.of(animal));
+        animalService.saveAnimals(Stream.of(animal).map(animalToAnimalDTOMapper).collect(Collectors.toList()));
         long id = animalService.getAllAnimals().get(0).getId();
 
         long beforeCall = animalService.countAnimals();
         mockMvc.perform(delete("/rest-api/" + id))
-                .andExpect(status().isOk());
+                .andExpect(status().is(204));
 
         long afterCall = animalService.countAnimals();
         assertThat(afterCall, IsEqual.equalTo(beforeCall - 1));

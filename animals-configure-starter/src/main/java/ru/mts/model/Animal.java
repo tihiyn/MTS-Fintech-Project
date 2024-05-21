@@ -26,7 +26,6 @@ public class Animal {
     private long id;
 
     @Column(name = "name")
-//    @NotEmpty
     private String name;
 
     @Column(name = "cost")
@@ -39,7 +38,6 @@ public class Animal {
     private LocalDate birthDate;
 
     @Column(name = "age")
-//    @Min(value = 0, message = "Age should be greater than 0")
     private short age;
 
     @ManyToOne
