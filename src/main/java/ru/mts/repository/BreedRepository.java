@@ -6,4 +6,5 @@ import ru.mts.model.Breed;
 
 @Repository
 public interface BreedRepository extends JpaRepository<Breed, Integer> {
+    Breed getBreedByBreed(String breed);
 }

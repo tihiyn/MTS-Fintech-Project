@@ -6,4 +6,5 @@ import ru.mts.model.AnimalType;
 
 @Repository
 public interface AnimalTypeRepository extends JpaRepository<AnimalType, Integer> {
+    AnimalType getAnimalTypeByType(String type);
 }
