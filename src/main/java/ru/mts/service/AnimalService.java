@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+import ru.mts.annotation.Logging;
 import ru.mts.dto.AnimalDTO;
 import ru.mts.exceptions.IllegalCollectionSizeException;
 import ru.mts.exceptions.NegativeArgumentException;
@@ -53,6 +54,7 @@ public class AnimalService {
         animalStorage = animals.stream().collect(Collectors.groupingByConcurrent(animal -> animal.getAnimalType().getType()));
     }
 
+    @Logging(value = "Поиск животных, родившихся в високосный год", entering = true, exiting = true)
     public Map<String, LocalDate> findLeapYearNames() {
         Path path = Paths.get("src/main/resources/results/findLeapYearNames.json");
         File file = new File(path.toString());
@@ -74,6 +76,7 @@ public class AnimalService {
         return outputMap;
     }
 
+    @Logging(value = "Поиск животных, возраст которых больше N лет", entering = true, exiting = true)
     public Map<Animal, Short> findOlderAnimal(int N) {
         Path path = Paths.get("src/main/resources/results/findOlderAnimal.json");
         File file = new File(path.toString());
@@ -115,6 +118,7 @@ public class AnimalService {
         }
     }
 
+    @Logging(value = "Поиск дубликатов", entering = true, exiting = true)
     public Map<String, List<Animal>> findDuplicate() {
         Path path = Paths.get("src/main/resources/results/findDuplicate.json");
         File file = new File(path.toString());
@@ -134,6 +138,7 @@ public class AnimalService {
         return duplicateMap;
     }
 
+    @Logging(value = "Поиск среднего возраста всех животных", entering = true, exiting = true)
     public double findAverageAge() {
         Path path = Paths.get("src/main/resources/results/findAverageAge.json");
         File file = new File(path.toString());
@@ -155,6 +160,7 @@ public class AnimalService {
         return result.doubleValue();
     }
 
+    @Logging(value = "Поиск старых и дорогих животных", entering = true, exiting = true)
     public List<Animal> findOldAndExpensive() {
         Path path = Paths.get("src/main/resources/results/findOldAndExpensive.json");
         File file = new File(path.toString());
@@ -190,6 +196,7 @@ public class AnimalService {
         return oldAndExpensiveList;
     }
 
+    @Logging(value = "Поиск животных с минимальной стоимостью", entering = true, exiting = true)
     public List<String> findMinCostAnimals() throws IllegalCollectionSizeException {
         Path path = Paths.get("src/main/resources/results/findMinCostAnimals.json");
         File file = new File(path.toString());
@@ -220,6 +227,7 @@ public class AnimalService {
         }
     }
 
+    @Logging(value = "Сохранение животных", entering = true, exiting = true)
     public void saveAnimals(List<AnimalDTO> animalsDTO) {
         List<Animal> animals = animalsDTO.stream()
                 .map(animalDTOToAnimalMapper)
@@ -228,10 +236,12 @@ public class AnimalService {
         animalRepository.saveAll(animals);
     }
 
+    @Logging(value = "Удаление всех животных", entering = true, exiting = true, level = "warn")
     public void deleteAnimals() {
         animalRepository.deleteAll();
     }
 
+    @Logging(value = "Получение всех животных", entering = true, exiting = true)
     public List<AnimalDTO> getAllAnimals() {
         List<AnimalDTO> animals = animalRepository.findAll().stream().map(animalToAnimalDTOMapper).collect(Collectors.toList());
         animals.forEach(animal -> animal.setSecretInformation(new String(Base64.getDecoder().decode(animal.getSecretInformation()))));
@@ -239,10 +249,13 @@ public class AnimalService {
         return animals;
     }
 
+    @Logging(value = "Удаление животного по ID", entering = true, exiting = true, level = "warn")
     public void deleteAnimalById(int id) {
+        getAllAnimals().forEach(System.out::println);
         animalRepository.deleteById(id);
     }
 
+    @Logging(value = "Подсчёт количества животных", entering = true, exiting = true)
     public long countAnimals() {
         return animalRepository.count();
     }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.mts.annotation.Logging;
 import ru.mts.dto.AnimalDTO;
 import ru.mts.service.AnimalService;
 
@@ -16,6 +17,7 @@ public class AnimalRESTController {
     private final AnimalService animalService;
 
     @PostMapping("/add")
+    @Logging(value = "CreateAnimal endpoint from AnimalRESTController", entering = true, exiting = true, level = "info")
     public ResponseEntity<Void> createAnimal(@RequestBody AnimalDTO animalDTO) {
         animalService.saveAnimals(List.of(animalDTO));
 
@@ -23,11 +25,13 @@ public class AnimalRESTController {
     }
 
     @GetMapping()
+    @Logging(value = "GetAnimal endpoint from AnimalRESTController", entering = true, exiting = true)
     public List<AnimalDTO> getAnimals() {
         return animalService.getAllAnimals();
     }
 
     @DeleteMapping("/{id}")
+    @Logging(value = "DeleteAnimal endpoint from AnimalRESTController", entering = true, exiting = true, level = "warn")
     public ResponseEntity<Void> deleteAnimal(@PathVariable("id") int id) {
         animalService.deleteAnimalById(id);
 

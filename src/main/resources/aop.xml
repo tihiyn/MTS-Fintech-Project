@@ -1,0 +1,5 @@
+<aspectj>
+    <aspects>
+        <aspect name="ru.mts.aop.LogAspect"/>
+    </aspects>
+</aspectj>
