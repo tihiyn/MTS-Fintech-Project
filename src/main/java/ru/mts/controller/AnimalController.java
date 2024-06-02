@@ -2,6 +2,7 @@ package ru.mts.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ public class AnimalController {
 
     @DeleteMapping("/{id}")
     @Logging(value = "Delete endpoint from AnimalController", entering = true, exiting = true, level = "warn")
+    @PreAuthorize("hasAuthority('USER')")
     public String delete(@PathVariable("id") int id) {
         animalService.deleteAnimalById(id);
         return "redirect:/index";
@@ -34,12 +36,14 @@ public class AnimalController {
 
     @GetMapping("/new")
     @Logging(value = "Create endpoint from AnimalController", entering = true, level = "info")
+    @PreAuthorize("hasAuthority('USER')")
     public String newPerson(@ModelAttribute("animalDTO") Animal animalDTO) {
         return "animals/new";
     }
 
     @PostMapping()
     @Logging(value = "Create endpoint from AnimalController", exiting = true, level = "info")
+    @PreAuthorize("hasAuthority('USER')")
     public String create(@ModelAttribute("animalDTO") AnimalDTO animalDTO) {
         animalService.saveAnimals(List.of(animalDTO));
         return "redirect:/index";
