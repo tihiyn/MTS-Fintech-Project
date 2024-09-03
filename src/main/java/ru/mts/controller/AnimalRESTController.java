@@ -3,6 +3,7 @@ package ru.mts.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.mts.annotation.Logging;
 import ru.mts.dto.AnimalDTO;
@@ -18,6 +19,7 @@ public class AnimalRESTController {
 
     @PostMapping("/add")
     @Logging(value = "CreateAnimal endpoint from AnimalRESTController", entering = true, exiting = true, level = "info")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<Void> createAnimal(@RequestBody AnimalDTO animalDTO) {
         animalService.saveAnimals(List.of(animalDTO));
 
@@ -32,6 +34,7 @@ public class AnimalRESTController {
 
     @DeleteMapping("/{id}")
     @Logging(value = "DeleteAnimal endpoint from AnimalRESTController", entering = true, exiting = true, level = "warn")
+    @PreAuthorize("hasAuthority('USER')")
     public ResponseEntity<Void> deleteAnimal(@PathVariable("id") int id) {
         animalService.deleteAnimalById(id);
 
